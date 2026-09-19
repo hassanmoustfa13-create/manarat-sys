@@ -17,6 +17,7 @@ import {
   NATIONALITIES,
   TRANSFER_STATUSES,
   type Worker,
+  type WorkerUpdate,
   daysUntil,
   errorMessage,
   formatDate,
@@ -63,7 +64,7 @@ function WorkersPage() {
   );
 
   const update = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: WorkerUpdate }) => {
       const { error } = await supabase.from("workers").update(patch).eq("id", id);
       if (error) throw error;
     },
@@ -228,12 +229,12 @@ function WorkersPage() {
           search={search}
           minWidth={1400}
           onCellSave={async (row, col, value) => {
-            const patch: Record<string, unknown> =
+            const patch: WorkerUpdate =
               col === "monthly_salary"
                 ? { monthly_salary: Number(value || 0) }
                 : col === "arrival_date"
                   ? { arrival_date: value || null }
-                  : { [col]: value };
+                  : ({ [col]: value } as WorkerUpdate);
             await update.mutateAsync({ id: row.id, patch });
           }}
           rowActions={(w) => (

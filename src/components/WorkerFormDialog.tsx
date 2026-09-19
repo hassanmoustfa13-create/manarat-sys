@@ -67,12 +67,12 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
         name: form.name.trim(),
         passport_number: form.passport_number.trim(),
         nationality: form.nationality,
-        monthly_salary: form.monthly_salary ? Number(form.monthly_salary) : null,
+        monthly_salary: form.monthly_salary ? Number(form.monthly_salary) : 0,
         arrival_date: form.arrival_date || null,
-        current_sponsor_name: form.current_sponsor_name.trim() || null,
-        current_sponsor_phone: form.current_sponsor_phone.trim() || null,
+        current_sponsor_name: form.current_sponsor_name.trim(),
+        current_sponsor_phone: form.current_sponsor_phone.trim(),
         transfer_status: form.transfer_status,
-        notes: form.notes.trim() || null,
+        notes: form.notes.trim(),
       };
       if (worker) {
         // Regular users must not send core fields (trigger would reject changes)

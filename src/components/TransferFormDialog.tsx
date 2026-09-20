@@ -206,8 +206,22 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
 
           <TextField label="اسم الكفيل الجديد" value={form.new_sponsor_name} onChange={set("new_sponsor_name")} required />
           <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
-          <TextField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} placeholder="مثال: عاملة منزلية" />
+          <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
+          <SelectField label="نوع النقل" value={form.transfer_type} onChange={set("transfer_type")} options={TRANSFER_TYPES} />
           <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
+          <SelectField
+            label="حالة النقل"
+            value={form.transfer_stage}
+            onChange={set("transfer_stage")}
+            options={TRANSFER_STAGES}
+          />
+          <SelectField
+            label="موقع العاملة"
+            value={form.worker_location}
+            onChange={set("worker_location")}
+            options={LOCATIONS}
+          />
+
           <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={set("old_sponsor_dues")} />
           <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
           <Field label="المتبقي (تلقائي)">

@@ -164,7 +164,19 @@ function TransfersPage() {
         meta: { editable: true, ltr: true, className: "tabular-nums" },
         cell: ({ getValue }) => (getValue() as string) || "—",
       },
-      { id: "visa_type", accessorKey: "visa_type", header: "نوع التأشيرة", meta: { editable: true } },
+      {
+        id: "visa_type",
+        accessorKey: "visa_type",
+        header: "نوع التأشيرة",
+        meta: { editable: true, type: "select", options: VISA_TYPES },
+      },
+      {
+        id: "transfer_type",
+        accessorKey: "transfer_type",
+        header: "نوع النقل",
+        meta: { editable: true, type: "select", options: TRANSFER_TYPES },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
       {
         id: "transfer_date",
         accessorKey: "transfer_date",
@@ -172,6 +184,30 @@ function TransfersPage() {
         meta: { editable: true, type: "date", ltr: true, className: "tabular-nums" },
         cell: ({ getValue }) => formatDate(getValue() as string | null),
       },
+      {
+        id: "transfer_stage",
+        accessorKey: "transfer_stage",
+        header: "حالة النقل",
+        meta: { editable: true, type: "select", options: TRANSFER_STAGES, width: 190 },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
+      {
+        id: "worker_condition",
+        accessorKey: "worker_condition",
+        header: "ملاحظات حالة العاملة",
+        meta: { editable: true, type: "textarea", width: 200 },
+        cell: ({ getValue }) => (
+          <span className="line-clamp-1 max-w-[220px] text-ink/70">{(getValue() as string) || "—"}</span>
+        ),
+      },
+      {
+        id: "worker_location",
+        accessorKey: "worker_location",
+        header: "موقع العاملة",
+        meta: { editable: true, type: "select", options: LOCATIONS },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
+
       {
         id: "old_sponsor_dues",
         accessorKey: "old_sponsor_dues",

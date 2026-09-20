@@ -90,13 +90,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
         name: form.name.trim(),
         passport_number: form.passport_number.trim(),
         nationality: form.nationality,
+        profession: form.profession,
+        visa_type: form.visa_type,
         monthly_salary: form.monthly_salary ? Number(form.monthly_salary) : 0,
         arrival_date: form.arrival_date || null,
+        arrival_time: form.arrival_time.trim(),
+        flight_group: form.flight_group.trim(),
+        arrival_status: form.arrival_status,
+        current_location: form.current_location,
         current_sponsor_name: form.current_sponsor_name.trim(),
         current_sponsor_phone: form.current_sponsor_phone.trim(),
         transfer_status: form.transfer_status,
         notes: form.notes.trim(),
       };
+
       if (worker) {
         // Regular users must not send core fields (trigger would reject changes)
         const { name, passport_number, nationality, arrival_date, ...allowed } = payload;

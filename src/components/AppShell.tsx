@@ -22,6 +22,17 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <nav className="ms-2 flex items-center gap-1">
             <Link
+              to="/requests"
+              className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
+              activeProps={{
+                className:
+                  "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
+              }}
+            >
+              طلبات الاستقدام
+            </Link>
+            <Link
+
               to="/workers"
               className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
               activeProps={{

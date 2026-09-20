@@ -13,7 +13,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, SelectField, TextField } from "@/components/FormFields";
-import { NATIONALITIES, TRANSFER_STATUSES, type Worker, errorMessage } from "@/lib/data";
+import {
+  ARRIVAL_STATUSES,
+  LOCATIONS,
+  NATIONALITIES,
+  PROFESSIONS,
+  TRANSFER_STATUSES,
+  VISA_TYPES,
+  type Worker,
+  errorMessage,
+} from "@/lib/data";
 
 interface Props {
   open: boolean;
@@ -26,13 +35,20 @@ const empty = {
   name: "",
   passport_number: "",
   nationality: NATIONALITIES[0]!,
+  profession: PROFESSIONS[0] as string,
+  visa_type: VISA_TYPES[0] as string,
   monthly_salary: "",
   arrival_date: "",
+  arrival_time: "",
+  flight_group: "",
+  arrival_status: ARRIVAL_STATUSES[0] as string,
+  current_location: LOCATIONS[0] as string,
   current_sponsor_name: "",
   current_sponsor_phone: "",
   transfer_status: TRANSFER_STATUSES[0] as string,
   notes: "",
 };
+
 
 export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props) {
   const qc = useQueryClient();

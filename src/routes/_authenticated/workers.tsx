@@ -14,8 +14,13 @@ import { TransferFormDialog } from "@/components/TransferFormDialog";
 import { SponsorLink, SponsorProfileDialog, WorkerProfileDialog } from "@/components/ProfileDialogs";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import {
+  ARRIVAL_STATUSES,
+  LOCATIONS,
   NATIONALITIES,
+  PROFESSIONS,
   TRANSFER_STATUSES,
+  VISA_TYPES,
+
   type Worker,
   type WorkerUpdate,
   daysUntil,

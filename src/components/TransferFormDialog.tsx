@@ -156,7 +156,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-w-3xl" dir="rtl">
+      <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
         <DialogHeader className="text-right sm:text-right">
           <DialogTitle>{editing ? "تعديل عملية نقل الكفالة" : "نقل كفالة جديد"}</DialogTitle>
           <DialogDescription>

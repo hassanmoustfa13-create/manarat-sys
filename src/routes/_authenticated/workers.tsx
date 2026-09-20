@@ -278,7 +278,7 @@ function WorkersPage() {
           data={filtered}
           columns={columns}
           search={search}
-          minWidth={1400}
+          minWidth={2200}
           onCellSave={async (row, col, value) => {
             const patch: WorkerUpdate =
               col === "monthly_salary"

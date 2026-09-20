@@ -126,7 +126,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-w-2xl" dir="rtl">
+      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl">
         <DialogHeader className="text-right sm:text-right">
           <DialogTitle>{editing ? "تعديل بيانات العامل/ـة" : "إضافة عامل/ـة جديد"}</DialogTitle>
           <DialogDescription>

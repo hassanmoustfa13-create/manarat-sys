@@ -14,7 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, SelectField, TextField } from "@/components/FormFields";
 import {
+  LOCATIONS,
   PAYMENT_STATUSES,
+  TRANSFER_STAGES,
+  TRANSFER_TYPES,
+  VISA_TYPES,
   YES_NO_EXISTS,
   YES_NO_EXISTS_F,
   type Transfer,
@@ -37,7 +41,9 @@ const empty = {
   worker_id: "",
   new_sponsor_name: "",
   new_sponsor_phone: "",
-  visa_type: "",
+  visa_type: VISA_TYPES[0] as string,
+  transfer_type: TRANSFER_TYPES[0] as string,
+  transfer_stage: TRANSFER_STAGES[0] as string,
   transfer_date: new Date().toISOString().slice(0, 10),
   old_sponsor_dues: "",
   down_payment: "",
@@ -45,8 +51,12 @@ const empty = {
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
   salary_dues_status: YES_NO_EXISTS_F[1] as string,
+  salary_dues_amount: "",
+  worker_condition: "",
+  worker_location: LOCATIONS[0] as string,
   notes: "",
 };
+
 
 export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdmin }: Props) {
   const qc = useQueryClient();

@@ -11,6 +11,8 @@ import {
   formatMoney,
   profileNameMap,
   profilesQuery,
+  requestsQuery,
+
   transfersQuery,
   workersQuery,
 } from "@/lib/data";
@@ -82,10 +84,18 @@ export function WorkerProfileDialog({
                 <h4 className="mb-2 text-[11px] font-semibold text-ink/50">البيانات الأساسية</h4>
                 <Row label="رقم الجواز" value={worker.passport_number} ltr />
                 <Row label="الجنسية" value={worker.nationality} />
+                <Row label="المهنة" value={worker.profession || "—"} />
+                <Row label="نوع التأشيرة" value={worker.visa_type || "—"} />
                 <Row label="الراتب الشهري" value={formatMoney(worker.monthly_salary)} ltr />
+                <h4 className="mb-2 mt-4 text-[11px] font-semibold text-ink/50">بيانات الوصول</h4>
                 <Row label="تاريخ الوصول" value={formatDate(worker.arrival_date)} ltr />
+                <Row label="وقت الوصول" value={worker.arrival_time || "—"} ltr />
+                <Row label="مجموعة الرحلة" value={worker.flight_group || "—"} />
+                <Row label="حالة الوصول" value={<StatusBadge value={worker.arrival_status} />} />
+                <Row label="الموقع الحالي" value={<StatusBadge value={worker.current_location} />} />
                 <Row label="الوقت المتبقي للوصول" value={formatDaysRemaining(days)} />
               </section>
+
               <section className="glass rounded-xl p-4">
                 <h4 className="mb-2 text-[11px] font-semibold text-ink/50">الكفيل الحالي</h4>
                 <Row
@@ -146,12 +156,25 @@ export function WorkerProfileDialog({
                         <Row label="العربون" value={formatMoney(t.down_payment)} ltr />
                         <Row label="المتبقي" value={formatMoney(t.remaining_amount)} ltr />
                       </div>
-                      <div className="mt-1 flex flex-wrap gap-1.5 text-[11px]">
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
+                        <span className="text-ink/45">نوع النقل:</span> <StatusBadge value={t.transfer_type} />
+                        <span className="text-ink/45">المرحلة:</span> <StatusBadge value={t.transfer_stage} />
+                        <span className="text-ink/45">موقع العاملة:</span>{" "}
+                        <StatusBadge value={t.worker_location} />
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
                         <span className="text-ink/45">فحص طبي:</span> <StatusBadge value={t.medical_exam} />
                         <span className="text-ink/45">إقامة:</span> <StatusBadge value={t.residency_status} />
                         <span className="text-ink/45">مستحقات رواتب:</span>{" "}
                         <StatusBadge value={t.salary_dues_status} />
+                        <span className="tabular-nums text-ink/60" dir="ltr">
+                          {formatMoney(t.salary_dues_amount)}
+                        </span>
                       </div>
+                      {t.worker_condition && (
+                        <p className="mt-2 text-[12px] text-ink/60">{t.worker_condition}</p>
+                      )}
+
                       <p className="mt-2 text-[11px] text-ink/45">
                         أضافها {nameOf(t.created_by)} · آخر تعديل {nameOf(t.updated_by)}
                       </p>
@@ -179,6 +202,7 @@ export function SponsorProfileDialog({
 }) {
   const { data: workers = [] } = useQuery(workersQuery);
   const { data: transfers = [] } = useQuery(transfersQuery);
+  const { data: requests = [] } = useQuery(requestsQuery);
 
   const info = useMemo(() => {
     if (!sponsor) return null;
@@ -186,8 +210,10 @@ export function SponsorProfileDialog({
     const related = transfers.filter(
       (t) => t.old_sponsor_name === sponsor || t.new_sponsor_name === sponsor,
     );
+    const customerRequests = requests.filter((r) => r.customer_name === sponsor);
     const phone =
       current.find((w) => w.current_sponsor_phone)?.current_sponsor_phone ||
+      customerRequests.find((r) => r.phone)?.phone ||
       related.find((t) => t.new_sponsor_name === sponsor && t.new_sponsor_phone)?.new_sponsor_phone ||
       related.find((t) => t.old_sponsor_name === sponsor && t.old_sponsor_phone)?.old_sponsor_phone ||
       "—";
@@ -200,8 +226,9 @@ export function SponsorProfileDialog({
     const currentIds = new Set(current.map((w) => w.id));
     const past = workers.filter((w) => pastIds.has(w.id) && !currentIds.has(w.id));
     const incoming = workers.filter((w) => incomingIds.has(w.id) && !currentIds.has(w.id));
-    return { current, past, incoming, phone, transfers: related.length };
-  }, [sponsor, workers, transfers]);
+    return { current, past, incoming, phone, transfers: related.length, requests: customerRequests };
+  }, [sponsor, workers, transfers, requests]);
+
 
   const List = ({ title, items, tone }: { title: string; items: Worker[]; tone: string }) => (
     <section>
@@ -242,14 +269,18 @@ export function SponsorProfileDialog({
           <>
             <DialogHeader className="text-right sm:text-right">
               <DialogTitle>{sponsor}</DialogTitle>
-              <DialogDescription>ملف الكفيل وجميع العمالة المرتبطة به</DialogDescription>
+              <DialogDescription>ملف العميل/الكفيل: طلباته وجميع العمالة المرتبطة به</DialogDescription>
             </DialogHeader>
-            <div className="glass grid grid-cols-3 gap-3 rounded-xl p-3 text-center text-[12px]">
+            <div className="glass grid grid-cols-4 gap-3 rounded-xl p-3 text-center text-[12px]">
               <div>
                 <p className="text-ink/45">الهاتف</p>
                 <p className="font-semibold tabular-nums" dir="ltr">
                   {info.phone}
                 </p>
+              </div>
+              <div>
+                <p className="text-ink/45">طلبات استقدام</p>
+                <p className="text-lg font-semibold text-ink/70">{info.requests.length}</p>
               </div>
               <div>
                 <p className="text-ink/45">عمالة حالية</p>
@@ -261,10 +292,35 @@ export function SponsorProfileDialog({
               </div>
             </div>
             <div className="space-y-4">
+              <section>
+                <h4 className="mb-1.5 text-[11px] font-semibold text-ink/50">
+                  طلبات الاستقدام ({info.requests.length})
+                </h4>
+                {info.requests.length === 0 ? (
+                  <p className="text-[12px] text-ink/40">لا يوجد</p>
+                ) : (
+                  <ul className="divide-y divide-black/5 overflow-hidden rounded-xl ring-1 ring-black/6">
+                    {info.requests.map((r) => (
+                      <li key={r.id} className="flex items-center gap-3 bg-white/50 px-3 py-2 text-[13px]">
+                        <span className="text-ink/45 tabular-nums" dir="ltr">
+                          {formatDate(r.request_date)}
+                        </span>
+                        <span className="font-medium">{r.profession}</span>
+                        <span className="text-ink/45">{r.nationality}</span>
+                        <span className="text-ink/45">{r.request_type}</span>
+                        <span className="ms-auto">
+                          <StatusBadge value={r.action_status} />
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
               <List title="العمالة الحالية" items={info.current} tone="pill pill-brand" />
               <List title="قيد النقل إليه" items={info.incoming} tone="pill pill-teal" />
               <List title="عمالة سابقة" items={info.past} tone="pill pill-neutral" />
             </div>
+
           </>
         )}
       </DialogContent>

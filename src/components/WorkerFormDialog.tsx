@@ -13,7 +13,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, SelectField, TextField } from "@/components/FormFields";
-import { NATIONALITIES, TRANSFER_STATUSES, type Worker, errorMessage } from "@/lib/data";
+import {
+  ARRIVAL_STATUSES,
+  LOCATIONS,
+  NATIONALITIES,
+  PROFESSIONS,
+  TRANSFER_STATUSES,
+  VISA_TYPES,
+  type Worker,
+  errorMessage,
+} from "@/lib/data";
 
 interface Props {
   open: boolean;
@@ -26,13 +35,20 @@ const empty = {
   name: "",
   passport_number: "",
   nationality: NATIONALITIES[0]!,
+  profession: PROFESSIONS[0] as string,
+  visa_type: VISA_TYPES[0] as string,
   monthly_salary: "",
   arrival_date: "",
+  arrival_time: "",
+  flight_group: "",
+  arrival_status: ARRIVAL_STATUSES[0] as string,
+  current_location: LOCATIONS[0] as string,
   current_sponsor_name: "",
   current_sponsor_phone: "",
   transfer_status: TRANSFER_STATUSES[0] as string,
   notes: "",
 };
+
 
 export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props) {
   const qc = useQueryClient();
@@ -48,13 +64,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             name: worker.name,
             passport_number: worker.passport_number,
             nationality: worker.nationality,
+            profession: worker.profession ?? "",
+            visa_type: worker.visa_type ?? "",
             monthly_salary: worker.monthly_salary?.toString() ?? "",
             arrival_date: worker.arrival_date ?? "",
+            arrival_time: worker.arrival_time ?? "",
+            flight_group: worker.flight_group ?? "",
+            arrival_status: worker.arrival_status ?? ARRIVAL_STATUSES[0],
+            current_location: worker.current_location ?? LOCATIONS[0],
             current_sponsor_name: worker.current_sponsor_name ?? "",
             current_sponsor_phone: worker.current_sponsor_phone ?? "",
             transfer_status: worker.transfer_status,
             notes: worker.notes ?? "",
           }
+
         : empty,
     );
   }, [open, worker]);
@@ -67,13 +90,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
         name: form.name.trim(),
         passport_number: form.passport_number.trim(),
         nationality: form.nationality,
+        profession: form.profession,
+        visa_type: form.visa_type,
         monthly_salary: form.monthly_salary ? Number(form.monthly_salary) : 0,
         arrival_date: form.arrival_date || null,
+        arrival_time: form.arrival_time.trim(),
+        flight_group: form.flight_group.trim(),
+        arrival_status: form.arrival_status,
+        current_location: form.current_location,
         current_sponsor_name: form.current_sponsor_name.trim(),
         current_sponsor_phone: form.current_sponsor_phone.trim(),
         transfer_status: form.transfer_status,
         notes: form.notes.trim(),
       };
+
       if (worker) {
         // Regular users must not send core fields (trigger would reject changes)
         const { name, passport_number, nationality, arrival_date, ...allowed } = payload;
@@ -96,7 +126,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-w-2xl" dir="rtl">
+      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl">
         <DialogHeader className="text-right sm:text-right">
           <DialogTitle>{editing ? "تعديل بيانات العامل/ـة" : "إضافة عامل/ـة جديد"}</DialogTitle>
           <DialogDescription>
@@ -146,6 +176,28 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             onChange={set("arrival_date")}
             disabled={coreLocked}
           />
+          <SelectField label="المهنة" value={form.profession} onChange={set("profession")} options={PROFESSIONS} />
+          <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
+          <TextField label="وقت الوصول" type="time" ltr value={form.arrival_time} onChange={set("arrival_time")} />
+          <TextField
+            label="مجموعة الرحلة"
+            value={form.flight_group}
+            onChange={set("flight_group")}
+            hint="نفس الاسم للوصول الجماعي بنفس التاريخ والوقت"
+          />
+          <SelectField
+            label="حالة الوصول"
+            value={form.arrival_status}
+            onChange={set("arrival_status")}
+            options={ARRIVAL_STATUSES}
+          />
+          <SelectField
+            label="الموقع الحالي"
+            value={form.current_location}
+            onChange={set("current_location")}
+            options={LOCATIONS}
+          />
+
           <SelectField
             label="حالة نقل الكفالة"
             value={form.transfer_status}

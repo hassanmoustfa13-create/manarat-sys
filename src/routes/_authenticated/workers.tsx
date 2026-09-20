@@ -14,8 +14,13 @@ import { TransferFormDialog } from "@/components/TransferFormDialog";
 import { SponsorLink, SponsorProfileDialog, WorkerProfileDialog } from "@/components/ProfileDialogs";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import {
+  ARRIVAL_STATUSES,
+  LOCATIONS,
   NATIONALITIES,
+  PROFESSIONS,
   TRANSFER_STATUSES,
+  VISA_TYPES,
+
   type Worker,
   type WorkerUpdate,
   daysUntil,
@@ -124,6 +129,18 @@ function WorkersPage() {
         meta: { editable: admin, type: "select", options: NATIONALITIES },
       },
       {
+        id: "profession",
+        accessorKey: "profession",
+        header: "المهنة",
+        meta: { editable: true, type: "select", options: PROFESSIONS },
+      },
+      {
+        id: "visa_type",
+        accessorKey: "visa_type",
+        header: "نوع التأشيرة",
+        meta: { editable: true, type: "select", options: VISA_TYPES },
+      },
+      {
         id: "monthly_salary",
         accessorKey: "monthly_salary",
         header: "الراتب الشهري",
@@ -137,6 +154,40 @@ function WorkersPage() {
         meta: { editable: admin, type: "date", ltr: true, className: "tabular-nums" },
         cell: ({ getValue }) => formatDate(getValue() as string | null),
       },
+      {
+        id: "arrival_time",
+        accessorKey: "arrival_time",
+        header: "وقت الوصول",
+        meta: { editable: true, ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => (getValue() as string) || <span className="text-ink/30">—</span>,
+      },
+      {
+        id: "flight_group",
+        accessorKey: "flight_group",
+        header: "مجموعة الرحلة",
+        meta: { editable: true },
+        cell: ({ getValue }) =>
+          (getValue() as string) ? (
+            <span className="pill pill-neutral">{getValue() as string}</span>
+          ) : (
+            <span className="text-ink/30">—</span>
+          ),
+      },
+      {
+        id: "arrival_status",
+        accessorKey: "arrival_status",
+        header: "حالة الوصول",
+        meta: { editable: true, type: "select", options: ARRIVAL_STATUSES },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
+      {
+        id: "current_location",
+        accessorKey: "current_location",
+        header: "الموقع الحالي",
+        meta: { editable: true, type: "select", options: LOCATIONS },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
+
       {
         id: "days_remaining",
         accessorFn: (r) => daysUntil(r.arrival_date),
@@ -227,7 +278,7 @@ function WorkersPage() {
           data={filtered}
           columns={columns}
           search={search}
-          minWidth={1400}
+          minWidth={2200}
           onCellSave={async (row, col, value) => {
             const patch: WorkerUpdate =
               col === "monthly_salary"

@@ -14,9 +14,14 @@ import { SponsorLink, SponsorProfileDialog, WorkerProfileDialog } from "@/compon
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import {
+  LOCATIONS,
   PAYMENT_STATUSES,
+  TRANSFER_STAGES,
+  TRANSFER_TYPES,
+  VISA_TYPES,
   YES_NO_EXISTS,
   YES_NO_EXISTS_F,
+
   type Transfer,
   type TransferUpdate,
   type Worker,
@@ -164,7 +169,19 @@ function TransfersPage() {
         meta: { editable: true, ltr: true, className: "tabular-nums" },
         cell: ({ getValue }) => (getValue() as string) || "—",
       },
-      { id: "visa_type", accessorKey: "visa_type", header: "نوع التأشيرة", meta: { editable: true } },
+      {
+        id: "visa_type",
+        accessorKey: "visa_type",
+        header: "نوع التأشيرة",
+        meta: { editable: true, type: "select", options: VISA_TYPES },
+      },
+      {
+        id: "transfer_type",
+        accessorKey: "transfer_type",
+        header: "نوع النقل",
+        meta: { editable: true, type: "select", options: TRANSFER_TYPES },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
       {
         id: "transfer_date",
         accessorKey: "transfer_date",
@@ -172,6 +189,30 @@ function TransfersPage() {
         meta: { editable: true, type: "date", ltr: true, className: "tabular-nums" },
         cell: ({ getValue }) => formatDate(getValue() as string | null),
       },
+      {
+        id: "transfer_stage",
+        accessorKey: "transfer_stage",
+        header: "حالة النقل",
+        meta: { editable: true, type: "select", options: TRANSFER_STAGES, width: 190 },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
+      {
+        id: "worker_condition",
+        accessorKey: "worker_condition",
+        header: "ملاحظات حالة العاملة",
+        meta: { editable: true, type: "textarea", width: 200 },
+        cell: ({ getValue }) => (
+          <span className="line-clamp-1 max-w-[220px] text-ink/70">{(getValue() as string) || "—"}</span>
+        ),
+      },
+      {
+        id: "worker_location",
+        accessorKey: "worker_location",
+        header: "موقع العاملة",
+        meta: { editable: true, type: "select", options: LOCATIONS },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
+
       {
         id: "old_sponsor_dues",
         accessorKey: "old_sponsor_dues",
@@ -226,6 +267,14 @@ function TransfersPage() {
         meta: { editable: true, type: "select", options: YES_NO_EXISTS_F },
         cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
       },
+      {
+        id: "salary_dues_amount",
+        accessorKey: "salary_dues_amount",
+        header: "قيمة مستحقات الرواتب",
+        meta: { editable: true, type: "number", ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => formatMoney(getValue() as number),
+      },
+
       {
         id: "notes",
         accessorKey: "notes",
@@ -284,17 +333,18 @@ function TransfersPage() {
           data={rows}
           columns={columns}
           search={search}
-          minWidth={1900}
+          minWidth={2600}
           emptyMessage="لا توجد عمليات نقل كفالة بعد"
           onCellSave={async (row, col, value) => {
             const patch: TransferUpdate =
-              col === "old_sponsor_dues" || col === "down_payment"
+              col === "old_sponsor_dues" || col === "down_payment" || col === "salary_dues_amount"
                 ? { [col]: Number(value || 0) }
                 : col === "transfer_date"
                   ? { transfer_date: value || null }
                   : ({ [col]: value } as TransferUpdate);
             await update.mutateAsync({ id: row.id, patch });
           }}
+
           rowActions={(t) => (
             <>
               {t.worker?.transfer_status !== "تم النقل" && (

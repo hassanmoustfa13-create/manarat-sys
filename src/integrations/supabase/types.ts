@@ -35,6 +35,72 @@ export type Database = {
         }
         Relationships: []
       }
+      requests: {
+        Row: {
+          action_status: string
+          created_at: string
+          created_by: string | null
+          customer_name: string
+          id: string
+          lead_source: string
+          nationality: string
+          notes: string
+          phone: string
+          pref_age: string
+          pref_driving_license: string
+          pref_experience: string
+          pref_languages: string
+          pref_religion: string
+          profession: string
+          request_date: string | null
+          request_type: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          action_status?: string
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string
+          id?: string
+          lead_source?: string
+          nationality?: string
+          notes?: string
+          phone?: string
+          pref_age?: string
+          pref_driving_license?: string
+          pref_experience?: string
+          pref_languages?: string
+          pref_religion?: string
+          profession?: string
+          request_date?: string | null
+          request_type?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          action_status?: string
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string
+          id?: string
+          lead_source?: string
+          nationality?: string
+          notes?: string
+          phone?: string
+          pref_age?: string
+          pref_driving_license?: string
+          pref_experience?: string
+          pref_languages?: string
+          pref_religion?: string
+          profession?: string
+          request_date?: string | null
+          request_type?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       transfers: {
         Row: {
           created_at: string
@@ -51,12 +117,17 @@ export type Database = {
           payment_status: string
           remaining_amount: number | null
           residency_status: string
+          salary_dues_amount: number
           salary_dues_status: string
           transfer_date: string | null
+          transfer_stage: string
+          transfer_type: string
           updated_at: string
           updated_by: string | null
           visa_type: string
+          worker_condition: string
           worker_id: string
+          worker_location: string
         }
         Insert: {
           created_at?: string
@@ -73,12 +144,17 @@ export type Database = {
           payment_status?: string
           remaining_amount?: number | null
           residency_status?: string
+          salary_dues_amount?: number
           salary_dues_status?: string
           transfer_date?: string | null
+          transfer_stage?: string
+          transfer_type?: string
           updated_at?: string
           updated_by?: string | null
           visa_type?: string
+          worker_condition?: string
           worker_id: string
+          worker_location?: string
         }
         Update: {
           created_at?: string
@@ -95,12 +171,17 @@ export type Database = {
           payment_status?: string
           remaining_amount?: number | null
           residency_status?: string
+          salary_dues_amount?: number
           salary_dues_status?: string
           transfer_date?: string | null
+          transfer_stage?: string
+          transfer_type?: string
           updated_at?: string
           updated_by?: string | null
           visa_type?: string
+          worker_condition?: string
           worker_id?: string
+          worker_location?: string
         }
         Relationships: [
           {
@@ -133,51 +214,69 @@ export type Database = {
       workers: {
         Row: {
           arrival_date: string | null
+          arrival_status: string
+          arrival_time: string
           created_at: string
           created_by: string | null
+          current_location: string
           current_sponsor_name: string
           current_sponsor_phone: string
+          flight_group: string
           id: string
           monthly_salary: number
           name: string
           nationality: string
           notes: string
           passport_number: string
+          profession: string
           transfer_status: string
           updated_at: string
           updated_by: string | null
+          visa_type: string
         }
         Insert: {
           arrival_date?: string | null
+          arrival_status?: string
+          arrival_time?: string
           created_at?: string
           created_by?: string | null
+          current_location?: string
           current_sponsor_name?: string
           current_sponsor_phone?: string
+          flight_group?: string
           id?: string
           monthly_salary?: number
           name: string
           nationality?: string
           notes?: string
           passport_number: string
+          profession?: string
           transfer_status?: string
           updated_at?: string
           updated_by?: string | null
+          visa_type?: string
         }
         Update: {
           arrival_date?: string | null
+          arrival_status?: string
+          arrival_time?: string
           created_at?: string
           created_by?: string | null
+          current_location?: string
           current_sponsor_name?: string
           current_sponsor_phone?: string
+          flight_group?: string
           id?: string
           monthly_salary?: number
           name?: string
           nationality?: string
           notes?: string
           passport_number?: string
+          profession?: string
           transfer_status?: string
           updated_at?: string
           updated_by?: string | null
+          visa_type?: string
         }
         Relationships: []
       }

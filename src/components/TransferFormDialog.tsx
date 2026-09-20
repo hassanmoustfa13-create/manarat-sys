@@ -14,7 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, SelectField, TextField } from "@/components/FormFields";
 import {
+  LOCATIONS,
   PAYMENT_STATUSES,
+  TRANSFER_STAGES,
+  TRANSFER_TYPES,
+  VISA_TYPES,
   YES_NO_EXISTS,
   YES_NO_EXISTS_F,
   type Transfer,
@@ -37,7 +41,9 @@ const empty = {
   worker_id: "",
   new_sponsor_name: "",
   new_sponsor_phone: "",
-  visa_type: "",
+  visa_type: VISA_TYPES[0] as string,
+  transfer_type: TRANSFER_TYPES[0] as string,
+  transfer_stage: TRANSFER_STAGES[0] as string,
   transfer_date: new Date().toISOString().slice(0, 10),
   old_sponsor_dues: "",
   down_payment: "",
@@ -45,8 +51,12 @@ const empty = {
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
   salary_dues_status: YES_NO_EXISTS_F[1] as string,
+  salary_dues_amount: "",
+  worker_condition: "",
+  worker_location: LOCATIONS[0] as string,
   notes: "",
 };
+
 
 export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdmin }: Props) {
   const qc = useQueryClient();
@@ -63,6 +73,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             new_sponsor_name: transfer.new_sponsor_name,
             new_sponsor_phone: transfer.new_sponsor_phone,
             visa_type: transfer.visa_type,
+            transfer_type: transfer.transfer_type ?? TRANSFER_TYPES[0],
+            transfer_stage: transfer.transfer_stage ?? TRANSFER_STAGES[0],
             transfer_date: transfer.transfer_date ?? "",
             old_sponsor_dues: String(transfer.old_sponsor_dues),
             down_payment: String(transfer.down_payment),
@@ -70,7 +82,11 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             medical_exam: transfer.medical_exam,
             residency_status: transfer.residency_status,
             salary_dues_status: transfer.salary_dues_status,
+            salary_dues_amount: String(transfer.salary_dues_amount ?? 0),
+            worker_condition: transfer.worker_condition ?? "",
+            worker_location: transfer.worker_location ?? LOCATIONS[0],
             notes: transfer.notes,
+
           }
         : { ...empty, worker_id: worker?.id ?? "" },
     );
@@ -101,7 +117,9 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
       const common = {
         new_sponsor_name: form.new_sponsor_name.trim(),
         new_sponsor_phone: form.new_sponsor_phone.trim(),
-        visa_type: form.visa_type.trim(),
+        visa_type: form.visa_type,
+        transfer_type: form.transfer_type,
+        transfer_stage: form.transfer_stage,
         transfer_date: form.transfer_date || null,
         old_sponsor_dues: dues,
         down_payment: deposit,
@@ -109,8 +127,12 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
         salary_dues_status: form.salary_dues_status,
+        salary_dues_amount: Number(form.salary_dues_amount || 0),
+        worker_condition: form.worker_condition.trim(),
+        worker_location: form.worker_location,
         notes: form.notes.trim(),
       };
+
       if (transfer) {
         const body = isAdmin ? { ...common, worker_id: form.worker_id } : common;
         const { error } = await supabase.from("transfers").update(body).eq("id", transfer.id);
@@ -134,7 +156,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-w-3xl" dir="rtl">
+      <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
         <DialogHeader className="text-right sm:text-right">
           <DialogTitle>{editing ? "تعديل عملية نقل الكفالة" : "نقل كفالة جديد"}</DialogTitle>
           <DialogDescription>
@@ -184,8 +206,22 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
 
           <TextField label="اسم الكفيل الجديد" value={form.new_sponsor_name} onChange={set("new_sponsor_name")} required />
           <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
-          <TextField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} placeholder="مثال: عاملة منزلية" />
+          <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
+          <SelectField label="نوع النقل" value={form.transfer_type} onChange={set("transfer_type")} options={TRANSFER_TYPES} />
           <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
+          <SelectField
+            label="حالة النقل"
+            value={form.transfer_stage}
+            onChange={set("transfer_stage")}
+            options={TRANSFER_STAGES}
+          />
+          <SelectField
+            label="موقع العاملة"
+            value={form.worker_location}
+            onChange={set("worker_location")}
+            options={LOCATIONS}
+          />
+
           <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={set("old_sponsor_dues")} />
           <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
           <Field label="المتبقي (تلقائي)">
@@ -200,7 +236,22 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           <SelectField label="الفحص الطبي" value={form.medical_exam} onChange={set("medical_exam")} options={YES_NO_EXISTS} />
           <SelectField label="الإقامة" value={form.residency_status} onChange={set("residency_status")} options={YES_NO_EXISTS_F} />
           <SelectField label="مستحقات رواتب العاملة" value={form.salary_dues_status} onChange={set("salary_dues_status")} options={YES_NO_EXISTS_F} />
+          <TextField
+            label="قيمة مستحقات الرواتب"
+            type="number"
+            ltr
+            value={form.salary_dues_amount}
+            onChange={set("salary_dues_amount")}
+          />
+          <Field label="ملاحظات حالة العاملة" className="sm:col-span-3">
+            <Textarea
+              rows={2}
+              value={form.worker_condition}
+              onChange={(e) => set("worker_condition")(e.target.value)}
+            />
+          </Field>
           <Field label="ملاحظات" className="sm:col-span-2">
+
             <Textarea rows={2} value={form.notes} onChange={(e) => set("notes")(e.target.value)} />
           </Field>
           <DialogFooter className="sm:col-span-3 sm:justify-start">

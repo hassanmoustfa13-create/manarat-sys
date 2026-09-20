@@ -205,3 +205,14 @@
   scrollbar-width: thin;
   scrollbar-color: oklch(0 0 0 / 0.18) transparent;
 }
+
+/* Hide the "Made with Lovable" badge without affecting layout */
+#lovable-badge,
+a[href*="lovable.dev"][target="_blank"],
+[id*="lovable-badge"],
+[class*="lovable-badge"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

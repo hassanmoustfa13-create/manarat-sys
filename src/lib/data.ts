@@ -5,27 +5,84 @@ import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase
 export type Worker = Tables<"workers">;
 export type Transfer = Tables<"transfers">;
 export type Profile = Tables<"profiles">;
+export type Request = Tables<"requests">;
 export type WorkerInsert = TablesInsert<"workers">;
 export type WorkerUpdate = TablesUpdate<"workers">;
 export type TransferInsert = TablesInsert<"transfers">;
 export type TransferUpdate = TablesUpdate<"transfers">;
+export type RequestInsert = TablesInsert<"requests">;
+export type RequestUpdate = TablesUpdate<"requests">;
 
 export const TRANSFER_STATUSES = ["بدون نقل", "قيد النقل", "تم النقل"] as const;
 export const PAYMENT_STATUSES = ["تم الدفع بالكامل", "متبقي مبلغ"] as const;
 export const YES_NO_EXISTS = ["يوجد", "لا يوجد"] as const;
 export const YES_NO_EXISTS_F = ["توجد", "لا توجد"] as const;
+
+/* --- Module 1: recruitment requests --- */
+export const PROFESSIONS = [
+  "عاملة منزلية",
+  "عاملة مهنية",
+  "مربية أطفال",
+  "طباخة",
+  "عامل مزرعة",
+  "سائق",
+  "مهني",
+  "راعية كبار سن",
+  "ممرضة منزلية",
+  "أخرى",
+] as const;
+export const REQUEST_TYPES = ["استقدام", "معينة"] as const;
+export const ACTION_STATUSES = [
+  "قيد المتابعة",
+  "انتظار تأشيرة",
+  "تم إرسال السيرة الذاتية",
+  "تم عمل عقد",
+  "العميل لا يرغب",
+  "لم يتم الرد",
+  "تم الإرسال وفي انتظار العميل",
+  "العميل يرغب في خيارات أخرى",
+  "خارج الشرقية",
+] as const;
+export const LANGUAGES = ["عربية", "إنجليزية", "عربية وإنجليزية", "لا يوجد"] as const;
+
+/* --- Module 2: arrivals --- */
+export const ARRIVAL_STATUSES = ["تم الوصول", "تم الإلغاء"] as const;
+export const LOCATIONS = ["الشركة", "الكفيل القديم", "الكفيل الجديد"] as const;
+
+/* --- Module 3: transfer operations --- */
+export const VISA_TYPES = ["عادية", "تأهيل", "بديلة"] as const;
+export const TRANSFER_TYPES = ["إيجار", "تجربة", "مؤقت"] as const;
+export const TRANSFER_STAGES = [
+  "إجراءات رفع طلب النقل",
+  "إجراءات البصمة في أبشر",
+  "إجراءات الفحص الطبي",
+  "تم النقل",
+] as const;
+
 export const NATIONALITIES = [
-  "إثيوبيا",
   "الفلبين",
+  "بنجلاديش",
   "كينيا",
+  "إثيوبيا",
   "أوغندا",
-  "بنغلاديش",
   "سريلانكا",
   "الهند",
-  "إندونيسيا",
-  "نيبال",
-  "مصر",
+  "باكستان",
+  "أخرى",
 ];
+
+export const requestsQuery = queryOptions({
+  queryKey: ["requests"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("requests")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+});
+
 
 export const workersQuery = queryOptions({
   queryKey: ["workers"],

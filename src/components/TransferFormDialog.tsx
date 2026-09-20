@@ -73,6 +73,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             new_sponsor_name: transfer.new_sponsor_name,
             new_sponsor_phone: transfer.new_sponsor_phone,
             visa_type: transfer.visa_type,
+            transfer_type: transfer.transfer_type ?? TRANSFER_TYPES[0],
+            transfer_stage: transfer.transfer_stage ?? TRANSFER_STAGES[0],
             transfer_date: transfer.transfer_date ?? "",
             old_sponsor_dues: String(transfer.old_sponsor_dues),
             down_payment: String(transfer.down_payment),
@@ -80,7 +82,11 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             medical_exam: transfer.medical_exam,
             residency_status: transfer.residency_status,
             salary_dues_status: transfer.salary_dues_status,
+            salary_dues_amount: String(transfer.salary_dues_amount ?? 0),
+            worker_condition: transfer.worker_condition ?? "",
+            worker_location: transfer.worker_location ?? LOCATIONS[0],
             notes: transfer.notes,
+
           }
         : { ...empty, worker_id: worker?.id ?? "" },
     );

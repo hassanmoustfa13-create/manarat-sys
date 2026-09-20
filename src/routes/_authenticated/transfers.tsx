@@ -333,17 +333,18 @@ function TransfersPage() {
           data={rows}
           columns={columns}
           search={search}
-          minWidth={1900}
+          minWidth={2600}
           emptyMessage="لا توجد عمليات نقل كفالة بعد"
           onCellSave={async (row, col, value) => {
             const patch: TransferUpdate =
-              col === "old_sponsor_dues" || col === "down_payment"
+              col === "old_sponsor_dues" || col === "down_payment" || col === "salary_dues_amount"
                 ? { [col]: Number(value || 0) }
                 : col === "transfer_date"
                   ? { transfer_date: value || null }
                   : ({ [col]: value } as TransferUpdate);
             await update.mutateAsync({ id: row.id, patch });
           }}
+
           rowActions={(t) => (
             <>
               {t.worker?.transfer_status !== "تم النقل" && (

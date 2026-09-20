@@ -236,7 +236,22 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           <SelectField label="الفحص الطبي" value={form.medical_exam} onChange={set("medical_exam")} options={YES_NO_EXISTS} />
           <SelectField label="الإقامة" value={form.residency_status} onChange={set("residency_status")} options={YES_NO_EXISTS_F} />
           <SelectField label="مستحقات رواتب العاملة" value={form.salary_dues_status} onChange={set("salary_dues_status")} options={YES_NO_EXISTS_F} />
+          <TextField
+            label="قيمة مستحقات الرواتب"
+            type="number"
+            ltr
+            value={form.salary_dues_amount}
+            onChange={set("salary_dues_amount")}
+          />
+          <Field label="ملاحظات حالة العاملة" className="sm:col-span-3">
+            <Textarea
+              rows={2}
+              value={form.worker_condition}
+              onChange={(e) => set("worker_condition")(e.target.value)}
+            />
+          </Field>
           <Field label="ملاحظات" className="sm:col-span-2">
+
             <Textarea rows={2} value={form.notes} onChange={(e) => set("notes")(e.target.value)} />
           </Field>
           <DialogFooter className="sm:col-span-3 sm:justify-start">

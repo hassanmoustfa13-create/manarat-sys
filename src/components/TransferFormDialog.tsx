@@ -117,7 +117,9 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
       const common = {
         new_sponsor_name: form.new_sponsor_name.trim(),
         new_sponsor_phone: form.new_sponsor_phone.trim(),
-        visa_type: form.visa_type.trim(),
+        visa_type: form.visa_type,
+        transfer_type: form.transfer_type,
+        transfer_stage: form.transfer_stage,
         transfer_date: form.transfer_date || null,
         old_sponsor_dues: dues,
         down_payment: deposit,
@@ -125,8 +127,12 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
         salary_dues_status: form.salary_dues_status,
+        salary_dues_amount: Number(form.salary_dues_amount || 0),
+        worker_condition: form.worker_condition.trim(),
+        worker_location: form.worker_location,
         notes: form.notes.trim(),
       };
+
       if (transfer) {
         const body = isAdmin ? { ...common, worker_id: form.worker_id } : common;
         const { error } = await supabase.from("transfers").update(body).eq("id", transfer.id);

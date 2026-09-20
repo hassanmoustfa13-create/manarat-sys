@@ -176,6 +176,28 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             onChange={set("arrival_date")}
             disabled={coreLocked}
           />
+          <SelectField label="المهنة" value={form.profession} onChange={set("profession")} options={PROFESSIONS} />
+          <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
+          <TextField label="وقت الوصول" type="time" ltr value={form.arrival_time} onChange={set("arrival_time")} />
+          <TextField
+            label="مجموعة الرحلة"
+            value={form.flight_group}
+            onChange={set("flight_group")}
+            hint="نفس الاسم للوصول الجماعي بنفس التاريخ والوقت"
+          />
+          <SelectField
+            label="حالة الوصول"
+            value={form.arrival_status}
+            onChange={set("arrival_status")}
+            options={ARRIVAL_STATUSES}
+          />
+          <SelectField
+            label="الموقع الحالي"
+            value={form.current_location}
+            onChange={set("current_location")}
+            options={LOCATIONS}
+          />
+
           <SelectField
             label="حالة نقل الكفالة"
             value={form.transfer_status}

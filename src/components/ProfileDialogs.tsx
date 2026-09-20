@@ -82,10 +82,18 @@ export function WorkerProfileDialog({
                 <h4 className="mb-2 text-[11px] font-semibold text-ink/50">البيانات الأساسية</h4>
                 <Row label="رقم الجواز" value={worker.passport_number} ltr />
                 <Row label="الجنسية" value={worker.nationality} />
+                <Row label="المهنة" value={worker.profession || "—"} />
+                <Row label="نوع التأشيرة" value={worker.visa_type || "—"} />
                 <Row label="الراتب الشهري" value={formatMoney(worker.monthly_salary)} ltr />
+                <h4 className="mb-2 mt-4 text-[11px] font-semibold text-ink/50">بيانات الوصول</h4>
                 <Row label="تاريخ الوصول" value={formatDate(worker.arrival_date)} ltr />
+                <Row label="وقت الوصول" value={worker.arrival_time || "—"} ltr />
+                <Row label="مجموعة الرحلة" value={worker.flight_group || "—"} />
+                <Row label="حالة الوصول" value={<StatusBadge value={worker.arrival_status} />} />
+                <Row label="الموقع الحالي" value={<StatusBadge value={worker.current_location} />} />
                 <Row label="الوقت المتبقي للوصول" value={formatDaysRemaining(days)} />
               </section>
+
               <section className="glass rounded-xl p-4">
                 <h4 className="mb-2 text-[11px] font-semibold text-ink/50">الكفيل الحالي</h4>
                 <Row

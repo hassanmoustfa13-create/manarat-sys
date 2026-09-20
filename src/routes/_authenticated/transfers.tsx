@@ -268,6 +268,14 @@ function TransfersPage() {
         cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
       },
       {
+        id: "salary_dues_amount",
+        accessorKey: "salary_dues_amount",
+        header: "قيمة مستحقات الرواتب",
+        meta: { editable: true, type: "number", ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => formatMoney(getValue() as number),
+      },
+
+      {
         id: "notes",
         accessorKey: "notes",
         header: "ملاحظات",

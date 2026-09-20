@@ -14,9 +14,14 @@ import { SponsorLink, SponsorProfileDialog, WorkerProfileDialog } from "@/compon
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import {
+  LOCATIONS,
   PAYMENT_STATUSES,
+  TRANSFER_STAGES,
+  TRANSFER_TYPES,
+  VISA_TYPES,
   YES_NO_EXISTS,
   YES_NO_EXISTS_F,
+
   type Transfer,
   type TransferUpdate,
   type Worker,

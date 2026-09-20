@@ -154,12 +154,25 @@ export function WorkerProfileDialog({
                         <Row label="العربون" value={formatMoney(t.down_payment)} ltr />
                         <Row label="المتبقي" value={formatMoney(t.remaining_amount)} ltr />
                       </div>
-                      <div className="mt-1 flex flex-wrap gap-1.5 text-[11px]">
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
+                        <span className="text-ink/45">نوع النقل:</span> <StatusBadge value={t.transfer_type} />
+                        <span className="text-ink/45">المرحلة:</span> <StatusBadge value={t.transfer_stage} />
+                        <span className="text-ink/45">موقع العاملة:</span>{" "}
+                        <StatusBadge value={t.worker_location} />
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
                         <span className="text-ink/45">فحص طبي:</span> <StatusBadge value={t.medical_exam} />
                         <span className="text-ink/45">إقامة:</span> <StatusBadge value={t.residency_status} />
                         <span className="text-ink/45">مستحقات رواتب:</span>{" "}
                         <StatusBadge value={t.salary_dues_status} />
+                        <span className="tabular-nums text-ink/60" dir="ltr">
+                          {formatMoney(t.salary_dues_amount)}
+                        </span>
                       </div>
+                      {t.worker_condition && (
+                        <p className="mt-2 text-[12px] text-ink/60">{t.worker_condition}</p>
+                      )}
+
                       <p className="mt-2 text-[11px] text-ink/45">
                         أضافها {nameOf(t.created_by)} · آخر تعديل {nameOf(t.updated_by)}
                       </p>

@@ -64,13 +64,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             name: worker.name,
             passport_number: worker.passport_number,
             nationality: worker.nationality,
+            profession: worker.profession ?? "",
+            visa_type: worker.visa_type ?? "",
             monthly_salary: worker.monthly_salary?.toString() ?? "",
             arrival_date: worker.arrival_date ?? "",
+            arrival_time: worker.arrival_time ?? "",
+            flight_group: worker.flight_group ?? "",
+            arrival_status: worker.arrival_status ?? ARRIVAL_STATUSES[0],
+            current_location: worker.current_location ?? LOCATIONS[0],
             current_sponsor_name: worker.current_sponsor_name ?? "",
             current_sponsor_phone: worker.current_sponsor_phone ?? "",
             transfer_status: worker.transfer_status,
             notes: worker.notes ?? "",
           }
+
         : empty,
     );
   }, [open, worker]);

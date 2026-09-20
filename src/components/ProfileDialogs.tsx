@@ -200,6 +200,7 @@ export function SponsorProfileDialog({
 }) {
   const { data: workers = [] } = useQuery(workersQuery);
   const { data: transfers = [] } = useQuery(transfersQuery);
+  const { data: requests = [] } = useQuery(requestsQuery);
 
   const info = useMemo(() => {
     if (!sponsor) return null;
@@ -207,8 +208,10 @@ export function SponsorProfileDialog({
     const related = transfers.filter(
       (t) => t.old_sponsor_name === sponsor || t.new_sponsor_name === sponsor,
     );
+    const customerRequests = requests.filter((r) => r.customer_name === sponsor);
     const phone =
       current.find((w) => w.current_sponsor_phone)?.current_sponsor_phone ||
+      customerRequests.find((r) => r.phone)?.phone ||
       related.find((t) => t.new_sponsor_name === sponsor && t.new_sponsor_phone)?.new_sponsor_phone ||
       related.find((t) => t.old_sponsor_name === sponsor && t.old_sponsor_phone)?.old_sponsor_phone ||
       "—";
@@ -221,8 +224,9 @@ export function SponsorProfileDialog({
     const currentIds = new Set(current.map((w) => w.id));
     const past = workers.filter((w) => pastIds.has(w.id) && !currentIds.has(w.id));
     const incoming = workers.filter((w) => incomingIds.has(w.id) && !currentIds.has(w.id));
-    return { current, past, incoming, phone, transfers: related.length };
-  }, [sponsor, workers, transfers]);
+    return { current, past, incoming, phone, transfers: related.length, requests: customerRequests };
+  }, [sponsor, workers, transfers, requests]);
+
 
   const List = ({ title, items, tone }: { title: string; items: Worker[]; tone: string }) => (
     <section>

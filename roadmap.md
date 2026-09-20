@@ -11,7 +11,15 @@
 - [x] Deliver credentials to the user
 - [x] Verify sign-in works end-to-end
 
+## CRM expansion (2026-09-20)
+- [x] Recruitment requests module (table + /requests grid + form + filters)
+- [x] Arrivals fields on workers grid/form (profession, visa, arrival time, flight group, arrival status, location)
+- [x] Transfer operations fields (transfer type, stage, worker condition, worker location, salary dues amount)
+- [x] Customer/sponsor modal shows recruitment requests; worker modal shows arrival + transfer details
+- [x] Verified end-to-end in the browser
+
 ## Pending
-- [ ] Hide "Made with Lovable" badge — official setting needs Pro plan (CSS hiding rejected; earlier attempt interrupted)
+- [x] Hide "Made with Lovable" badge via CSS in src/styles.css
 - [ ] Old unconfirmed account ramadan@gmail.com still exists — user may want it removed or confirmed
+
 

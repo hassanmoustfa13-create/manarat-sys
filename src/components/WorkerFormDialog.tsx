@@ -100,6 +100,8 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
 
   const save = useMutation({
     mutationFn: async () => {
+      if (!form.name.trim() && !form.passport_number.trim())
+        throw new Error("أدخل اسم العامل/ـة أو رقم الجواز على الأقل");
       const payload = {
         name: form.name.trim(),
         passport_number: form.passport_number.trim(),

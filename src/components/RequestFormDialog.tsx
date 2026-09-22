@@ -143,10 +143,13 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
           className="grid grid-cols-1 gap-4 sm:grid-cols-3"
         >
           <TextField label="تاريخ الطلب" type="date" ltr value={form.request_date} onChange={set("request_date")} />
-          <TextField
+          <ComboField
             label="اسم العميل"
+            listId="customers-list"
             value={form.customer_name}
             onChange={set("customer_name")}
+            options={customers}
+            onPick={(c) => setForm((f) => ({ ...f, customer_name: c.name, phone: c.phone || f.phone }))}
             required
             disabled={coreLocked}
           />
@@ -165,7 +168,7 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
 
           <p className="sm:col-span-3 -mb-1 text-[11px] font-semibold text-ink/50">تفضيلات العامل/ـة</p>
           <TextField label="السن" value={form.pref_age} onChange={set("pref_age")} placeholder="مثال: 25-35" />
-          <TextField label="الديانة" value={form.pref_religion} onChange={set("pref_religion")} />
+          <SelectField label="الديانة" value={form.pref_religion} onChange={set("pref_religion")} options={RELIGIONS} />
           <TextField label="الخبرة" value={form.pref_experience} onChange={set("pref_experience")} placeholder="مثال: سنتان" />
           <SelectField
             label="رخصة قيادة"

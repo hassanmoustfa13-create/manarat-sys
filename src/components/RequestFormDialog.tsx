@@ -168,7 +168,16 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
 
           <p className="sm:col-span-3 -mb-1 text-[11px] font-semibold text-ink/50">تفضيلات العامل/ـة</p>
           <TextField label="السن" value={form.pref_age} onChange={set("pref_age")} placeholder="مثال: 25-35" />
-          <SelectField label="الديانة" value={form.pref_religion} onChange={set("pref_religion")} options={RELIGIONS} />
+          <SelectField
+            label="الديانة"
+            value={form.pref_religion}
+            onChange={set("pref_religion")}
+            options={
+              RELIGIONS.includes(form.pref_religion as (typeof RELIGIONS)[number])
+                ? RELIGIONS
+                : [form.pref_religion, ...RELIGIONS]
+            }
+          />
           <TextField label="الخبرة" value={form.pref_experience} onChange={set("pref_experience")} placeholder="مثال: سنتان" />
           <SelectField
             label="رخصة قيادة"

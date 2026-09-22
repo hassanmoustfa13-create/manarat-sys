@@ -45,7 +45,7 @@ const empty = {
   lead_source: "",
   action_status: ACTION_STATUSES[0] as string,
   pref_age: "",
-  pref_religion: "",
+  pref_religion: RELIGIONS[0] as string,
   pref_experience: "",
   pref_driving_license: YES_NO_EXISTS[1] as string,
   pref_languages: LANGUAGES[0] as string,
@@ -57,6 +57,16 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
   const [form, setForm] = useState(empty);
   const editing = Boolean(request);
   const coreLocked = editing && !isAdmin;
+  const { data: requests } = useQuery(requestsQuery);
+  const { data: workers } = useQuery(workersQuery);
+  const customers = useMemo(
+    () =>
+      mergeContacts(
+        requests?.map((r) => ({ name: r.customer_name, phone: r.phone })),
+        workers?.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
+      ),
+    [requests, workers],
+  );
 
   useEffect(() => {
     if (!open) return;

@@ -143,15 +143,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
           }}
           className="grid grid-cols-1 gap-4 sm:grid-cols-2"
         >
-          <TextField label="اسم العامل/العاملة" value={form.name} onChange={set("name")} required disabled={coreLocked} />
+          <TextField
+            label="اسم العامل/العاملة"
+            value={form.name}
+            onChange={set("name")}
+            disabled={coreLocked}
+            hint="يكفي إدخال الاسم أو رقم الجواز"
+          />
           <TextField
             label="رقم الجواز"
             value={form.passport_number}
             onChange={set("passport_number")}
-            required
             ltr
             disabled={coreLocked}
-            hint="يجب أن يكون فريداً"
+            hint="اختياري إذا تم إدخال الاسم — ويجب أن يكون فريداً"
           />
           <Field label="الجنسية">
             <input
@@ -168,7 +173,6 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
               ))}
             </datalist>
           </Field>
-          <TextField label="الراتب الشهري" type="number" ltr value={form.monthly_salary} onChange={set("monthly_salary")} />
           <TextField
             label="تاريخ الوصول"
             type="date"

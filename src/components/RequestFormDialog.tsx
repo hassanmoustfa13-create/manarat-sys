@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -12,16 +12,20 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
 import {
   ACTION_STATUSES,
   LANGUAGES,
   NATIONALITIES,
   PROFESSIONS,
+  RELIGIONS,
   REQUEST_TYPES,
   YES_NO_EXISTS,
   type Request,
   errorMessage,
+  mergeContacts,
+  requestsQuery,
+  workersQuery,
 } from "@/lib/data";
 
 interface Props {
@@ -41,7 +45,7 @@ const empty = {
   lead_source: "",
   action_status: ACTION_STATUSES[0] as string,
   pref_age: "",
-  pref_religion: "",
+  pref_religion: RELIGIONS[0] as string,
   pref_experience: "",
   pref_driving_license: YES_NO_EXISTS[1] as string,
   pref_languages: LANGUAGES[0] as string,
@@ -53,6 +57,16 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
   const [form, setForm] = useState(empty);
   const editing = Boolean(request);
   const coreLocked = editing && !isAdmin;
+  const { data: requests } = useQuery(requestsQuery);
+  const { data: workers } = useQuery(workersQuery);
+  const customers = useMemo(
+    () =>
+      mergeContacts(
+        requests?.map((r) => ({ name: r.customer_name, phone: r.phone })),
+        workers?.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
+      ),
+    [requests, workers],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -129,10 +143,13 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
           className="grid grid-cols-1 gap-4 sm:grid-cols-3"
         >
           <TextField label="تاريخ الطلب" type="date" ltr value={form.request_date} onChange={set("request_date")} />
-          <TextField
+          <ComboField
             label="اسم العميل"
+            listId="customers-list"
             value={form.customer_name}
             onChange={set("customer_name")}
+            options={customers}
+            onPick={(c) => setForm((f) => ({ ...f, customer_name: c.name, phone: c.phone || f.phone }))}
             required
             disabled={coreLocked}
           />
@@ -151,7 +168,16 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
 
           <p className="sm:col-span-3 -mb-1 text-[11px] font-semibold text-ink/50">تفضيلات العامل/ـة</p>
           <TextField label="السن" value={form.pref_age} onChange={set("pref_age")} placeholder="مثال: 25-35" />
-          <TextField label="الديانة" value={form.pref_religion} onChange={set("pref_religion")} />
+          <SelectField
+            label="الديانة"
+            value={form.pref_religion}
+            onChange={set("pref_religion")}
+            options={
+              RELIGIONS.includes(form.pref_religion as (typeof RELIGIONS)[number])
+                ? RELIGIONS
+                : [form.pref_religion, ...RELIGIONS]
+            }
+          />
           <TextField label="الخبرة" value={form.pref_experience} onChange={set("pref_experience")} placeholder="مثال: سنتان" />
           <SelectField
             label="رخصة قيادة"

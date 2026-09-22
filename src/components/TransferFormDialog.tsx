@@ -12,12 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
 import {
   LOCATIONS,
   PAYMENT_STATUSES,
   TRANSFER_STAGES,
   TRANSFER_TYPES,
+  TRANSFER_TYPE_OTHER,
   VISA_TYPES,
   YES_NO_EXISTS,
   YES_NO_EXISTS_F,
@@ -25,6 +26,9 @@ import {
   type Worker,
   errorMessage,
   formatMoney,
+  mergeContacts,
+  requestsQuery,
+  transfersQuery,
   workersQuery,
 } from "@/lib/data";
 
@@ -45,6 +49,8 @@ const empty = {
   transfer_type: TRANSFER_TYPES[0] as string,
   transfer_stage: TRANSFER_STAGES[0] as string,
   transfer_date: new Date().toISOString().slice(0, 10),
+  period_start: "",
+  period_end: "",
   old_sponsor_dues: "",
   down_payment: "",
   payment_status: PAYMENT_STATUSES[1] as string,
@@ -76,6 +82,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             transfer_type: transfer.transfer_type ?? TRANSFER_TYPES[0],
             transfer_stage: transfer.transfer_stage ?? TRANSFER_STAGES[0],
             transfer_date: transfer.transfer_date ?? "",
+            period_start: transfer.period_start ?? "",
+            period_end: transfer.period_end ?? "",
             old_sponsor_dues: String(transfer.old_sponsor_dues),
             down_payment: String(transfer.down_payment),
             payment_status: transfer.payment_status,
@@ -98,18 +106,30 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
     () => workers.find((w) => w.id === form.worker_id) ?? null,
     [workers, form.worker_id],
   );
+  const { data: transfers } = useQuery(transfersQuery);
+  const { data: requests } = useQuery(requestsQuery);
+  const sponsors = useMemo(
+    () =>
+      mergeContacts(
+        transfers?.map((t) => ({ name: t.new_sponsor_name, phone: t.new_sponsor_phone })),
+        workers.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
+        requests?.map((r) => ({ name: r.customer_name, phone: r.phone })),
+      ),
+    [transfers, workers, requests],
+  );
+
   const dues = Number(form.old_sponsor_dues || 0);
   const deposit = Number(form.down_payment || 0);
   const remaining = dues - deposit;
+  const needsPeriod = form.transfer_type !== TRANSFER_TYPE_OTHER;
 
-  // Auto-derive payment status from amounts
-  useEffect(() => {
-    if (!open) return;
-    setForm((f) => ({
-      ...f,
-      payment_status: remaining <= 0 && dues > 0 ? PAYMENT_STATUSES[0] : f.payment_status,
-    }));
-  }, [remaining, dues, open]);
+  /** Amounts drive the payment status automatically; it stays manually editable afterwards */
+  const setAmount = (k: "old_sponsor_dues" | "down_payment") => (v: string) =>
+    setForm((f) => {
+      const next = { ...f, [k]: v };
+      const left = Number(next.old_sponsor_dues || 0) - Number(next.down_payment || 0);
+      return { ...next, payment_status: left > 0 ? PAYMENT_STATUSES[1] : PAYMENT_STATUSES[0] };
+    });
 
   const save = useMutation({
     mutationFn: async () => {

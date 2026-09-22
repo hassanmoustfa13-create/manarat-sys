@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
 import {
   ARRIVAL_STATUSES,
   LOCATIONS,
@@ -22,6 +22,10 @@ import {
   VISA_TYPES,
   type Worker,
   errorMessage,
+  mergeContacts,
+  requestsQuery,
+  transfersQuery,
+  workersQuery,
 } from "@/lib/data";
 
 interface Props {
@@ -37,7 +41,6 @@ const empty = {
   nationality: NATIONALITIES[0]!,
   profession: PROFESSIONS[0] as string,
   visa_type: VISA_TYPES[0] as string,
-  monthly_salary: "",
   arrival_date: "",
   arrival_time: "",
   flight_group: "",
@@ -55,6 +58,18 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
   const [form, setForm] = useState(empty);
   const editing = Boolean(worker);
   const coreLocked = editing && !isAdmin;
+  const { data: workers } = useQuery(workersQuery);
+  const { data: transfers } = useQuery(transfersQuery);
+  const { data: requests } = useQuery(requestsQuery);
+  const sponsors = useMemo(
+    () =>
+      mergeContacts(
+        workers?.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
+        transfers?.map((t) => ({ name: t.new_sponsor_name, phone: t.new_sponsor_phone })),
+        requests?.map((r) => ({ name: r.customer_name, phone: r.phone })),
+      ),
+    [workers, transfers, requests],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -66,7 +81,6 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             nationality: worker.nationality,
             profession: worker.profession ?? "",
             visa_type: worker.visa_type ?? "",
-            monthly_salary: worker.monthly_salary?.toString() ?? "",
             arrival_date: worker.arrival_date ?? "",
             arrival_time: worker.arrival_time ?? "",
             flight_group: worker.flight_group ?? "",
@@ -86,13 +100,14 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
 
   const save = useMutation({
     mutationFn: async () => {
+      if (!form.name.trim() && !form.passport_number.trim())
+        throw new Error("أدخل اسم العامل/ـة أو رقم الجواز على الأقل");
       const payload = {
         name: form.name.trim(),
         passport_number: form.passport_number.trim(),
         nationality: form.nationality,
         profession: form.profession,
         visa_type: form.visa_type,
-        monthly_salary: form.monthly_salary ? Number(form.monthly_salary) : 0,
         arrival_date: form.arrival_date || null,
         arrival_time: form.arrival_time.trim(),
         flight_group: form.flight_group.trim(),
@@ -142,15 +157,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
           }}
           className="grid grid-cols-1 gap-4 sm:grid-cols-2"
         >
-          <TextField label="اسم العامل/العاملة" value={form.name} onChange={set("name")} required disabled={coreLocked} />
+          <TextField
+            label="اسم العامل/العاملة"
+            value={form.name}
+            onChange={set("name")}
+            disabled={coreLocked}
+            hint="يكفي إدخال الاسم أو رقم الجواز"
+          />
           <TextField
             label="رقم الجواز"
             value={form.passport_number}
             onChange={set("passport_number")}
-            required
             ltr
             disabled={coreLocked}
-            hint="يجب أن يكون فريداً"
+            hint="اختياري إذا تم إدخال الاسم — ويجب أن يكون فريداً"
           />
           <Field label="الجنسية">
             <input
@@ -167,7 +187,6 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
               ))}
             </datalist>
           </Field>
-          <TextField label="الراتب الشهري" type="number" ltr value={form.monthly_salary} onChange={set("monthly_salary")} />
           <TextField
             label="تاريخ الوصول"
             type="date"
@@ -204,7 +223,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             onChange={set("transfer_status")}
             options={TRANSFER_STATUSES}
           />
-          <TextField label="اسم الكفيل الحالي" value={form.current_sponsor_name} onChange={set("current_sponsor_name")} />
+          <ComboField
+            label="اسم الكفيل الحالي"
+            listId="worker-sponsors-list"
+            value={form.current_sponsor_name}
+            onChange={set("current_sponsor_name")}
+            options={sponsors}
+            onPick={(c) =>
+              setForm((f) => ({
+                ...f,
+                current_sponsor_name: c.name,
+                current_sponsor_phone: c.phone || f.current_sponsor_phone,
+              }))
+            }
+          />
           <TextField label="هاتف الكفيل الحالي" ltr value={form.current_sponsor_phone} onChange={set("current_sponsor_phone")} />
           <Field label="ملاحظات" className="sm:col-span-2">
             <Textarea rows={2} value={form.notes} onChange={(e) => set("notes")(e.target.value)} />

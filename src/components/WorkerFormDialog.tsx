@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
 import {
   ARRIVAL_STATUSES,
   LOCATIONS,
@@ -22,6 +22,10 @@ import {
   VISA_TYPES,
   type Worker,
   errorMessage,
+  mergeContacts,
+  requestsQuery,
+  transfersQuery,
+  workersQuery,
 } from "@/lib/data";
 
 interface Props {

@@ -106,18 +106,30 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
     () => workers.find((w) => w.id === form.worker_id) ?? null,
     [workers, form.worker_id],
   );
+  const { data: transfers } = useQuery(transfersQuery);
+  const { data: requests } = useQuery(requestsQuery);
+  const sponsors = useMemo(
+    () =>
+      mergeContacts(
+        transfers?.map((t) => ({ name: t.new_sponsor_name, phone: t.new_sponsor_phone })),
+        workers.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
+        requests?.map((r) => ({ name: r.customer_name, phone: r.phone })),
+      ),
+    [transfers, workers, requests],
+  );
+
   const dues = Number(form.old_sponsor_dues || 0);
   const deposit = Number(form.down_payment || 0);
   const remaining = dues - deposit;
+  const needsPeriod = form.transfer_type !== TRANSFER_TYPE_OTHER;
 
-  // Auto-derive payment status from amounts
-  useEffect(() => {
-    if (!open) return;
-    setForm((f) => ({
-      ...f,
-      payment_status: remaining <= 0 && dues > 0 ? PAYMENT_STATUSES[0] : f.payment_status,
-    }));
-  }, [remaining, dues, open]);
+  /** Amounts drive the payment status automatically; it stays manually editable afterwards */
+  const setAmount = (k: "old_sponsor_dues" | "down_payment") => (v: string) =>
+    setForm((f) => {
+      const next = { ...f, [k]: v };
+      const left = Number(next.old_sponsor_dues || 0) - Number(next.down_payment || 0);
+      return { ...next, payment_status: left > 0 ? PAYMENT_STATUSES[1] : PAYMENT_STATUSES[0] };
+    });
 
   const save = useMutation({
     mutationFn: async () => {

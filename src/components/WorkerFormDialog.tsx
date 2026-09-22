@@ -41,7 +41,6 @@ const empty = {
   nationality: NATIONALITIES[0]!,
   profession: PROFESSIONS[0] as string,
   visa_type: VISA_TYPES[0] as string,
-  monthly_salary: "",
   arrival_date: "",
   arrival_time: "",
   flight_group: "",

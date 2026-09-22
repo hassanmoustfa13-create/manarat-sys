@@ -12,12 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
 import {
   LOCATIONS,
   PAYMENT_STATUSES,
   TRANSFER_STAGES,
   TRANSFER_TYPES,
+  TRANSFER_TYPE_OTHER,
   VISA_TYPES,
   YES_NO_EXISTS,
   YES_NO_EXISTS_F,
@@ -25,6 +26,9 @@ import {
   type Worker,
   errorMessage,
   formatMoney,
+  mergeContacts,
+  requestsQuery,
+  transfersQuery,
   workersQuery,
 } from "@/lib/data";
 

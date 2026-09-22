@@ -15,6 +15,13 @@
       "when": 1789892248313,
       "tag": "0001_crm_modules_expansion",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790102259500,
+      "tag": "0002_transfer_period_dates",
+      "breakpoints": true
     }
   ]
 }

@@ -115,6 +115,8 @@ export type Database = {
           old_sponsor_name: string
           old_sponsor_phone: string
           payment_status: string
+          period_end: string | null
+          period_start: string | null
           remaining_amount: number | null
           residency_status: string
           salary_dues_amount: number
@@ -142,6 +144,8 @@ export type Database = {
           old_sponsor_name?: string
           old_sponsor_phone?: string
           payment_status?: string
+          period_end?: string | null
+          period_start?: string | null
           remaining_amount?: number | null
           residency_status?: string
           salary_dues_amount?: number
@@ -169,6 +173,8 @@ export type Database = {
           old_sponsor_name?: string
           old_sponsor_phone?: string
           payment_status?: string
+          period_end?: string | null
+          period_start?: string | null
           remaining_amount?: number | null
           residency_status?: string
           salary_dues_amount?: number

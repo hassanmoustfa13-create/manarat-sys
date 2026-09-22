@@ -58,6 +58,18 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
   const [form, setForm] = useState(empty);
   const editing = Boolean(worker);
   const coreLocked = editing && !isAdmin;
+  const { data: workers } = useQuery(workersQuery);
+  const { data: transfers } = useQuery(transfersQuery);
+  const { data: requests } = useQuery(requestsQuery);
+  const sponsors = useMemo(
+    () =>
+      mergeContacts(
+        workers?.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
+        transfers?.map((t) => ({ name: t.new_sponsor_name, phone: t.new_sponsor_phone })),
+        requests?.map((r) => ({ name: r.customer_name, phone: r.phone })),
+      ),
+    [workers, transfers, requests],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -209,7 +221,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             onChange={set("transfer_status")}
             options={TRANSFER_STATUSES}
           />
-          <TextField label="اسم الكفيل الحالي" value={form.current_sponsor_name} onChange={set("current_sponsor_name")} />
+          <ComboField
+            label="اسم الكفيل الحالي"
+            listId="worker-sponsors-list"
+            value={form.current_sponsor_name}
+            onChange={set("current_sponsor_name")}
+            options={sponsors}
+            onPick={(c) =>
+              setForm((f) => ({
+                ...f,
+                current_sponsor_name: c.name,
+                current_sponsor_phone: c.phone || f.current_sponsor_phone,
+              }))
+            }
+          />
           <TextField label="هاتف الكفيل الحالي" ltr value={form.current_sponsor_phone} onChange={set("current_sponsor_phone")} />
           <Field label="ملاحظات" className="sm:col-span-2">
             <Textarea rows={2} value={form.notes} onChange={(e) => set("notes")(e.target.value)} />

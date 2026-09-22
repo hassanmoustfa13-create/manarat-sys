@@ -51,7 +51,10 @@ export const LOCATIONS = ["الشركة", "الكفيل القديم", "الكف
 
 /* --- Module 3: transfer operations --- */
 export const VISA_TYPES = ["عادية", "تأهيل", "بديلة"] as const;
-export const TRANSFER_TYPES = ["إيجار", "تجربة", "مؤقت"] as const;
+export const TRANSFER_TYPES = ["إيجار", "تجربة", "مؤقت", "أخرى"] as const;
+/** Transfer types that require a start/end period */
+export const TRANSFER_TYPE_OTHER = "أخرى";
+export const RELIGIONS = ["مسلم", "مسيحي", "أخرى"] as const;
 export const TRANSFER_STAGES = [
   "إجراءات رفع طلب النقل",
   "إجراءات البصمة في أبشر",
@@ -155,6 +158,26 @@ export function formatDateTime(d: string | null | undefined): string {
   if (!d) return "—";
   const dt = new Date(d);
   return `${formatDate(dt.toISOString())} ${dt.toTimeString().slice(0, 5)}`;
+}
+
+/* --- Contact directory (customers & sponsors already in the system) --- */
+export type Contact = { name: string; phone: string };
+
+/** Merge name/phone pairs, dedupe by name, keep the first non-empty phone found */
+export function mergeContacts(...lists: (Contact[] | undefined)[]): Contact[] {
+  const map = new Map<string, string>();
+  for (const list of lists) {
+    for (const c of list ?? []) {
+      const name = (c.name ?? "").trim();
+      if (!name) continue;
+      const phone = (c.phone ?? "").trim();
+      const existing = map.get(name);
+      if (existing === undefined || (!existing && phone)) map.set(name, phone);
+    }
+  }
+  return [...map.entries()]
+    .map(([name, phone]) => ({ name, phone }))
+    .sort((a, b) => a.name.localeCompare(b.name, "ar"));
 }
 
 export function errorMessage(e: unknown): string {

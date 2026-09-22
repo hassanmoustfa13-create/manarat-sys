@@ -49,6 +49,60 @@ export function TextField(props: {
   );
 }
 
+/**
+ * Free-text field with suggestions from existing records.
+ * Typing a new value is allowed; picking an existing one reports the match
+ * so the caller can auto-fill related data (e.g. the phone number).
+ */
+export function ComboField({
+  label,
+  value,
+  onChange,
+  options,
+  onPick,
+  required,
+  disabled,
+  hint,
+  listId,
+  className,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { name: string; phone: string }[];
+  onPick?: (opt: { name: string; phone: string }) => void;
+  required?: boolean;
+  disabled?: boolean;
+  hint?: string;
+  listId: string;
+  className?: string | undefined;
+}) {
+  return (
+    <Field label={label} hint={hint ?? "اكتب اسماً جديداً أو اختر من المسجّلين"} className={className}>
+      <Input
+        list={listId}
+        value={value}
+        required={required}
+        disabled={disabled}
+        autoComplete="off"
+        onChange={(e) => {
+          const v = e.target.value;
+          onChange(v);
+          const match = options.find((o) => o.name === v);
+          if (match && onPick) onPick(match);
+        }}
+      />
+      <datalist id={listId}>
+        {options.map((o) => (
+          <option key={o.name} value={o.name}>
+            {o.phone || ""}
+          </option>
+        ))}
+      </datalist>
+    </Field>
+  );
+}
+
 export function SelectField({
   label,
   value,

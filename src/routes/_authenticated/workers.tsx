@@ -141,13 +141,6 @@ function WorkersPage() {
         meta: { editable: true, type: "select", options: VISA_TYPES },
       },
       {
-        id: "monthly_salary",
-        accessorKey: "monthly_salary",
-        header: "الراتب الشهري",
-        meta: { editable: true, type: "number", ltr: true, className: "tabular-nums" },
-        cell: ({ getValue }) => formatMoney(getValue() as number),
-      },
-      {
         id: "arrival_date",
         accessorKey: "arrival_date",
         header: "تاريخ الوصول",

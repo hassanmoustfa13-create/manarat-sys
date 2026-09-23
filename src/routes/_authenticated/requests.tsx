@@ -139,7 +139,12 @@ function RequestsPage() {
         cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
       },
       { id: "pref_age", accessorKey: "pref_age", header: "السن", meta: { editable: true } },
-      { id: "pref_religion", accessorKey: "pref_religion", header: "الديانة", meta: { editable: true } },
+      {
+        id: "pref_religion",
+        accessorKey: "pref_religion",
+        header: "الديانة",
+        meta: { editable: true, type: "select", options: RELIGIONS },
+      },
       { id: "pref_experience", accessorKey: "pref_experience", header: "الخبرة", meta: { editable: true } },
       {
         id: "pref_driving_license",

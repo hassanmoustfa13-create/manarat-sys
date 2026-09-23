@@ -141,6 +141,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         transfer_type: form.transfer_type,
         transfer_stage: form.transfer_stage,
         transfer_date: form.transfer_date || null,
+        period_start: needsPeriod ? form.period_start || null : null,
+        period_end: needsPeriod ? form.period_end || null : null,
         old_sponsor_dues: dues,
         down_payment: deposit,
         payment_status: form.payment_status,
@@ -224,11 +226,45 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             </div>
           </div>
 
-          <TextField label="اسم الكفيل الجديد" value={form.new_sponsor_name} onChange={set("new_sponsor_name")} required />
+          <ComboField
+            label="اسم الكفيل الجديد"
+            listId="new-sponsors-list"
+            value={form.new_sponsor_name}
+            onChange={set("new_sponsor_name")}
+            options={sponsors}
+            onPick={(c) =>
+              setForm((f) => ({
+                ...f,
+                new_sponsor_name: c.name,
+                new_sponsor_phone: c.phone || f.new_sponsor_phone,
+              }))
+            }
+            required
+          />
           <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
           <SelectField label="نوع النقل" value={form.transfer_type} onChange={set("transfer_type")} options={TRANSFER_TYPES} />
           <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
+          {needsPeriod && (
+            <>
+              <TextField
+                label="تاريخ بداية المدة"
+                type="date"
+                ltr
+                value={form.period_start}
+                onChange={set("period_start")}
+                required
+              />
+              <TextField
+                label="تاريخ انتهاء المدة"
+                type="date"
+                ltr
+                value={form.period_end}
+                onChange={set("period_end")}
+                required
+              />
+            </>
+          )}
           <SelectField
             label="حالة النقل"
             value={form.transfer_stage}
@@ -242,8 +278,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             options={LOCATIONS}
           />
 
-          <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={set("old_sponsor_dues")} />
-          <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
+          <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={setAmount("old_sponsor_dues")} />
+          <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={setAmount("down_payment")} />
           <Field label="المتبقي (تلقائي)">
             <div
               className={`flex h-9 items-center rounded-md border border-dashed px-3 text-sm font-semibold tabular-nums ${remaining > 0 ? "border-terracotta/40 text-terracotta" : "border-success/40 text-success"}`}

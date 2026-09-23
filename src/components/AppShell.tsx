@@ -52,6 +52,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               نقل الكفالة
             </Link>
+            <Link
+              to="/reports"
+              className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
+              activeProps={{
+                className:
+                  "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
+              }}
+            >
+              التقارير
+            </Link>
           </nav>
           <div className="ms-auto flex items-center gap-2">
             <div className="flex items-center gap-2 rounded-full bg-white/70 px-3 py-1.5 ring-1 ring-black/8 backdrop-blur-md">

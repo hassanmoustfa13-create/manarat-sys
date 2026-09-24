@@ -26,10 +26,10 @@ export const Route = createFileRoute("/_authenticated/reports")({
       { title: "لوحة التقارير — منارات هجر للاستقدام" },
       {
         name: "description",
-        content: "إحصاءات طلبات الاستقدام والعمالة ونقل الكفالة وحالات الدفع والفترات المنتهية مع فلاتر وتقارير العملاء",
+        content: "إحصاءات طلبات الاستقدام والعمالة ونقل الكفالة وحالات الدفع والفترات المنتهية مع فلاتر",
       },
       { property: "og:title", content: "لوحة التقارير — منارات هجر للاستقدام" },
-      { property: "og:description", content: "إحصاءات ومؤشرات الاستقدام ونقل الكفالة وتقارير العملاء" },
+      { property: "og:description", content: "إحصاءات ومؤشرات الاستقدام ونقل الكفالة" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -134,7 +134,6 @@ function ReportsPage() {
   const [status, setStatus] = useState("");
   const [sponsor, setSponsor] = useState<string | null>(null);
   const [profileWorker, setProfileWorker] = useState<Worker | null>(null);
-  const [customerSearch, setCustomerSearch] = useState("");
 
   const today = todayISO();
 
@@ -202,22 +201,6 @@ function ReportsPage() {
     return [...map.entries()].map(([label, count]) => ({ label, count }));
   }, [fWorkers]);
 
-  const customers = useMemo(() => {
-    const base = mergeContacts(
-      requests.map((r) => ({ name: r.customer_name, phone: r.phone })),
-      workers.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
-      transfers.map((t) => ({ name: t.new_sponsor_name, phone: t.new_sponsor_phone })),
-    );
-    const q = customerSearch.trim();
-    return base
-      .map((c) => ({
-        ...c,
-        requests: requests.filter((r) => r.customer_name === c.name).length,
-        workers: workers.filter((w) => w.current_sponsor_name === c.name).length,
-        transfers: transfers.filter((t) => t.new_sponsor_name === c.name || t.old_sponsor_name === c.name).length,
-      }))
-      .filter((c) => !q || c.name.includes(q) || c.phone.includes(q));
-  }, [requests, workers, transfers, customerSearch]);
 
   const staffRows = useMemo(() => {
     const ids = new Set<string>();

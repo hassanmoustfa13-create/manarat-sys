@@ -18,6 +18,7 @@ import {
   transfersQuery,
   workersQuery,
 } from "@/lib/data";
+import { authQueryOptions } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
@@ -113,11 +114,19 @@ function BreakdownList({ rows, total }: { rows: { label: string; count: number }
 }
 
 function ReportsPage() {
-  const { data: requests = [] } = useQuery(requestsQuery);
-  const { data: workers = [] } = useQuery(workersQuery);
-  const { data: transfers = [] } = useQuery(transfersQuery);
+  const { data: allRequests = [] } = useQuery(requestsQuery);
+  const { data: allWorkers = [] } = useQuery(workersQuery);
+  const { data: allTransfers = [] } = useQuery(transfersQuery);
   const { data: profiles = [] } = useQuery(profilesQuery);
+  const { data: auth } = useQuery(authQueryOptions);
   const nameOf = profileNameMap(profiles);
+  const isAdmin = Boolean(auth?.isAdmin);
+  const me = auth?.userId ?? null;
+  const own = <T extends { created_by: string | null }>(rows: T[]) =>
+    isAdmin ? rows : me ? rows.filter((r) => r.created_by === me) : [];
+  const requests = useMemo(() => own(allRequests), [allRequests, isAdmin, me]);
+  const workers = useMemo(() => own(allWorkers), [allWorkers, isAdmin, me]);
+  const transfers = useMemo(() => own(allTransfers), [allTransfers, isAdmin, me]);
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -248,7 +257,7 @@ function ReportsPage() {
               className="bg-transparent text-[12.5px] text-ink outline-none"
             />
           </label>
-          <select
+          {isAdmin && <select
             value={staff}
             onChange={(e) => setStaff(e.target.value)}
             className="glass h-9 rounded-lg px-3 text-[12.5px] outline-none"
@@ -259,7 +268,7 @@ function ReportsPage() {
                 {nameOf(id)}
               </option>
             ))}
-          </select>
+          </select>}
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}

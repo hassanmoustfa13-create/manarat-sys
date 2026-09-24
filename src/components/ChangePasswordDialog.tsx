@@ -14,7 +14,10 @@ export function ChangePasswordDialog() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (pw !== confirm) return toast.error("كلمتا المرور غير متطابقتين");
+    if (pw !== confirm) {
+      toast.error("كلمتا المرور غير متطابقتين");
+      return;
+    }
     setBusy(true);
     try {
       await save({ data: { password: pw } });

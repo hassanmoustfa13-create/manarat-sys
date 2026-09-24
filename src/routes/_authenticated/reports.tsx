@@ -396,44 +396,6 @@ function ReportsPage() {
           )}
         </Panel>
       </div>
-
-      <div className="mt-3">
-        <Panel
-          title={`العملاء (${customers.length})`}
-          extra={
-            <input
-              value={customerSearch}
-              onChange={(e) => setCustomerSearch(e.target.value)}
-              placeholder="بحث باسم العميل أو الهاتف"
-              className="glass h-8 w-56 rounded-lg px-3 text-[12.5px] outline-none placeholder:text-ink/35"
-            />
-          }
-        >
-          {customers.length === 0 ? (
-            <p className="py-6 text-center text-[13px] text-ink/40">لا يوجد عملاء</p>
-          ) : (
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {customers.map((c) => (
-                <button
-                  key={c.name}
-                  type="button"
-                  onClick={() => setSponsor(c.name)}
-                  className="rounded-xl bg-white/55 p-3 text-start ring-1 ring-black/5 transition-colors hover:bg-white"
-                >
-                  <div className="truncate text-[13.5px] font-medium">{c.name}</div>
-                  <div dir="ltr" className="mt-0.5 text-start text-[11.5px] tabular-nums text-ink/45">
-                    {c.phone || "—"}
-                  </div>
-                  <div className="mt-2 flex gap-1.5 text-[11px]">
-                    <span className="pill pill-brand">{c.requests} طلب</span>
-                    <span className="pill pill-teal">{c.workers} عامل</span>
-                    <span className="pill pill-neutral">{c.transfers} نقل</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </Panel>
       </div>
 
       <SponsorProfileDialog

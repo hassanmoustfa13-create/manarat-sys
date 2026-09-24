@@ -36,9 +36,9 @@ import {
 export const Route = createFileRoute("/_authenticated/workers")({
   head: () => ({
     meta: [
-      { title: "جدول العمالة — هجرة" },
+      { title: "جدول العمالة — منارات هجر للاستقدام" },
       { name: "description", content: "إدارة بيانات العمالة، الكفلاء، وحالة نقل الكفالة في جدول تفاعلي" },
-      { property: "og:title", content: "جدول العمالة — هجرة" },
+      { property: "og:title", content: "جدول العمالة — منارات هجر للاستقدام" },
       { property: "og:description", content: "إدارة بيانات العمالة والكفلاء في جدول تفاعلي" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

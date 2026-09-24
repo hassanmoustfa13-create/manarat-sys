@@ -10,9 +10,9 @@ import { errorMessage } from "@/lib/data";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "تسجيل الدخول — هجرة" },
+      { title: "تسجيل الدخول — منارات هجر للاستقدام" },
       { name: "description", content: "سجّل الدخول إلى نظام إدارة الاستقدام لإدارة العمالة ونقل الكفالة" },
-      { property: "og:title", content: "تسجيل الدخول — هجرة" },
+      { property: "og:title", content: "تسجيل الدخول — منارات هجر للاستقدام" },
       { property: "og:description", content: "سجّل الدخول إلى نظام إدارة الاستقدام" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -55,7 +55,7 @@ function AuthPage() {
             هـ
           </span>
           <div>
-            <p className="text-[15px] font-semibold leading-tight">هجرة</p>
+            <p className="text-[15px] font-semibold leading-tight">منارات هجر للاستقدام</p>
             <p className="text-[11px] text-muted-foreground">نظام إدارة الاستقدام</p>
           </div>
         </div>

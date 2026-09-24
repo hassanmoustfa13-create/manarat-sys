@@ -79,10 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "هجرة — نظام إدارة الاستقدام" },
+      { title: "منارات هجر للاستقدام — نظام إدارة الاستقدام" },
       { name: "description", content: "نظام إدارة العمالة ونقل الكفالة لشركات الاستقدام" },
-      { name: "author", content: "هجرة" },
-      { property: "og:title", content: "هجرة — نظام إدارة الاستقدام" },
+      { name: "author", content: "منارات هجر للاستقدام" },
+      { property: "og:title", content: "منارات هجر للاستقدام — نظام إدارة الاستقدام" },
       { property: "og:description", content: "نظام إدارة العمالة ونقل الكفالة لشركات الاستقدام" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

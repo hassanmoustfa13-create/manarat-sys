@@ -255,7 +255,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
                 onChange={set("period_start")}
                 required
               />
-              <TextField label="تاريخ انتهاء المدة (تلقائي: 10 أيام)" type="date" ltr value={form.period_start ? addDays(form.period_start, 10) : ""} onChange={() => {}} readOnly />
+              <TextField label="تاريخ انتهاء المدة (تلقائي: 10 أيام)" type="date" ltr value={form.period_start ? addDays(form.period_start, 10) : ""} onChange={() => {}} disabled />
             </>
           )}
           <SelectField

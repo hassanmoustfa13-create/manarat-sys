@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-const EXPERIENCE_OPTIONS = ["سنة", "سنتان", "3 سنوات", "4 سنوات", "5 سنوات", "6 سنوات"];
 import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
 import {
   ACTION_STATUSES,
@@ -28,6 +27,8 @@ import {
   requestsQuery,
   workersQuery,
 } from "@/lib/data";
+
+const EXPERIENCE_OPTIONS = ["سنة", "سنتان", "3 سنوات", "4 سنوات", "5 سنوات", "6 سنوات"];
 
 interface Props {
   open: boolean;

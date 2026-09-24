@@ -299,6 +299,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
+      staff_names: {
+        Args: never
+        Returns: {
+          full_name: string
+          id: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"

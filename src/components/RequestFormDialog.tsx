@@ -28,6 +28,8 @@ import {
   workersQuery,
 } from "@/lib/data";
 
+const EXPERIENCE_OPTIONS = ["سنة", "سنتان", "3 سنوات", "4 سنوات", "5 سنوات", "6 سنوات"];
+
 interface Props {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -178,7 +180,7 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
                 : [form.pref_religion, ...RELIGIONS]
             }
           />
-          <TextField label="الخبرة" value={form.pref_experience} onChange={set("pref_experience")} placeholder="مثال: سنتان" />
+          <SelectField label="الخبرة" value={form.pref_experience} onChange={set("pref_experience")} options={EXPERIENCE_OPTIONS} />
           <SelectField
             label="رخصة قيادة"
             value={form.pref_driving_license}

@@ -197,7 +197,6 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
           />
           <SelectField label="المهنة" value={form.profession} onChange={set("profession")} options={PROFESSIONS} />
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
-          <TextField label="وقت الوصول" type="time" ltr value={form.arrival_time} onChange={set("arrival_time")} />
           <TextField
             label="مجموعة الرحلة"
             value={form.flight_group}

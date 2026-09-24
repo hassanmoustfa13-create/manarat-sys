@@ -15,9 +15,9 @@ type Editing = { id: string; fullName: string; email: string; password: string; 
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
     meta: [
-      { title: "إدارة المستخدمين — هجرة" },
-      { name: "description", content: "إضافة موظفين ومديرين جدد إلى نظام هجرة" },
-      { property: "og:title", content: "إدارة المستخدمين — هجرة" },
+      { title: "إدارة المستخدمين — منارات هجر للاستقدام" },
+      { name: "description", content: "إضافة موظفين ومديرين جدد إلى نظام منارات هجر للاستقدام" },
+      { property: "og:title", content: "إدارة المستخدمين — منارات هجر للاستقدام" },
       { property: "og:description", content: "إضافة موظفين ومديرين جدد" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

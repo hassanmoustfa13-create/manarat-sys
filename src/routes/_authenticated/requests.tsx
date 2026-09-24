@@ -34,9 +34,9 @@ import {
 export const Route = createFileRoute("/_authenticated/requests")({
   head: () => ({
     meta: [
-      { title: "طلبات الاستقدام — هجرة" },
+      { title: "طلبات الاستقدام — منارات هجر للاستقدام" },
       { name: "description", content: "إدارة طلبات العملاء، تفضيلات العمالة، وحالة الإجراء على كل طلب" },
-      { property: "og:title", content: "طلبات الاستقدام — هجرة" },
+      { property: "og:title", content: "طلبات الاستقدام — منارات هجر للاستقدام" },
       { property: "og:description", content: "إدارة طلبات العملاء وتفضيلات العمالة" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -49,7 +49,7 @@ const empty = {
   transfer_type: TRANSFER_TYPES[0] as string,
   transfer_stage: TRANSFER_STAGES[0] as string,
   transfer_date: new Date().toISOString().slice(0, 10),
-  period_start: "",
+  period_start: new Date().toISOString().slice(0, 10),
   period_end: "",
   old_sponsor_dues: "",
   down_payment: "",
@@ -142,7 +142,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         transfer_stage: form.transfer_stage,
         transfer_date: form.transfer_date || null,
         period_start: needsPeriod ? form.period_start || null : null,
-        period_end: needsPeriod ? form.period_end || null : null,
+        period_end: needsPeriod && form.period_start ? addDays(form.period_start, 10) : null,
         old_sponsor_dues: dues,
         down_payment: deposit,
         payment_status: form.payment_status,
@@ -255,14 +255,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
                 onChange={set("period_start")}
                 required
               />
-              <TextField
-                label="تاريخ انتهاء المدة"
-                type="date"
-                ltr
-                value={form.period_end}
-                onChange={set("period_end")}
-                required
-              />
+              <TextField label="تاريخ انتهاء المدة (تلقائي: 10 أيام)" type="date" ltr value={form.period_start ? addDays(form.period_start, 10) : ""} onChange={() => {}} disabled />
             </>
           )}
           <SelectField
@@ -322,4 +315,10 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
       </DialogContent>
     </Dialog>
   );
+}
+
+function addDays(date: string, days: number) {
+  const d = new Date(date + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
 }

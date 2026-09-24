@@ -16,7 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="grid size-8 place-items-center rounded-lg bg-brand/15 text-sm font-bold text-brand">
               هـ
             </span>
-            <span className="text-[15px] font-semibold">هجرة</span>
+            <span className="text-[15px] font-semibold">منارات هجر للاستقدام</span>
             <span className="hidden border-r border-black/10 pr-2 text-[11px] text-ink/40 sm:block">
               نظام إدارة الاستقدام
             </span>

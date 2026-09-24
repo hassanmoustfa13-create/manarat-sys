@@ -23,12 +23,12 @@ import { authQueryOptions } from "@/hooks/useAuth";
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
-      { title: "لوحة التقارير — هجرة" },
+      { title: "لوحة التقارير — منارات هجر للاستقدام" },
       {
         name: "description",
         content: "إحصاءات طلبات الاستقدام والعمالة ونقل الكفالة وحالات الدفع والفترات المنتهية مع فلاتر وتقارير العملاء",
       },
-      { property: "og:title", content: "لوحة التقارير — هجرة" },
+      { property: "og:title", content: "لوحة التقارير — منارات هجر للاستقدام" },
       { property: "og:description", content: "إحصاءات ومؤشرات الاستقدام ونقل الكفالة وتقارير العملاء" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -37,9 +37,9 @@ import {
 export const Route = createFileRoute("/_authenticated/transfers")({
   head: () => ({
     meta: [
-      { title: "جدول نقل الكفالة — هجرة" },
+      { title: "جدول نقل الكفالة — منارات هجر للاستقدام" },
       { name: "description", content: "متابعة عمليات نقل الكفالة، المستحقات، العربون، والمتبقي في جدول تفاعلي" },
-      { property: "og:title", content: "جدول نقل الكفالة — هجرة" },
+      { property: "og:title", content: "جدول نقل الكفالة — منارات هجر للاستقدام" },
       { property: "og:description", content: "متابعة عمليات نقل الكفالة والمدفوعات" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -379,7 +379,6 @@ function ReportsPage() {
           )}
         </Panel>
       </div>
-      </div>
 
       <SponsorProfileDialog
         sponsor={sponsor}

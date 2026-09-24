@@ -4,8 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { createUser, listUsers } from "@/lib/users.functions";
+import { createUser, deleteUser, listUsers, updateUser } from "@/lib/users.functions";
 import { formatDate } from "@/lib/data";
+import { Pencil, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ConfirmDelete } from "@/components/ConfirmDelete";
+
+type Editing = { id: string; fullName: string; email: string; password: string; isAdmin: boolean };
 
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
@@ -38,6 +43,34 @@ function UsersPage() {
       setForm({ fullName: "", email: "", password: "", isAdmin: false });
       qc.invalidateQueries({ queryKey: ["users"] });
       qc.invalidateQueries({ queryKey: ["profiles"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const update = useServerFn(updateUser);
+  const remove = useServerFn(deleteUser);
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["users"] });
+    qc.invalidateQueries({ queryKey: ["profiles"] });
+    qc.invalidateQueries({ queryKey: ["auth"] });
+  };
+  const editM = useMutation({
+    mutationFn: () => update({ data: { ...editing!, password: editing!.password || undefined } }),
+    onSuccess: () => {
+      toast.success("تم حفظ التعديلات");
+      setEditing(null);
+      refresh();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const delM = useMutation({
+    mutationFn: () => remove({ data: { id: deleting!.id } }),
+    onSuccess: () => {
+      toast.success("تم حذف المستخدم");
+      setDeleting(null);
+      refresh();
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -76,10 +109,55 @@ function UsersPage() {
               <span dir="ltr" className="truncate text-ink/50">{u.email}</span>
               <span className="text-[11px] text-ink/40">{formatDate(u.created_at)}</span>
               <span className={u.isAdmin ? "pill pill-teal" : "pill pill-brand"}>{u.isAdmin ? "مدير" : "موظف"}</span>
+              <button type="button" title="تعديل" onClick={() => setEditing({ id: u.id, fullName: u.full_name, email: u.email, password: "", isAdmin: u.isAdmin })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
+                <Pencil className="size-3.5" />
+              </button>
+              {u.id !== auth.userId && (
+                <button type="button" title="حذف" onClick={() => setDeleting({ id: u.id, name: u.full_name })} className="grid size-7 place-items-center rounded-lg text-terracotta/70 hover:bg-terracotta/10 hover:text-terracotta">
+                  <Trash2 className="size-3.5" />
+                </button>
+              )}
             </div>
           ))}
         </div>
       </section>
+
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent dir="rtl" className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>تعديل بيانات المستخدم</DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <form
+              className="space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                editM.mutate();
+              }}
+            >
+              <input required placeholder="الاسم" value={editing.fullName} onChange={(e) => setEditing({ ...editing, fullName: e.target.value })} className={input} />
+              <input required type="email" dir="ltr" placeholder="البريد الإلكتروني" value={editing.email} onChange={(e) => setEditing({ ...editing, email: e.target.value })} className={input} />
+              <input dir="ltr" minLength={6} placeholder="كلمة مرور جديدة (اتركها فارغة لعدم التغيير)" value={editing.password} onChange={(e) => setEditing({ ...editing, password: e.target.value })} className={input} />
+              <label className="flex items-center gap-2 text-[13px]">
+                <input type="checkbox" disabled={editing.id === auth.userId} checked={editing.isAdmin} onChange={(e) => setEditing({ ...editing, isAdmin: e.target.checked })} />
+                صلاحية مدير
+              </label>
+              <button disabled={editM.isPending} className="h-10 w-full rounded-lg bg-brand text-[13px] font-medium text-primary-foreground disabled:opacity-60">
+                {editM.isPending ? "جارٍ الحفظ…" : "حفظ التعديلات"}
+              </button>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDelete
+        open={!!deleting}
+        onOpenChange={(o) => !o && setDeleting(null)}
+        title="حذف المستخدم"
+        description={`سيتم حذف حساب "${deleting?.name ?? ""}" نهائياً ولن يتمكن من الدخول. السجلات التي أضافها ستبقى.`}
+        pending={delM.isPending}
+        onConfirm={() => delM.mutate()}
+      />
     </main>
   );
 }

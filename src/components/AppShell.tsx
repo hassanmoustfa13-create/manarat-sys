@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
+import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
@@ -62,6 +63,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               التقارير
             </Link>
+            {auth.isAdmin && (
+              <Link
+                to="/users"
+                className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
+                activeProps={{
+                  className:
+                    "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
+                }}
+              >
+                المستخدمون
+              </Link>
+            )}
           </nav>
           <div className="ms-auto flex items-center gap-2">
             <div className="flex items-center gap-2 rounded-full bg-white/70 px-3 py-1.5 ring-1 ring-black/8 backdrop-blur-md">
@@ -73,6 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {auth.isAdmin ? "مدير" : "موظف"}
               </span>
             </div>
+            <ChangePasswordDialog />
             <button
               type="button"
               onClick={signOut}

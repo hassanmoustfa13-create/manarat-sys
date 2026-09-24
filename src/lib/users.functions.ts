@@ -103,5 +103,7 @@ export const deleteUser = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.id);
     if (error) throw new Error(error.message);
+    await supabaseAdmin.from("user_roles").delete().eq("user_id", data.id);
+    await supabaseAdmin.from("profiles").delete().eq("id", data.id);
     return { ok: true };
   });

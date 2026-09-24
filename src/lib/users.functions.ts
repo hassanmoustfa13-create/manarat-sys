@@ -27,7 +27,7 @@ export const createUser = createServerFn({ method: "POST" })
     z
       .object({
         email: z.string().trim().email().max(255),
-        password: z.string().min(1).max(72),
+        password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل").max(72),
         fullName: z.string().trim().min(1).max(100),
         isAdmin: z.boolean(),
       })
@@ -51,7 +51,7 @@ export const createUser = createServerFn({ method: "POST" })
 
 export const setUserPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ password: z.string().min(1).max(72) }).parse(d))
+  .inputValidator((d) => z.object({ password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل").max(72) }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.updateUserById(context.userId, { password: data.password });

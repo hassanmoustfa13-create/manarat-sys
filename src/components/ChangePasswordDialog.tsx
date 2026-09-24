@@ -45,7 +45,7 @@ export function ChangePasswordDialog() {
           <DialogTitle>تغيير كلمة المرور</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-3">
-          <input required dir="ltr" type="password" placeholder="كلمة المرور الجديدة" value={pw} onChange={(e) => setPw(e.target.value)} className={cls} />
+          <input required dir="ltr" type="password" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)" minLength={6} value={pw} onChange={(e) => setPw(e.target.value)} className={cls} />
           <input required dir="ltr" type="password" placeholder="تأكيد كلمة المرور" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={cls} />
           <button disabled={busy} className="h-10 w-full rounded-lg bg-brand text-[13px] font-medium text-primary-foreground disabled:opacity-60">
             {busy ? "جارٍ الحفظ…" : "حفظ"}

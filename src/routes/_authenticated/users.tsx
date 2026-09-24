@@ -47,6 +47,34 @@ function UsersPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const update = useServerFn(updateUser);
+  const remove = useServerFn(deleteUser);
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);
+  const refresh = () => {
+    qc.invalidateQueries({ queryKey: ["users"] });
+    qc.invalidateQueries({ queryKey: ["profiles"] });
+    qc.invalidateQueries({ queryKey: ["auth"] });
+  };
+  const editM = useMutation({
+    mutationFn: () => update({ data: { ...editing!, password: editing!.password || undefined } }),
+    onSuccess: () => {
+      toast.success("تم حفظ التعديلات");
+      setEditing(null);
+      refresh();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const delM = useMutation({
+    mutationFn: () => remove({ data: { id: deleting!.id } }),
+    onSuccess: () => {
+      toast.success("تم حذف المستخدم");
+      setDeleting(null);
+      refresh();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (auth.loading) return null;
   if (!auth.isAdmin)
     return <main className="p-10 text-center text-ink/50">هذه الصفحة متاحة للمدير فقط</main>;

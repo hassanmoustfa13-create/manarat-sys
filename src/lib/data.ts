@@ -114,9 +114,9 @@ export const transfersQuery = queryOptions({
 export const profilesQuery = queryOptions({
   queryKey: ["profiles"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("profiles").select("*");
+    const { data, error } = await supabase.rpc("staff_names");
     if (error) throw error;
-    return data;
+    return (data ?? []).map((p) => ({ id: p.id, full_name: p.full_name, email: "", created_at: "" })) as Profile[];
   },
   staleTime: 5 * 60_000,
 });

@@ -22,7 +22,6 @@ import {
   REQUEST_TYPES,
   YES_NO_EXISTS,
   type Request,
-  type RequestUpdate,
   type Worker,
   errorMessage,
   formatDate,
@@ -66,17 +65,6 @@ function RequestsPage() {
     [requests, statusFilter],
   );
 
-  const update = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: RequestUpdate }) => {
-      const { error } = await supabase.from("requests").update(patch).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["requests"] });
-      toast.success("تم الحفظ", { duration: 1500 });
-    },
-    onError: (e) => toast.error(errorMessage(e)),
-  });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -220,11 +208,6 @@ function RequestsPage() {
           search={search}
           minWidth={2000}
           emptyMessage="لا توجد طلبات بعد"
-          onCellSave={async (row, col, value) => {
-            const patch: RequestUpdate =
-              col === "request_date" ? { request_date: value || null } : ({ [col]: value } as RequestUpdate);
-            await update.mutateAsync({ id: row.id, patch });
-          }}
           rowActions={(r) => (
             <>
               <IconBtn

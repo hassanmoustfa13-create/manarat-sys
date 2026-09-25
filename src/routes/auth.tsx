@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { errorMessage } from "@/lib/data";
+import logoAsset from "@/assets/manarat-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -51,9 +52,11 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="glass w-full max-w-sm rounded-2xl p-6">
         <div className="mb-6 flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-lg bg-brand/15 text-sm font-bold text-brand">
-            هـ
-          </span>
+          <img
+            src={logoAsset.url}
+            alt="شعار منارات هجر للاستقدام"
+            className="size-11 rounded-xl object-contain"
+          />
           <div>
             <p className="text-[15px] font-semibold leading-tight">منارات هجر للاستقدام</p>
             <p className="text-[11px] text-muted-foreground">نظام إدارة الاستقدام</p>

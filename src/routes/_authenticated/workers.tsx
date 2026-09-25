@@ -22,7 +22,6 @@ import {
   VISA_TYPES,
 
   type Worker,
-  type WorkerUpdate,
   daysUntil,
   errorMessage,
   formatDate,

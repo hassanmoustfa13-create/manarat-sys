@@ -67,17 +67,6 @@ function WorkersPage() {
     [workers, statusFilter],
   );
 
-  const update = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: WorkerUpdate }) => {
-      const { error } = await supabase.from("workers").update(patch).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["workers"] });
-      toast.success("تم الحفظ", { duration: 1500 });
-    },
-    onError: (e) => toast.error(errorMessage(e)),
-  });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -264,15 +253,6 @@ function WorkersPage() {
           columns={columns}
           search={search}
           minWidth={2200}
-          onCellSave={async (row, col, value) => {
-            const patch: WorkerUpdate =
-              col === "monthly_salary"
-                ? { monthly_salary: Number(value || 0) }
-                : col === "arrival_date"
-                  ? { arrival_date: value || null }
-                  : ({ [col]: value } as WorkerUpdate);
-            await update.mutateAsync({ id: row.id, patch });
-          }}
           rowActions={(w) => (
             <>
               <IconBtn title="نقل الكفالة" onClick={() => setTransferFor(w)}>

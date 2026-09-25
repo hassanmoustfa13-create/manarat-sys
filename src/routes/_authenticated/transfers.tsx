@@ -23,7 +23,6 @@ import {
   YES_NO_EXISTS_F,
 
   type Transfer,
-  type TransferUpdate,
   type Worker,
   errorMessage,
   formatDate,
@@ -83,17 +82,6 @@ function TransfersPage() {
     qc.invalidateQueries({ queryKey: ["workers"] });
   };
 
-  const update = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: TransferUpdate }) => {
-      const { error } = await supabase.from("transfers").update(patch).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      invalidate();
-      toast.success("تم الحفظ", { duration: 1500 });
-    },
-    onError: (e) => toast.error(errorMessage(e)),
-  });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -335,15 +323,6 @@ function TransfersPage() {
           search={search}
           minWidth={2600}
           emptyMessage="لا توجد عمليات نقل كفالة بعد"
-          onCellSave={async (row, col, value) => {
-            const patch: TransferUpdate =
-              col === "old_sponsor_dues" || col === "down_payment" || col === "salary_dues_amount"
-                ? { [col]: Number(value || 0) }
-                : col === "transfer_date"
-                  ? { transfer_date: value || null }
-                  : ({ [col]: value } as TransferUpdate);
-            await update.mutateAsync({ id: row.id, patch });
-          }}
 
           rowActions={(t) => (
             <>

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import type { ReactNode } from "react";
+import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 
@@ -13,9 +14,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-black/5 bg-white/70 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-2.5">
-            <span className="grid size-8 place-items-center rounded-lg bg-brand/15 text-sm font-bold text-brand">
-              هـ
-            </span>
+            <img
+              src={logoAsset.url}
+              alt="شعار منارات هجر للاستقدام"
+              className="size-9 rounded-lg object-contain"
+            />
             <span className="text-[15px] font-semibold">منارات هجر للاستقدام</span>
             <span className="hidden border-r border-black/10 pr-2 text-[11px] text-ink/40 sm:block">
               نظام إدارة الاستقدام

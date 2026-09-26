@@ -16,6 +16,7 @@ import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
+import { SmartAlerts } from "@/components/SmartAlerts";
 
 type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
 
@@ -82,6 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
+      <SmartAlerts />
       {/* Desktop sidebar — first child in RTL flex = right side */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-l border-black/5 bg-white/70 backdrop-blur-xl md:flex">
         <div className="flex items-center gap-2.5 border-b border-black/5 px-4 py-4">

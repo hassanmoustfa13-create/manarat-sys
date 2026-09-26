@@ -248,9 +248,14 @@ export function SponsorProfileDialog({
                 {w.name}
               </button>
               <span className="text-ink/45">{w.nationality}</span>
-              <span className="text-ink/45 tabular-nums" dir="ltr">
-                {w.passport_number}
-              </span>
+              <button
+                type="button"
+                onClick={() => onWorkerClick(w)}
+                className="text-ink/45 tabular-nums hover:text-brand hover:underline"
+                dir="ltr"
+              >
+                {w.passport_number || "بدون رقم جواز"}
+              </button>
               <span className="ms-auto">
                 <StatusBadge value={w.transfer_status} />
               </span>

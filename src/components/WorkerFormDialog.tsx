@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, SuggestField, TextField } from "@/components/FormFields";
 import {
   ARRIVAL_STATUSES,
   LOCATIONS,
@@ -181,21 +181,15 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             disabled={coreLocked}
             hint="اختياري إذا تم إدخال الاسم — ويجب أن يكون فريداً"
           />
-          <Field label="الجنسية">
-            <input
-              list="nationalities"
-              value={form.nationality}
-              onChange={(e) => set("nationality")(e.target.value)}
-              required
-              disabled={coreLocked}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"
-            />
-            <datalist id="nationalities">
-              {NATIONALITIES.map((n) => (
-                <option key={n} value={n} />
-              ))}
-            </datalist>
-          </Field>
+          <SuggestField
+            label="الجنسية"
+            value={form.nationality}
+            onChange={set("nationality")}
+            options={NATIONALITIES}
+            required
+            disabled={coreLocked}
+            hint="اكتب الجنسية أو اخترها من القائمة"
+          />
           <TextField
             label="تاريخ الوصول"
             type="date"

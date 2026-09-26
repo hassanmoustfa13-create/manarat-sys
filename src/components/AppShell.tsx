@@ -1,119 +1,84 @@
 import { Link } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import {
+  ArrowLeftRight,
+  BarChart3,
+  ClipboardList,
+  LogOut,
+  Settings2,
+  UserCog,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
+
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/reports" | "/users" | "/columns"; label: string; icon: LucideIcon; admin?: boolean };
+
+const NAV: NavItem[] = [
+  { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
+  { to: "/workers", label: "العمالة", icon: Users },
+  { to: "/transfers", label: "نقل الكفالة", icon: ArrowLeftRight },
+  { to: "/reports", label: "التقارير", icon: BarChart3 },
+  { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
+  { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },
+];
+
+const itemCls =
+  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-ink/60 transition-colors hover:bg-black/5";
+const activeCls =
+  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
   const signOut = useSignOut();
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-black/5 bg-white/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-4 px-4 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <img
-              src={logoAsset.url}
-              alt="شعار منارات هجر للاستقدام"
-              className="size-9 rounded-lg object-contain"
-            />
-            <span className="text-[15px] font-semibold">منارات هجر للاستقدام</span>
-            <span className="hidden border-r border-black/10 pr-2 text-[11px] text-ink/40 sm:block">
-              نظام إدارة الاستقدام
+    <div className="flex min-h-screen">
+      <main className="min-w-0 flex-1">{children}</main>
+
+      {/* Sidebar — last child in RTL flex = left side */}
+      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-black/5 bg-white/70 backdrop-blur-xl">
+        <div className="flex items-center gap-2.5 border-b border-black/5 px-4 py-4">
+          <img src={logoAsset.url} alt="شعار منارات هجر للاستقدام" className="size-10 shrink-0 rounded-lg object-contain" />
+          <div className="min-w-0">
+            <div className="truncate text-[14px] font-semibold">منارات هجر للاستقدام</div>
+            <div className="truncate text-[11px] text-ink/40">نظام إدارة الاستقدام</div>
+          </div>
+        </div>
+
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+          {NAV.filter((n) => !n.admin || auth.isAdmin).map(({ to, label, icon: Icon }) => (
+            <Link key={to} to={to} className={itemCls} activeProps={{ className: activeCls }}>
+              <Icon className="size-4 shrink-0" />
+              <span className="truncate">{label}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="space-y-2 border-t border-black/5 p-3">
+          <div className="flex items-center gap-2 rounded-lg bg-white/70 px-3 py-2 ring-1 ring-black/8">
+            <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
+              {auth.loading ? "…" : auth.fullName}
+            </span>
+            <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
+              {auth.isAdmin ? "مدير" : "موظف"}
             </span>
           </div>
-          <nav className="ms-2 flex items-center gap-1">
-            <Link
-              to="/requests"
-              className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
-              activeProps={{
-                className:
-                  "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
-              }}
-            >
-              طلبات الاستقدام
-            </Link>
-            <Link
-
-              to="/workers"
-              className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
-              activeProps={{
-                className:
-                  "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
-              }}
-            >
-              العمالة
-            </Link>
-            <Link
-              to="/transfers"
-              className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
-              activeProps={{
-                className:
-                  "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
-              }}
-            >
-              نقل الكفالة
-            </Link>
-            <Link
-              to="/reports"
-              className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
-              activeProps={{
-                className:
-                  "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
-              }}
-            >
-              التقارير
-            </Link>
-            {auth.isAdmin && (
-              <Link
-                to="/users"
-                className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
-                activeProps={{
-                  className:
-                    "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
-                }}
-              >
-                المستخدمون
-              </Link>
-            )}
-            {auth.isAdmin && (
-              <Link
-                to="/columns"
-                className="rounded-lg px-3 py-1.5 text-sm text-ink/55 transition-colors hover:bg-black/5"
-                activeProps={{
-                  className:
-                    "rounded-lg px-3 py-1.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20",
-                }}
-              >
-                إعدادات الجداول
-              </Link>
-            )}
-          </nav>
-          <div className="ms-auto flex items-center gap-2">
-            <div className="flex items-center gap-2 rounded-full bg-white/70 px-3 py-1.5 ring-1 ring-black/8 backdrop-blur-md">
-              <span className="hidden text-[11px] text-ink/40 sm:inline">مرحبا</span>
-              <span className="max-w-[140px] truncate text-[13px] font-medium">
-                {auth.loading ? "…" : auth.fullName}
-              </span>
-              <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
-                {auth.isAdmin ? "مدير" : "موظف"}
-              </span>
-            </div>
+          <div className="flex items-center justify-between">
             <ChangePasswordDialog />
             <button
               type="button"
               onClick={signOut}
-              title="تسجيل الخروج"
-              className="grid size-8 place-items-center rounded-full text-ink/50 transition-colors hover:bg-black/5 hover:text-ink"
+              className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] text-ink/60 transition-colors hover:bg-black/5 hover:text-ink"
             >
               <LogOut className="size-4" />
+              تسجيل الخروج
             </button>
           </div>
         </div>
-      </header>
-      {children}
+      </aside>
     </div>
   );
 }

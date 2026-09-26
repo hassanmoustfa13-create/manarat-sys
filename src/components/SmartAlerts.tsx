@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import { workersQuery, transfersQuery, daysUntil, type Worker } from "@/lib/data";
 import { WorkerProfileDialog, SponsorProfileDialog } from "@/components/ProfileDialogs";
 
-const TRIAL_DAYS = 3; // تنبيه قبل انتهاء مدة التجربة
-const ARRIVAL_DAYS = 3; // تنبيه قبل وصول العاملة
+const TRIAL_DAYS = 1; // تنبيه قبل انتهاء مدة التجربة بيوم واحد
+const ARRIVAL_DAYS = 1; // تنبيه قبل وصول العاملة بيوم واحد
 
 function dayText(d: number) {
   if (d === 0) return "اليوم";

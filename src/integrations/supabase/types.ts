@@ -157,6 +157,7 @@ export type Database = {
       }
       transfers: {
         Row: {
+          category: string
           created_at: string
           created_by: string | null
           down_payment: number
@@ -186,6 +187,7 @@ export type Database = {
           worker_location: string
         }
         Insert: {
+          category?: string
           created_at?: string
           created_by?: string | null
           down_payment?: number
@@ -215,6 +217,7 @@ export type Database = {
           worker_location?: string
         }
         Update: {
+          category?: string
           created_at?: string
           created_by?: string | null
           down_payment?: number

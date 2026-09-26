@@ -90,7 +90,6 @@ export function WorkerProfileDialog({
                 <h4 className="mb-2 mt-4 text-[11px] font-semibold text-ink/50">بيانات الوصول</h4>
                 <Row label="تاريخ الوصول" value={formatDate(worker.arrival_date)} ltr />
                 <Row label="وقت الوصول" value={worker.arrival_time || "—"} ltr />
-                <Row label="مجموعة الرحلة" value={worker.flight_group || "—"} />
                 <Row label="حالة الوصول" value={<StatusBadge value={worker.arrival_status} />} />
                 <Row label="الموقع الحالي" value={<StatusBadge value={worker.current_location} />} />
                 <Row label="الوقت المتبقي للوصول" value={formatDaysRemaining(days)} />

@@ -20,6 +20,7 @@ const STATUS_CLASS: Record<string, string> = {
   "تم الوصول": "pill pill-success",
   "تم الإلغاء": "pill pill-terracotta",
   الشركة: "pill pill-brand",
+  السكن: "pill pill-brand",
   "الكفيل القديم": "pill pill-neutral",
   "الكفيل الجديد": "pill pill-teal",
   "إجراءات رفع طلب النقل": "pill pill-brand",

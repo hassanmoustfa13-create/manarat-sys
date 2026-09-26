@@ -43,7 +43,7 @@ export function DataGrid<T extends { id: string }>({
   search,
   rowActions,
   emptyMessage = "لا توجد سجلات بعد",
-  minWidth = 1080,
+  minWidth = 0,
   gridKey,
 }: DataGridProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -110,7 +110,7 @@ export function DataGrid<T extends { id: string }>({
                           type="button"
                           disabled={!canSort}
                           onClick={header.column.getToggleSortingHandler()}
-                          className="inline-flex items-center gap-1.5 whitespace-nowrap disabled:cursor-default"
+                          className="inline-flex items-center gap-1.5 leading-snug disabled:cursor-default"
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {canSort &&
@@ -157,7 +157,7 @@ export function DataGrid<T extends { id: string }>({
                     <td
                       key={cell.id}
                       dir={meta.ltr ? "ltr" : undefined}
-                      className={`border-l border-black/5 px-4 ${padCls} align-middle first:border-l-0 ${alignOf(
+                      className={`border-l border-black/5 px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
                         cell.column.id,
                         meta.ltr,
                       )} ${meta.className ?? ""}`}

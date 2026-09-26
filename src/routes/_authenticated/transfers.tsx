@@ -333,7 +333,6 @@ function TransfersPage() {
           data={rows}
           columns={columns}
           search={search}
-          minWidth={2600}
           emptyMessage="لا توجد عمليات نقل كفالة بعد"
 
           rowActions={(t) => (

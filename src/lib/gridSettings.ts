@@ -86,13 +86,76 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
   ],
 };
 
+/** Default compact widths (~1.5 words) so the table stays narrow; text wraps nicely. */
+const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
+  workers: {
+    name: 130,
+    passport_number: 110,
+    nationality: 90,
+    profession: 100,
+    visa_type: 90,
+    arrival_date: 100,
+    arrival_status: 90,
+    current_location: 100,
+    days_remaining: 90,
+    current_sponsor_name: 130,
+    current_sponsor_phone: 110,
+    transfer_status: 100,
+    notes: 160,
+    created_by: 110,
+    updated_by: 110,
+  },
+  requests: {
+    request_date: 100,
+    customer_name: 130,
+    phone: 110,
+    profession: 100,
+    nationality: 90,
+    request_type: 90,
+    lead_source: 100,
+    action_status: 130,
+    pref_age: 70,
+    pref_religion: 80,
+    pref_experience: 90,
+    pref_driving_license: 90,
+    pref_languages: 90,
+    notes: 160,
+    created_by: 110,
+    updated_by: 110,
+  },
+  transfers: {
+    worker_name: 130,
+    days_in_saudi: 110,
+    old_sponsor_name: 120,
+    new_sponsor_name: 120,
+    new_sponsor_phone: 110,
+    visa_type: 90,
+    transfer_type: 90,
+    transfer_date: 100,
+    transfer_stage: 130,
+    worker_condition: 160,
+    worker_location: 100,
+    old_sponsor_dues: 100,
+    down_payment: 80,
+    remaining_amount: 80,
+    payment_status: 110,
+    medical_exam: 90,
+    residency_status: 80,
+    salary_dues_status: 110,
+    salary_dues_amount: 110,
+    created_by: 110,
+    updated_by: 110,
+  },
+};
+
 /** Merge saved settings with the known column list (new columns appended, unknown dropped). */
 export function resolveColumns(key: GridKey, saved?: GridSettings | null): ColumnSetting[] {
   const known = GRID_COLUMNS[key].map(([id]) => id);
+  const defaults = DEFAULT_WIDTHS[key];
   const savedCols = (saved?.columns ?? []).filter((c) => known.includes(c.id));
   const missing = known
     .filter((id) => !savedCols.some((c) => c.id === id))
-    .map((id) => ({ id, visible: true }) as ColumnSetting);
+    .map((id) => ({ id, visible: true, width: defaults[id] ?? 110 }) as ColumnSetting);
   return [...savedCols, ...missing];
 }
 

@@ -6,6 +6,7 @@ import {
   LogOut,
   Menu,
   Settings2,
+  ShieldCheck,
   UserCog,
   Users,
   X,
@@ -16,7 +17,7 @@ import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/reports" | "/users" | "/columns"; label: string; icon: LucideIcon; admin?: boolean };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
 
 const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -25,6 +26,7 @@ const NAV: NavItem[] = [
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },
+  { to: "/security", label: "سجل الأمان", icon: ShieldCheck, admin: true },
 ];
 
 const itemCls =

@@ -64,6 +64,13 @@
       "when": 1790442223764,
       "tag": "0008_company_as_default_sponsor",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790444693705,
+      "tag": "0009_transfer_category",
+      "breakpoints": true
     }
   ]
 }

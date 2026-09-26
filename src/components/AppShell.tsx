@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
-  ArrowLeftRight,
+  ArrowLeftRight, Briefcase,
   BarChart3,
   ClipboardList,
   LogOut,
@@ -17,12 +17,13 @@ import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
 
 const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
   { to: "/workers", label: "العمالة", icon: Users },
-  { to: "/transfers", label: "نقل الكفالة", icon: ArrowLeftRight },
+  { to: "/transfers", label: "نقل الكفالة (منزلية)", icon: ArrowLeftRight },
+  { to: "/transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },

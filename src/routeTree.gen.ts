@@ -17,6 +17,7 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated/transfers'
+import { Route as AuthenticatedTransfersProRouteImport } from './routes/_authenticated/transfers-pro'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedWorkersRouteImport } from './routes/_authenticated/workers'
 
@@ -59,6 +60,12 @@ const AuthenticatedTransfersRoute = AuthenticatedTransfersRouteImport.update({
   path: '/transfers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTransfersProRoute =
+  AuthenticatedTransfersProRouteImport.update({
+    id: '/transfers-pro',
+    path: '/transfers-pro',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/transfers': typeof AuthenticatedTransfersRoute
+  '/transfers-pro': typeof AuthenticatedTransfersProRoute
   '/users': typeof AuthenticatedUsersRoute
   '/workers': typeof AuthenticatedWorkersRoute
 }
@@ -89,6 +97,7 @@ export interface FileRoutesByTo {
   '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/transfers': typeof AuthenticatedTransfersRoute
+  '/transfers-pro': typeof AuthenticatedTransfersProRoute
   '/users': typeof AuthenticatedUsersRoute
   '/workers': typeof AuthenticatedWorkersRoute
 }
@@ -102,6 +111,7 @@ export interface FileRoutesById {
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
+  '/_authenticated/transfers-pro': typeof AuthenticatedTransfersProRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/workers': typeof AuthenticatedWorkersRoute
 }
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/security'
     | '/transfers'
+    | '/transfers-pro'
     | '/users'
     | '/workers'
   fileRoutesByTo: FileRoutesByTo
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/requests'
     | '/security'
     | '/transfers'
+    | '/transfers-pro'
     | '/users'
     | '/workers'
   id:
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
     | '/_authenticated/requests'
     | '/_authenticated/security'
     | '/_authenticated/transfers'
+    | '/_authenticated/transfers-pro'
     | '/_authenticated/users'
     | '/_authenticated/workers'
   fileRoutesById: FileRoutesById
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTransfersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/transfers-pro': {
+      id: '/_authenticated/transfers-pro'
+      path: '/transfers-pro'
+      fullPath: '/transfers-pro'
+      preLoaderRoute: typeof AuthenticatedTransfersProRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/users': {
       id: '/_authenticated/users'
       path: '/users'
@@ -229,6 +249,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
   AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
+  AuthenticatedTransfersProRoute: typeof AuthenticatedTransfersProRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedWorkersRoute: typeof AuthenticatedWorkersRoute
 }
@@ -239,6 +260,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,
   AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
+  AuthenticatedTransfersProRoute: AuthenticatedTransfersProRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedWorkersRoute: AuthenticatedWorkersRoute,
 }

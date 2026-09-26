@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -68,6 +69,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
   const qc = useQueryClient();
   const { data: workers = [] } = useQuery(workersQuery);
   const [form, setForm] = useState(empty);
+  const [workerOpen, setWorkerOpen] = useState(false);
+  const [workerQuery, setWorkerQuery] = useState("");
   const editing = Boolean(transfer);
 
   useEffect(() => {
@@ -106,6 +109,18 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
     () => workers.find((w) => w.id === form.worker_id) ?? null,
     [workers, form.worker_id],
   );
+
+  /** Searchable by name or passport number (Arabic-Indic digits normalized to Latin) */
+  const filteredWorkers = useMemo(() => {
+    const q = workerQuery.trim().toLowerCase().replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+    if (!q) return workers;
+    return workers.filter(
+      (w) =>
+        (w.name ?? "").toLowerCase().includes(q) ||
+        String(w.passport_number ?? "").toLowerCase().includes(q),
+    );
+  }, [workers, workerQuery]);
+
   const { data: transfers } = useQuery(transfersQuery);
   const { data: requests } = useQuery(requestsQuery);
   const sponsors = useMemo(
@@ -193,21 +208,65 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           className="grid grid-cols-1 gap-4 sm:grid-cols-3"
         >
           <Field label="العامل/العاملة" className="sm:col-span-3">
-            <select
-              value={form.worker_id}
-              onChange={(e) => set("worker_id")(e.target.value)}
-              required
-              disabled={editing && !isAdmin}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"
-            >
-              <option value="">— اختر —</option>
-              {workers.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name} · {w.passport_number}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <button
+                type="button"
+                disabled={editing && !isAdmin}
+                onClick={() => {
+                  setWorkerQuery("");
+                  setWorkerOpen((o) => !o);
+                }}
+                className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"
+              >
+                <span className={selectedWorker ? "" : "text-ink/50"}>
+                  {selectedWorker
+                    ? `${selectedWorker.name || "بدون اسم"} · ${selectedWorker.passport_number || "بدون جواز"}`
+                    : "— اختر —"}
+                </span>
+                <ChevronDown className="size-4 shrink-0 text-ink/50" />
+              </button>
+              {workerOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setWorkerOpen(false)} />
+                  <div className="glass-strong absolute z-50 mt-1 w-full overflow-hidden rounded-md border border-black/10 shadow-lg">
+                    <input
+                      autoFocus
+                      value={workerQuery}
+                      onChange={(e) => setWorkerQuery(e.target.value)}
+                      placeholder="ابحث بالاسم أو رقم الجواز..."
+                      className="w-full border-b border-black/10 px-3 py-2 text-sm outline-none"
+                    />
+                    <ul className="max-h-56 overflow-y-auto">
+                      {filteredWorkers.length === 0 && (
+                        <li className="px-3 py-2 text-sm text-ink/50">لا توجد نتائج مطابقة</li>
+                      )}
+                      {filteredWorkers.map((w) => (
+                        <li key={w.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              set("worker_id")(w.id);
+                              setWorkerOpen(false);
+                            }}
+                            className={`w-full px-3 py-2 text-right text-sm hover:bg-brand/10 ${
+                              w.id === form.worker_id ? "bg-brand/15 font-semibold" : ""
+                            }`}
+                          >
+                            <span>{w.name || "بدون اسم"}</span>
+                            <span dir="ltr" className="text-ink/60">
+                              {" "}
+                              · {w.passport_number || "—"}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+            </div>
           </Field>
+
 
           <div className="glass sm:col-span-3 grid grid-cols-2 gap-3 rounded-xl p-3 text-[12px]">
             <div>

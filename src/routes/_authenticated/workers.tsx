@@ -237,6 +237,7 @@ function WorkersPage() {
         <div className="glass h-64 animate-pulse rounded-2xl" />
       ) : (
         <DataGrid
+          gridKey="workers"
           data={filtered}
           columns={columns}
           search={search}

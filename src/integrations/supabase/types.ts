@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      grid_settings: {
+        Row: {
+          grid_key: string
+          settings: Json
+          updated_at: string
+        }
+        Insert: {
+          grid_key: string
+          settings?: Json
+          updated_at?: string
+        }
+        Update: {
+          grid_key?: string
+          settings?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

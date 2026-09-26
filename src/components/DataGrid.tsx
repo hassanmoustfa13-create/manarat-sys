@@ -9,7 +9,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
 
 export type CellType = "text" | "number" | "date" | "select" | "textarea";
 
@@ -32,6 +34,7 @@ interface DataGridProps<T extends { id: string }> {
   rowActions?: (row: T) => ReactNode;
   emptyMessage?: string;
   minWidth?: number;
+  gridKey?: GridKey;
 }
 
 export function DataGrid<T extends { id: string }>({
@@ -41,13 +44,30 @@ export function DataGrid<T extends { id: string }>({
   rowActions,
   emptyMessage = "لا توجد سجلات بعد",
   minWidth = 1080,
+  gridKey,
 }: DataGridProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const { data: allSettings } = useQuery(gridSettingsQuery);
+  const saved = gridKey ? allSettings?.[gridKey] : undefined;
+  const colSettings = useMemo(() => (gridKey ? resolveColumns(gridKey, saved) : []), [gridKey, saved]);
+  const setById = useMemo(() => new Map(colSettings.map((c) => [c.id, c])), [colSettings]);
+  const columnOrder = colSettings.map((c) => c.id);
+  const columnVisibility = Object.fromEntries(colSettings.map((c) => [c.id, c.visible]));
+  const fontCls = saved?.fontSize === "sm" ? "text-[13px]" : saved?.fontSize === "lg" ? "text-[17px]" : "text-[15px]";
+  const padCls = saved?.density === "compact" ? "py-1.5" : saved?.density === "comfortable" ? "py-5" : "py-3";
+  const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;
+  const alignOf = (id: string, ltr?: boolean) => {
+    const a = setById.get(id)?.align;
+    if (a === "center") return "text-center";
+    if (a === "left") return "text-left";
+    if (a === "right") return "text-right";
+    return ltr ? "text-left" : "text-right";
+  };
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter: search },
+    state: { sorting, globalFilter: search, ...(gridKey ? { columnOrder, columnVisibility } : {}) },
     onSortingChange: setSorting,
     getRowId: (r) => r.id,
     getCoreRowModel: getCoreRowModel(),
@@ -69,7 +89,7 @@ export function DataGrid<T extends { id: string }>({
   return (
     <div className="overflow-hidden rounded-[min(1vw,14px)] bg-white/60 ring-1 ring-black/8 backdrop-blur-xl">
       <div className="grid-scroll max-h-[calc(100vh-15rem)] overflow-auto">
-        <table className="w-full border-collapse text-[15px]" style={{ minWidth }}>
+        <table className={`w-full border-collapse ${fontCls}`} style={{ minWidth }}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="text-[13px] font-bold text-ink/70">
@@ -82,8 +102,8 @@ export function DataGrid<T extends { id: string }>({
                   return (
                     <th
                       key={header.id}
-                      style={{ width: header.column.columnDef.meta?.width }}
-                      className="border-b-2 border-l border-black/10 bg-white/95 px-4 py-3.5 text-right font-bold backdrop-blur-xl first:border-l-0"
+                      style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
+                      className={`border-b-2 border-l border-black/10 bg-white/95 px-4 py-3.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
                     >
                       {header.isPlaceholder ? null : (
                         <button
@@ -114,11 +134,11 @@ export function DataGrid<T extends { id: string }>({
               </tr>
             ))}
           </thead>
-          <tbody className="text-[15px] text-ink/85">
+          <tbody className="text-ink/85">
             {rows.length === 0 && (
               <tr>
                 <td
-                  colSpan={columns.length + 1 + (rowActions ? 1 : 0)}
+                  colSpan={table.getVisibleLeafColumns().length + 1 + (rowActions ? 1 : 0)}
                   className="px-4 py-16 text-center text-base text-muted-foreground"
                 >
                   {emptyMessage}
@@ -130,16 +150,17 @@ export function DataGrid<T extends { id: string }>({
                 key={row.id}
                 className={`border-b border-black/5 transition-colors hover:bg-brand/[0.06] ${i % 2 === 0 ? "bg-black/[0.015]" : ""}`}
               >
-                <td className="px-3 py-3 text-center text-[13px] font-semibold text-ink/40">{i + 1}</td>
+                <td className={`px-3 ${padCls} text-center text-[13px] font-semibold text-ink/40`}>{i + 1}</td>
                 {row.getVisibleCells().map((cell) => {
                   const meta = cell.column.columnDef.meta ?? {};
                   return (
                     <td
                       key={cell.id}
                       dir={meta.ltr ? "ltr" : undefined}
-                      className={`border-l border-black/5 px-4 py-3 align-middle first:border-l-0 ${
-                        meta.ltr ? "text-left" : "text-right"
-                      } ${meta.className ?? ""}`}
+                      className={`border-l border-black/5 px-4 ${padCls} align-middle first:border-l-0 ${alignOf(
+                        cell.column.id,
+                        meta.ltr,
+                      )} ${meta.className ?? ""}`}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>

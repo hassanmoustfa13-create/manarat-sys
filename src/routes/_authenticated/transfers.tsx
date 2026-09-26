@@ -329,6 +329,7 @@ function TransfersPage() {
         <div className="glass h-64 animate-pulse rounded-2xl" />
       ) : (
         <DataGrid
+          gridKey="transfers"
           data={rows}
           columns={columns}
           search={search}

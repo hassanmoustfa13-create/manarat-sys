@@ -203,6 +203,7 @@ function RequestsPage() {
         <div className="glass h-64 animate-pulse rounded-2xl" />
       ) : (
         <DataGrid
+          gridKey="requests"
           data={filtered}
           columns={columns}
           search={search}

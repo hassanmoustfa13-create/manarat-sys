@@ -129,11 +129,20 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
       } else {
         const { error } = await supabase.from("workers").insert(payload);
         if (error) throw error;
+        const sponsor = payload.current_sponsor_name;
+        if (sponsor && sponsor !== "الشركة") {
+          await supabase
+            .from("requests")
+            .update({ action_status: "تم عمل عقد" })
+            .eq("customer_name", sponsor)
+            .not("action_status", "in", '("تم عمل عقد","العميل لا يرغب")');
+        }
       }
     },
     onSuccess: () => {
       toast.success(worker ? "تم حفظ التعديلات" : "تمت إضافة العامل/ـة");
       qc.invalidateQueries({ queryKey: ["workers"] });
+      qc.invalidateQueries({ queryKey: ["requests"] });
       onOpenChange(false);
     },
     onError: (e) => toast.error(errorMessage(e)),

@@ -66,9 +66,22 @@ export const createUser = createServerFn({ method: "POST" })
 
 export const setUserPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل").max(72) }).parse(d))
+  .inputValidator((d) => z.object({ currentPassword: z.string().min(1, "أدخل كلمة المرور الحالية").max(72), password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل").max(72) }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const email = (context.claims as any)?.email as string | undefined;
+    if (!email) throw new Error("تعذر التحقق من الحساب");
+    const { createClient } = await import("@supabase/supabase-js");
+    const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+    const verifier = createClient(process.env["SUPABASE_URL"]!, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { fetch: (input, init) => { const h = new Headers(init?.headers); if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization"); h.set("apikey", key); return fetch(input, { ...init, headers: h }); } },
+    });
+    const { error: vErr } = await verifier.auth.signInWithPassword({ email, password: data.currentPassword });
+    if (vErr) {
+      await log({ event_type: "password_changed_self", success: false, target_user_id: context.userId, actor_user_id: context.userId, details: "كلمة المرور الحالية غير صحيحة" });
+      throw new Error("كلمة المرور الحالية غير صحيحة");
+    }
     const { error } = await supabaseAdmin.auth.admin.updateUserById(context.userId, { password: data.password });
     await log({ event_type: "password_changed_self", success: !error, target_user_id: context.userId, actor_user_id: context.userId, details: error?.message ?? "" });
     if (error) throw new Error(error.message);

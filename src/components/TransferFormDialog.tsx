@@ -31,6 +31,8 @@ import {
   requestsQuery,
   transfersQuery,
   workersQuery,
+  workerCategory,
+  type TransferCategory,
 } from "@/lib/data";
 
 interface Props {
@@ -40,6 +42,7 @@ interface Props {
   worker?: Worker | null;
   transfer?: Transfer | null;
   isAdmin: boolean;
+  category?: TransferCategory;
 }
 
 const empty = {
@@ -65,9 +68,12 @@ const empty = {
 };
 
 
-export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdmin }: Props) {
+export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdmin, category: categoryProp }: Props) {
   const qc = useQueryClient();
-  const { data: workers = [] } = useQuery(workersQuery);
+  const { data: allWorkers = [] } = useQuery(workersQuery);
+  const category: TransferCategory =
+    (transfer as any)?.category ?? categoryProp ?? (worker ? workerCategory(worker) : "منزلية");
+  const workers = useMemo(() => allWorkers.filter((w) => workerCategory(w) === category), [allWorkers, category]);
   const [form, setForm] = useState(empty);
   const [workerOpen, setWorkerOpen] = useState(false);
   const [workerQuery, setWorkerQuery] = useState("");
@@ -170,6 +176,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         worker_condition: form.worker_condition.trim(),
         worker_location: form.worker_location,
         notes: form.notes.trim(),
+        category,
       };
 
       if (transfer) {
@@ -197,7 +204,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
         <DialogHeader className="text-right sm:text-right">
-          <DialogTitle>{editing ? "تعديل عملية نقل الكفالة" : "نقل كفالة جديد"}</DialogTitle>
+          <DialogTitle>{editing ? "تعديل عملية نقل الكفالة" : "نقل كفالة جديد"} {category === "مهنية" ? "(مهنية)" : "(عمالة منزلية)"}</DialogTitle>
           <DialogDescription>
             بيانات الكفيل القديم تُعبّأ تلقائياً من سجل العامل/ـة، والمبلغ المتبقي يُحسب تلقائياً.
           </DialogDescription>

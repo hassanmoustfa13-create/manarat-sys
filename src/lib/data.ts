@@ -31,6 +31,11 @@ export const PROFESSIONS = [
   "ممرضة منزلية",
   "أخرى",
 ] as const;
+export type TransferCategory = "منزلية" | "مهنية";
+/** Professions handled by the professional-transfer page; everything else is domestic */
+export const PRO_PROFESSIONS = ["عاملة مهنية", "مهني"];
+export const workerCategory = (w: { profession?: string | null } | null | undefined): TransferCategory =>
+  w && PRO_PROFESSIONS.includes(w.profession ?? "") ? "مهنية" : "منزلية";
 export const REQUEST_TYPES = ["استقدام", "معينة"] as const;
 export const ACTION_STATUSES = [
   "قيد المتابعة",

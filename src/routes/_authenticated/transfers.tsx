@@ -36,6 +36,7 @@ import {
 } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/transfers")({
+  component: () => <TransfersView category="منزلية" />,
   head: () => ({
     meta: [
       { title: "جدول نقل الكفالة — منارات هجر للاستقدام" },
@@ -46,12 +47,11 @@ export const Route = createFileRoute("/_authenticated/transfers")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: TransfersPage,
 });
 
 type Row = Transfer & { worker_name: string; worker: Worker | null };
 
-function TransfersPage() {
+export function TransfersView({ category }: { category: "منزلية" | "مهنية" }) {
   const auth = useAuth();
   const admin = auth.isAdmin;
   const qc = useQueryClient();
@@ -72,6 +72,7 @@ function TransfersPage() {
   const rows = useMemo<Row[]>(() => {
     const byId = new Map(workers.map((w) => [w.id, w]));
     return transfers
+      .filter((t) => ((t as any).category ?? "منزلية") === category)
       .map((t) => {
         const worker = byId.get(t.worker_id) ?? null;
         return { ...t, worker, worker_name: worker?.name ?? "—" };
@@ -302,8 +303,8 @@ function TransfersPage() {
   return (
     <main className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6">
       <GridToolbar
-        title="جدول نقل الكفالة"
-        count={transfers.length}
+        title={category === "مهنية" ? "نقل الكفالة المهنية" : "نقل كفالة العمالة المنزلية"}
+        count={rows.length}
         search={search}
         onSearch={setSearch}
         addLabel="نقل كفالة جديد"
@@ -361,7 +362,7 @@ function TransfersPage() {
         />
       )}
 
-      <TransferFormDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} isAdmin={admin} />
+      <TransferFormDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} isAdmin={admin} category={category} />
       <WorkerProfileDialog
         worker={profileWorker}
         onClose={() => setProfileWorker(null)}

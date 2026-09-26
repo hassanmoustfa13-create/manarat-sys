@@ -4,12 +4,14 @@ import {
   BarChart3,
   ClipboardList,
   LogOut,
+  Menu,
   Settings2,
   UserCog,
   Users,
+  X,
   type LucideIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
@@ -30,14 +32,55 @@ const itemCls =
 const activeCls =
   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20";
 
-export function AppShell({ children }: { children: ReactNode }) {
+function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
+  return (
+    <>
+      {NAV.filter((n) => !n.admin || isAdmin).map(({ to, label, icon: Icon }) => (
+        <Link key={to} to={to} onClick={onNavigate} className={itemCls} activeProps={{ className: activeCls }}>
+          <Icon className="size-4 shrink-0" />
+          <span className="truncate">{label}</span>
+        </Link>
+      ))}
+    </>
+  );
+}
+
+function UserBlock() {
   const auth = useAuth();
   const signOut = useSignOut();
+  return (
+    <div className="space-y-2 border-t border-black/5 p-3">
+      <div className="flex items-center gap-2 rounded-lg bg-white/70 px-3 py-2 ring-1 ring-black/8">
+        <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
+          {auth.loading ? "…" : auth.fullName}
+        </span>
+        <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
+          {auth.isAdmin ? "مدير" : "موظف"}
+        </span>
+      </div>
+      <div className="flex items-center justify-between">
+        <ChangePasswordDialog />
+        <button
+          type="button"
+          onClick={signOut}
+          className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] text-ink/60 transition-colors hover:bg-black/5 hover:text-ink"
+        >
+          <LogOut className="size-4" />
+          تسجيل الخروج
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function AppShell({ children }: { children: ReactNode }) {
+  const auth = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar — first child in RTL flex = right side */}
-      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-l border-black/5 bg-white/70 backdrop-blur-xl">
+      {/* Desktop sidebar — first child in RTL flex = right side */}
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-l border-black/5 bg-white/70 backdrop-blur-xl md:flex">
         <div className="flex items-center gap-2.5 border-b border-black/5 px-4 py-4">
           <img src={logoAsset.url} alt="شعار منارات هجر للاستقدام" className="size-10 shrink-0 rounded-lg object-contain" />
           <div className="min-w-0">
@@ -47,38 +90,56 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-          {NAV.filter((n) => !n.admin || auth.isAdmin).map(({ to, label, icon: Icon }) => (
-            <Link key={to} to={to} className={itemCls} activeProps={{ className: activeCls }}>
-              <Icon className="size-4 shrink-0" />
-              <span className="truncate">{label}</span>
-            </Link>
-          ))}
+          <NavLinks isAdmin={auth.isAdmin} />
         </nav>
 
-        <div className="space-y-2 border-t border-black/5 p-3">
-          <div className="flex items-center gap-2 rounded-lg bg-white/70 px-3 py-2 ring-1 ring-black/8">
-            <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
-              {auth.loading ? "…" : auth.fullName}
-            </span>
-            <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
-              {auth.isAdmin ? "مدير" : "موظف"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <ChangePasswordDialog />
-            <button
-              type="button"
-              onClick={signOut}
-              className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] text-ink/60 transition-colors hover:bg-black/5 hover:text-ink"
-            >
-              <LogOut className="size-4" />
-              تسجيل الخروج
-            </button>
-          </div>
-        </div>
+        <UserBlock />
       </aside>
 
-      <main className="min-w-0 flex-1">{children}</main>
+      {/* Mobile top bar */}
+      <header className="fixed inset-x-0 top-0 z-40 flex items-center gap-2 border-b border-black/5 bg-white/80 px-3 py-2.5 backdrop-blur-xl md:hidden">
+        <img src={logoAsset.url} alt="شعار منارات هجر للاستقدام" className="size-8 shrink-0 rounded-md object-contain" />
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-semibold">منارات هجر للاستقدام</div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-label="فتح القائمة"
+          className="grid size-9 place-items-center rounded-lg text-ink/70 transition-colors hover:bg-black/5"
+        >
+          <Menu className="size-5" />
+        </button>
+      </header>
+
+      {/* Mobile drawer */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setMenuOpen(false)} />
+          <aside className="absolute inset-y-0 right-0 flex w-64 flex-col bg-white shadow-2xl">
+            <div className="flex items-center gap-2.5 border-b border-black/5 px-4 py-4">
+              <img src={logoAsset.url} alt="شعار منارات هجر للاستقدام" className="size-9 shrink-0 rounded-lg object-contain" />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[14px] font-semibold">منارات هجر للاستقدام</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="إغلاق القائمة"
+                className="grid size-8 place-items-center rounded-lg text-ink/60 hover:bg-black/5"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+              <NavLinks isAdmin={auth.isAdmin} onNavigate={() => setMenuOpen(false)} />
+            </nav>
+            <UserBlock />
+          </aside>
+        </div>
+      )}
+
+      <main className="min-w-0 flex-1 pt-14 md:pt-0">{children}</main>
     </div>
   );
 }

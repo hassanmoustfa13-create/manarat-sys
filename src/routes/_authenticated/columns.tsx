@@ -71,7 +71,9 @@ function ColumnsPage() {
     const j = i + dir;
     if (j < 0 || j >= cols.length) return;
     const next = [...cols];
-    [next[i], next[j]] = [next[j], next[i]];
+    const tmp = next[i]!;
+    next[i] = next[j]!;
+    next[j] = tmp;
     setDraft((d) => ({ ...d, columns: next }));
   };
 

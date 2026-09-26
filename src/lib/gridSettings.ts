@@ -7,14 +7,14 @@ export type ColAlign = "right" | "center" | "left";
 export interface ColumnSetting {
   id: string;
   visible: boolean;
-  width?: number | null;
-  align?: ColAlign;
+  width?: number | null | undefined;
+  align?: ColAlign | undefined;
 }
 
 export interface GridSettings {
-  fontSize?: "sm" | "md" | "lg";
-  density?: "compact" | "normal" | "comfortable";
-  columns?: ColumnSetting[];
+  fontSize?: "sm" | "md" | "lg" | undefined;
+  density?: "compact" | "normal" | "comfortable" | undefined;
+  columns?: ColumnSetting[] | undefined;
 }
 
 export const GRID_LABELS: Record<GridKey, string> = {

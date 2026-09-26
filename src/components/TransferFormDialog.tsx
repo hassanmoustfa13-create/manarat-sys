@@ -121,6 +121,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
     );
   }, [workers, workerQuery]);
 
+  const { data: transfers } = useQuery(transfersQuery);
   const { data: requests } = useQuery(requestsQuery);
   const sponsors = useMemo(
     () =>

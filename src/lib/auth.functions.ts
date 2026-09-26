@@ -18,7 +18,7 @@ export const signInWithIdentifier = createServerFn({ method: "POST" })
       if (!p?.email) throw new Error("اسم المستخدم أو كلمة المرور غير صحيحة");
       email = p.email;
     }
-    const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    const client = createClient(process.env['SUPABASE_URL']!, process.env['SUPABASE_PUBLISHABLE_KEY']!, {
       auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
     });
     const { data: s, error } = await client.auth.signInWithPassword({ email, password: data.password });

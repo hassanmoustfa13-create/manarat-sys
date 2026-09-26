@@ -69,6 +69,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
   const qc = useQueryClient();
   const { data: workers = [] } = useQuery(workersQuery);
   const [form, setForm] = useState(empty);
+  const [workerOpen, setWorkerOpen] = useState(false);
+  const [workerQuery, setWorkerQuery] = useState("");
   const editing = Boolean(transfer);
 
   useEffect(() => {

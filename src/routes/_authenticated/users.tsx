@@ -10,7 +10,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 
-type Editing = { id: string; fullName: string; email: string; password: string; isAdmin: boolean };
+type Editing = { id: string; fullName: string; username: string; email: string; password: string; isAdmin: boolean };
 
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
@@ -34,13 +34,13 @@ function UsersPage() {
   const list = useServerFn(listUsers);
   const create = useServerFn(createUser);
   const { data: users = [] } = useQuery({ queryKey: ["users"], queryFn: () => list(), enabled: auth.isAdmin });
-  const [form, setForm] = useState({ fullName: "", email: "", password: "", isAdmin: false });
+  const [form, setForm] = useState({ fullName: "", username: "", email: "", password: "", isAdmin: false });
 
   const m = useMutation({
     mutationFn: () => create({ data: form }),
     onSuccess: () => {
       toast.success("تمت إضافة المستخدم");
-      setForm({ fullName: "", email: "", password: "", isAdmin: false });
+      setForm({ fullName: "", username: "", email: "", password: "", isAdmin: false });
       qc.invalidateQueries({ queryKey: ["users"] });
       qc.invalidateQueries({ queryKey: ["profiles"] });
     },
@@ -90,6 +90,7 @@ function UsersPage() {
       >
         <h1 className="text-[15px] font-semibold">إضافة مستخدم جديد</h1>
         <input required placeholder="الاسم" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} className={input} />
+        <input required dir="ltr" placeholder="اسم المستخدم (يوزر)" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} className={input} />
         <input required type="email" dir="ltr" placeholder="البريد الإلكتروني" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={input} />
         <input required dir="ltr" placeholder="كلمة المرور (6 أحرف على الأقل)" minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className={input} />
         <label className="flex items-center gap-2 text-[13px]">
@@ -106,10 +107,11 @@ function UsersPage() {
           {users.map((u) => (
             <div key={u.id} className="flex items-center gap-3 rounded-xl bg-white/55 px-3 py-2 text-[13px] ring-1 ring-black/5">
               <span className="flex-1 truncate font-medium">{u.full_name}</span>
+              <span dir="ltr" className="truncate text-[12px] font-semibold text-brand">@{u.username}</span>
               <span dir="ltr" className="truncate text-ink/50">{u.email}</span>
               <span className="text-[11px] text-ink/40">{formatDate(u.created_at)}</span>
               <span className={u.isAdmin ? "pill pill-teal" : "pill pill-brand"}>{u.isAdmin ? "مدير" : "موظف"}</span>
-              <button type="button" title="تعديل" onClick={() => setEditing({ id: u.id, fullName: u.full_name, email: u.email, password: "", isAdmin: u.isAdmin })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
+              <button type="button" title="تعديل" onClick={() => setEditing({ id: u.id, fullName: u.full_name, username: u.username ?? "", email: u.email, password: "", isAdmin: u.isAdmin })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
                 <Pencil className="size-3.5" />
               </button>
               {u.id !== auth.userId && (
@@ -136,6 +138,7 @@ function UsersPage() {
               }}
             >
               <input required placeholder="الاسم" value={editing.fullName} onChange={(e) => setEditing({ ...editing, fullName: e.target.value })} className={input} />
+              <input required dir="ltr" placeholder="اسم المستخدم (يوزر)" value={editing.username} onChange={(e) => setEditing({ ...editing, username: e.target.value })} className={input} />
               <input required type="email" dir="ltr" placeholder="البريد الإلكتروني" value={editing.email} onChange={(e) => setEditing({ ...editing, email: e.target.value })} className={input} />
               <input dir="ltr" minLength={6} placeholder="كلمة مرور جديدة (اتركها فارغة لعدم التغيير)" value={editing.password} onChange={(e) => setEditing({ ...editing, password: e.target.value })} className={input} />
               <label className="flex items-center gap-2 text-[13px]">

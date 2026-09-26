@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { errorMessage } from "@/lib/data";
+import { signInWithIdentifier } from "@/lib/auth.functions";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
@@ -38,7 +39,8 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const tokens = await signInWithIdentifier({ data: { identifier: email, password } });
+      const { error } = await supabase.auth.setSession(tokens);
       if (error) throw error;
       navigate({ to: "/workers", replace: true });
     } catch (err) {
@@ -65,10 +67,11 @@ function AuthPage() {
 
         <form onSubmit={submit} className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="email">البريد الإلكتروني</Label>
+            <Label htmlFor="email">اسم المستخدم أو البريد الإلكتروني</Label>
             <Input
               id="email"
-              type="email"
+              type="text"
+              autoComplete="username"
               dir="ltr"
               required
               value={email}

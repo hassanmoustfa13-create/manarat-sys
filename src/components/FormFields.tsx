@@ -141,8 +141,7 @@ export function SuggestField({
     return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
-  const q = value.trim();
-  const list = q ? options.filter((o) => o.includes(q) || q.includes(o)) : [...options];
+  const list = [...options];
 
   return (
     <Field label={label} hint={hint} className={className}>
@@ -164,7 +163,10 @@ export function SuggestField({
           tabIndex={-1}
           disabled={disabled}
           aria-label="إظهار القائمة"
-          onClick={() => setOpen((o) => !o)}
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(true);
+          }}
           className="absolute inset-y-0 left-0 flex w-9 items-center justify-center text-ink/60 hover:text-ink disabled:opacity-50"
         >
           <ChevronDown className="size-4" />

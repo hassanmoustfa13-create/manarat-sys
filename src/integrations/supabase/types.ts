@@ -122,6 +122,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          details: string
+          event_type: string
+          id: string
+          identifier: string
+          success: boolean
+          target_user_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: string
+          event_type: string
+          id?: string
+          identifier?: string
+          success?: boolean
+          target_user_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: string
+          event_type?: string
+          id?: string
+          identifier?: string
+          success?: boolean
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       transfers: {
         Row: {
           created_at: string

@@ -8,6 +8,11 @@ export const signInWithIdentifier = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { createClient } = await import("@supabase/supabase-js");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { logSecurityEvent } = await import("./security-log.server");
+    const fail = async (details: string, uid?: string) => {
+      await logSecurityEvent({ event_type: "login", success: false, identifier: data.identifier, target_user_id: uid ?? null, details });
+      throw new Error("اسم المستخدم أو كلمة المرور غير صحيحة");
+    };
     let email = data.identifier;
     if (!email.includes("@")) {
       const { data: p } = await supabaseAdmin
@@ -15,13 +20,14 @@ export const signInWithIdentifier = createServerFn({ method: "POST" })
         .select("email")
         .ilike("username", data.identifier.toLowerCase())
         .maybeSingle();
-      if (!p?.email) throw new Error("اسم المستخدم أو كلمة المرور غير صحيحة");
+      if (!p?.email) return await fail("اسم مستخدم غير موجود");
       email = p.email;
     }
     const client = createClient(process.env['SUPABASE_URL']!, process.env['SUPABASE_PUBLISHABLE_KEY']!, {
       auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
     });
     const { data: s, error } = await client.auth.signInWithPassword({ email, password: data.password });
-    if (error || !s.session) throw new Error("اسم المستخدم أو كلمة المرور غير صحيحة");
+    if (error || !s.session) return await fail("كلمة مرور خاطئة أو حساب غير موجود");
+    await logSecurityEvent({ event_type: "login", success: true, identifier: data.identifier, target_user_id: s.user?.id ?? null, actor_user_id: s.user?.id ?? null });
     return { access_token: s.session.access_token, refresh_token: s.session.refresh_token };
   });

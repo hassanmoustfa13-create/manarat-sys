@@ -2,6 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+async function log(e: Parameters<typeof import("./security-log.server").logSecurityEvent>[0]) {
+  const { logSecurityEvent } = await import("./security-log.server");
+  await logSecurityEvent(e);
+}
+
 async function assertAdmin(supabase: any, userId: string) {
   const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (!data) throw new Error("غير مسموح: هذه العملية للمدير فقط");
@@ -47,7 +52,11 @@ export const createUser = createServerFn({ method: "POST" })
       email_confirm: true,
       user_metadata: { full_name: data.fullName, username: data.username },
     });
-    if (error) throw new Error(error.message);
+    if (error) {
+      await log({ event_type: "user_created", success: false, identifier: data.email, actor_user_id: context.userId, details: error.message });
+      throw new Error(error.message);
+    }
+    await log({ event_type: "user_created", identifier: data.email, target_user_id: created.user?.id, actor_user_id: context.userId, details: data.isAdmin ? "بصلاحية مدير" : "موظف" });
     if (created.user) await supabaseAdmin.from("profiles").update({ username: data.username }).eq("id", created.user.id);
     if (data.isAdmin && created.user) {
       await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: "admin" });
@@ -61,6 +70,7 @@ export const setUserPassword = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.updateUserById(context.userId, { password: data.password });
+    await log({ event_type: "password_changed_self", success: !error, target_user_id: context.userId, actor_user_id: context.userId, details: error?.message ?? "" });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -94,6 +104,7 @@ export const updateUser = createServerFn({ method: "POST" })
       user_metadata: { full_name: data.fullName },
       ...(data.password ? { password: data.password } : {}),
     });
+    await log({ event_type: data.password ? "password_reset_by_admin" : "user_updated", success: !error, identifier: data.email, target_user_id: data.id, actor_user_id: context.userId, details: error?.message ?? (data.isAdmin ? "صلاحية مدير" : "صلاحية موظف") });
     if (error) throw new Error(error.message);
     await supabaseAdmin.from("profiles").update({ full_name: data.fullName, email: data.email, username: data.username }).eq("id", data.id);
     if (data.isAdmin) {
@@ -112,9 +123,31 @@ export const deleteUser = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     if (data.id === context.userId) throw new Error("لا يمكنك حذف حسابك");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: prof } = await supabaseAdmin.from("profiles").select("email").eq("id", data.id).maybeSingle();
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.id);
+    await log({ event_type: "user_deleted", success: !error, identifier: prof?.email ?? "", target_user_id: data.id, actor_user_id: context.userId, details: error?.message ?? "" });
     if (error) throw new Error(error.message);
     await supabaseAdmin.from("user_roles").delete().eq("user_id", data.id);
     await supabaseAdmin.from("profiles").delete().eq("id", data.id);
     return { ok: true };
+  });
+
+export const listSecurityEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { data, error } = await context.supabase
+      .from("security_events")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name, email");
+    const names = new Map((profiles ?? []).map((p) => [p.id, p.full_name || p.email]));
+    return (data ?? []).map((e) => ({
+      ...e,
+      target_name: e.target_user_id ? names.get(e.target_user_id) ?? "" : "",
+      actor_name: e.actor_user_id ? names.get(e.actor_user_id) ?? "" : "",
+    }));
   });

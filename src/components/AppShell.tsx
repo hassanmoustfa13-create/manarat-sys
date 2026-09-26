@@ -36,10 +36,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <main className="min-w-0 flex-1">{children}</main>
-
-      {/* Sidebar — last child in RTL flex = left side */}
-      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-black/5 bg-white/70 backdrop-blur-xl">
+      {/* Sidebar — first child in RTL flex = right side */}
+      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-l border-black/5 bg-white/70 backdrop-blur-xl">
         <div className="flex items-center gap-2.5 border-b border-black/5 px-4 py-4">
           <img src={logoAsset.url} alt="شعار منارات هجر للاستقدام" className="size-10 shrink-0 rounded-lg object-contain" />
           <div className="min-w-0">
@@ -79,6 +77,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </aside>
+
+      <main className="min-w-0 flex-1">{children}</main>
     </div>
   );
 }

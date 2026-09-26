@@ -225,7 +225,20 @@ export function SponsorProfileDialog({
     const currentIds = new Set(current.map((w) => w.id));
     const past = workers.filter((w) => pastIds.has(w.id) && !currentIds.has(w.id));
     const incoming = workers.filter((w) => incomingIds.has(w.id) && !currentIds.has(w.id));
-    return { current, past, incoming, phone, transfers: related.length, requests: customerRequests };
+    const allIds = new Set([
+      ...current.map((w) => w.id),
+      ...past.map((w) => w.id),
+      ...incoming.map((w) => w.id),
+    ]);
+    return {
+      current,
+      past,
+      incoming,
+      totalWorkers: allIds.size,
+      phone,
+      transfers: related.length,
+      requests: customerRequests,
+    };
   }, [sponsor, workers, transfers, requests]);
 
 
@@ -287,8 +300,8 @@ export function SponsorProfileDialog({
                 <p className="text-lg font-semibold text-ink/70">{info.requests.length}</p>
               </div>
               <div>
-                <p className="text-ink/45">عمالة حالية</p>
-                <p className="text-lg font-semibold text-brand">{info.current.length}</p>
+                <p className="text-ink/45">إجمالي العمالة</p>
+                <p className="text-lg font-semibold text-brand">{info.totalWorkers}</p>
               </div>
               <div>
                 <p className="text-ink/45">عمليات نقل</p>

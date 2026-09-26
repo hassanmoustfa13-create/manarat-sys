@@ -12,7 +12,7 @@ export const listUsers = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const [{ data: profiles }, { data: roles }] = await Promise.all([
-      context.supabase.from("profiles").select("id, full_name, email, created_at").order("created_at"),
+      context.supabase.from("profiles").select("id, full_name, email, username, created_at").order("created_at"),
       context.supabase.from("user_roles").select("user_id, role"),
     ]);
     return (profiles ?? []).map((p) => ({
@@ -29,6 +29,7 @@ export const createUser = createServerFn({ method: "POST" })
         email: z.string().trim().email().max(255),
         password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل").max(72),
         fullName: z.string().trim().min(1).max(100),
+        username: z.string().trim().toLowerCase().regex(/^[a-z0-9._-]{3,30}$/, "اسم المستخدم: 3-30 حرفاً إنجليزياً أو أرقام أو . _ -"),
         isAdmin: z.boolean(),
       })
       .parse(d),
@@ -36,13 +37,18 @@ export const createUser = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    {
+      const { data: dup } = await supabaseAdmin.from("profiles").select("id").ilike("username", data.username).maybeSingle();
+      if (dup && dup.id !== (data as any).id) throw new Error("اسم المستخدم مستخدم بالفعل");
+    }
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
       password: data.password,
       email_confirm: true,
-      user_metadata: { full_name: data.fullName },
+      user_metadata: { full_name: data.fullName, username: data.username },
     });
     if (error) throw new Error(error.message);
+    if (created.user) await supabaseAdmin.from("profiles").update({ username: data.username }).eq("id", created.user.id);
     if (data.isAdmin && created.user) {
       await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: "admin" });
     }
@@ -67,6 +73,7 @@ export const updateUser = createServerFn({ method: "POST" })
         id: z.string().uuid(),
         email: z.string().trim().email().max(255),
         fullName: z.string().trim().min(1).max(100),
+        username: z.string().trim().toLowerCase().regex(/^[a-z0-9._-]{3,30}$/, "اسم المستخدم: 3-30 حرفاً إنجليزياً أو أرقام أو . _ -"),
         password: z.string().max(72).optional(),
         isAdmin: z.boolean(),
       })
@@ -77,6 +84,10 @@ export const updateUser = createServerFn({ method: "POST" })
     if (data.password && data.password.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
     if (data.id === context.userId && !data.isAdmin) throw new Error("لا يمكنك إزالة صلاحية المدير عن حسابك");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    {
+      const { data: dup } = await supabaseAdmin.from("profiles").select("id").ilike("username", data.username).maybeSingle();
+      if (dup && dup.id !== (data as any).id) throw new Error("اسم المستخدم مستخدم بالفعل");
+    }
     const { error } = await supabaseAdmin.auth.admin.updateUserById(data.id, {
       email: data.email,
       email_confirm: true,
@@ -84,7 +95,7 @@ export const updateUser = createServerFn({ method: "POST" })
       ...(data.password ? { password: data.password } : {}),
     });
     if (error) throw new Error(error.message);
-    await supabaseAdmin.from("profiles").update({ full_name: data.fullName, email: data.email }).eq("id", data.id);
+    await supabaseAdmin.from("profiles").update({ full_name: data.fullName, email: data.email, username: data.username }).eq("id", data.id);
     if (data.isAdmin) {
       await supabaseAdmin.from("user_roles").upsert({ user_id: data.id, role: "admin" }, { onConflict: "user_id,role" });
     } else {

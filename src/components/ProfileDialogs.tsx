@@ -300,8 +300,8 @@ export function SponsorProfileDialog({
                 <p className="text-lg font-semibold text-ink/70">{info.requests.length}</p>
               </div>
               <div>
-                <p className="text-ink/45">عمالة حالية</p>
-                <p className="text-lg font-semibold text-brand">{info.current.length}</p>
+                <p className="text-ink/45">إجمالي العمالة</p>
+                <p className="text-lg font-semibold text-brand">{info.totalWorkers}</p>
               </div>
               <div>
                 <p className="text-ink/45">عمليات نقل</p>

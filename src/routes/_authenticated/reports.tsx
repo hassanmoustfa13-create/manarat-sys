@@ -281,9 +281,16 @@ function ReportsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-7">
         <StatCard icon={<ClipboardList className="size-4" />} label="طلبات الاستقدام" value={fRequests.length} />
         <StatCard icon={<Users className="size-4" />} label="العمالة" value={fWorkers.length} tone="teal" />
+        <StatCard
+          icon={<Users className="size-4" />}
+          label="العاملات في السكن"
+          value={fWorkers.filter((w) => w.current_location === "السكن" || w.current_location === "الشركة").length}
+          tone="brand"
+          hint={`${fWorkers.filter((w) => !w.current_sponsor_name || w.current_sponsor_name === "الشركة").length} على كفالة الشركة`}
+        />
         <StatCard icon={<ArrowLeftRight className="size-4" />} label="عمليات النقل" value={fTransfers.length} tone="teal" />
         <StatCard
           icon={<Wallet className="size-4" />}

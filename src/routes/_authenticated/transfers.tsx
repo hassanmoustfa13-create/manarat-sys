@@ -130,6 +130,24 @@ function TransfersPage() {
           ),
       },
       {
+        id: "days_in_saudi",
+        accessorFn: (r) => daysInSaudi(r.worker?.arrival_date ?? null),
+        header: "أيام العاملة في السعودية",
+        meta: { width: 150 },
+        cell: ({ row }) => {
+          const d = daysInSaudi(row.original.worker?.arrival_date ?? null);
+          const arrival = row.original.worker?.arrival_date;
+          return (
+            <div className="leading-tight">
+              <span className="font-semibold tabular-nums text-brand">{formatDaysInSaudi(d)}</span>
+              {arrival && (
+                <div className="text-[11px] text-ink/45 tabular-nums">وصول: {formatDate(arrival)}</div>
+              )}
+            </div>
+          );
+        },
+      },
+      {
         id: "old_sponsor_name",
         accessorKey: "old_sponsor_name",
         header: "الكفيل القديم",

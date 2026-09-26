@@ -143,6 +143,19 @@ export function formatDaysRemaining(days: number | null): string {
   return `${days} يوم`;
 }
 
+/** Days the worker has been in Saudi Arabia since arrival (null if no date or not yet arrived) */
+export function daysInSaudi(arrivalDate: string | null): number | null {
+  const d = daysUntil(arrivalDate);
+  if (d === null || d > 0) return null;
+  return Math.abs(d);
+}
+
+export function formatDaysInSaudi(days: number | null): string {
+  if (days === null) return "—";
+  if (days === 0) return "وصلت اليوم";
+  return `${days} يوم`;
+}
+
 export function formatMoney(n: number | string | null | undefined): string {
   if (n === null || n === undefined || n === "") return "—";
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(n));

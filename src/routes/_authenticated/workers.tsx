@@ -109,6 +109,19 @@ function WorkersPage() {
         accessorKey: "passport_number",
         header: "رقم الجواز",
         meta: { editable: admin, ltr: true, className: "tabular-nums" },
+        cell: ({ row }) => (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setProfileWorker(row.original);
+            }}
+            className="font-medium text-brand underline-offset-2 hover:underline"
+            dir="ltr"
+          >
+            {row.original.passport_number || "—"}
+          </button>
+        ),
       },
       {
         id: "nationality",

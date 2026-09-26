@@ -7,6 +7,7 @@ import { setUserPassword } from "@/lib/users.functions";
 
 export function ChangePasswordDialog() {
   const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState("");
   const [pw, setPw] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -20,9 +21,10 @@ export function ChangePasswordDialog() {
     }
     setBusy(true);
     try {
-      await save({ data: { password: pw } });
+      await save({ data: { currentPassword: current, password: pw } });
       toast.success("تم تغيير كلمة المرور");
       setPw("");
+      setCurrent("");
       setConfirm("");
       setOpen(false);
     } catch (err) {
@@ -45,6 +47,7 @@ export function ChangePasswordDialog() {
           <DialogTitle>تغيير كلمة المرور</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-3">
+          <input required dir="ltr" type="password" placeholder="كلمة المرور الحالية" value={current} onChange={(e) => setCurrent(e.target.value)} className={cls} />
           <input required dir="ltr" type="password" placeholder="كلمة المرور الجديدة (6 أحرف على الأقل)" minLength={6} value={pw} onChange={(e) => setPw(e.target.value)} className={cls} />
           <input required dir="ltr" type="password" placeholder="تأكيد كلمة المرور" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={cls} />
           <button disabled={busy} className="h-10 w-full rounded-lg bg-brand text-[13px] font-medium text-primary-foreground disabled:opacity-60">

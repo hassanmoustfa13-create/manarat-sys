@@ -207,7 +207,6 @@ function RequestsPage() {
           data={filtered}
           columns={columns}
           search={search}
-          minWidth={2000}
           emptyMessage="لا توجد طلبات بعد"
           rowActions={(r) => (
             <>

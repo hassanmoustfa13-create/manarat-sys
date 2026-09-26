@@ -254,7 +254,6 @@ function WorkersPage() {
           data={filtered}
           columns={columns}
           search={search}
-          minWidth={2200}
           rowActions={(w) => (
             <>
               <IconBtn title="نقل الكفالة" onClick={() => setTransferFor(w)}>

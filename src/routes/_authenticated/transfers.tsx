@@ -264,15 +264,6 @@ function TransfersPage() {
       },
 
       {
-        id: "notes",
-        accessorKey: "notes",
-        header: "ملاحظات",
-        meta: { editable: true, type: "textarea", width: 180 },
-        cell: ({ getValue }) => (
-          <span className="line-clamp-1 max-w-[200px] text-ink/70">{(getValue() as string) || "—"}</span>
-        ),
-      },
-      {
         id: "created_by",
         accessorFn: (r) => nameOf(r.created_by),
         header: "تم الإضافة بواسطة",

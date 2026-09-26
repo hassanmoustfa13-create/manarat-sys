@@ -141,8 +141,7 @@ export function SuggestField({
     return () => document.removeEventListener("mousedown", onDown);
   }, [open]);
 
-  const q = value.trim();
-  const list = q ? options.filter((o) => o.includes(q) || q.includes(o)) : [...options];
+  const list = [...options];
 
   return (
     <Field label={label} hint={hint} className={className}>

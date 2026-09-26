@@ -136,7 +136,6 @@ function WorkersPage() {
         cell: ({ getValue }) => formatDate(getValue() as string | null),
       },
       {
-      {
         id: "arrival_status",
         accessorKey: "arrival_status",
         header: "حالة الوصول",

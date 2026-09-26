@@ -43,6 +43,13 @@
       "when": 1790416683631,
       "tag": "0005_profiles_username",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790437586025,
+      "tag": "0006_grid_settings",
+      "breakpoints": true
     }
   ]
 }

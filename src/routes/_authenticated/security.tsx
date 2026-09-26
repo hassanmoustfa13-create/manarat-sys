@@ -96,7 +96,7 @@ function SecurityPage() {
                 </td>
                 <td className="px-4 py-3">{e.actor_name || "—"}</td>
                 <td className="px-4 py-3">
-                  <span className={e.success ? "pill pill-teal" : "pill pill-rose"}>{e.success ? "ناجح" : "فاشل"}</span>
+                  <span className={e.success ? "pill pill-success" : "pill pill-terracotta"}>{e.success ? "ناجح" : "فاشل"}</span>
                 </td>
                 <td className="px-4 py-3 text-ink/70">{e.details || "—"}</td>
               </tr>

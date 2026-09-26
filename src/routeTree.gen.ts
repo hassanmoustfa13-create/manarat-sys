@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedColumnsRouteImport } from './routes/_authenticated/columns'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
+import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated/transfers'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedWorkersRouteImport } from './routes/_authenticated/workers'
@@ -48,6 +49,11 @@ const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
   path: '/requests',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSecurityRoute = AuthenticatedSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTransfersRoute = AuthenticatedTransfersRouteImport.update({
   id: '/transfers',
   path: '/transfers',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/columns': typeof AuthenticatedColumnsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
+  '/security': typeof AuthenticatedSecurityRoute
   '/transfers': typeof AuthenticatedTransfersRoute
   '/users': typeof AuthenticatedUsersRoute
   '/workers': typeof AuthenticatedWorkersRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/columns': typeof AuthenticatedColumnsRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
+  '/security': typeof AuthenticatedSecurityRoute
   '/transfers': typeof AuthenticatedTransfersRoute
   '/users': typeof AuthenticatedUsersRoute
   '/workers': typeof AuthenticatedWorkersRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/_authenticated/columns': typeof AuthenticatedColumnsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
+  '/_authenticated/security': typeof AuthenticatedSecurityRoute
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/workers': typeof AuthenticatedWorkersRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/columns'
     | '/reports'
     | '/requests'
+    | '/security'
     | '/transfers'
     | '/users'
     | '/workers'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/columns'
     | '/reports'
     | '/requests'
+    | '/security'
     | '/transfers'
     | '/users'
     | '/workers'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/_authenticated/columns'
     | '/_authenticated/reports'
     | '/_authenticated/requests'
+    | '/_authenticated/security'
     | '/_authenticated/transfers'
     | '/_authenticated/users'
     | '/_authenticated/workers'
@@ -180,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRequestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/security': {
+      id: '/_authenticated/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof AuthenticatedSecurityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/transfers': {
       id: '/_authenticated/transfers'
       path: '/transfers'
@@ -208,6 +227,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedColumnsRoute: typeof AuthenticatedColumnsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
+  AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
   AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedWorkersRoute: typeof AuthenticatedWorkersRoute
@@ -217,6 +237,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedColumnsRoute: AuthenticatedColumnsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
+  AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,
   AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedWorkersRoute: AuthenticatedWorkersRoute,

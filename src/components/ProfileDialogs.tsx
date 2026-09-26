@@ -245,7 +245,7 @@ export function SponsorProfileDialog({
                 onClick={() => onWorkerClick(w)}
                 className="font-medium text-brand hover:underline"
               >
-                {w.name}
+                {w.name || "بدون اسم"}
               </button>
               <span className="text-ink/45">{w.nationality}</span>
               <button

@@ -109,7 +109,18 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
     () => workers.find((w) => w.id === form.worker_id) ?? null,
     [workers, form.worker_id],
   );
-  const { data: transfers } = useQuery(transfersQuery);
+
+  /** Searchable by name or passport number (Arabic-Indic digits normalized to Latin) */
+  const filteredWorkers = useMemo(() => {
+    const q = workerQuery.trim().toLowerCase().replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+    if (!q) return workers;
+    return workers.filter(
+      (w) =>
+        (w.name ?? "").toLowerCase().includes(q) ||
+        String(w.passport_number ?? "").toLowerCase().includes(q),
+    );
+  }, [workers, workerQuery]);
+
   const { data: requests } = useQuery(requestsQuery);
   const sponsors = useMemo(
     () =>

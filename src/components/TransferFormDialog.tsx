@@ -51,13 +51,13 @@ const empty = {
   transfer_date: new Date().toISOString().slice(0, 10),
   period_start: new Date().toISOString().slice(0, 10),
   period_end: "",
-  old_sponsor_dues: "",
-  down_payment: "",
+  old_sponsor_dues: "0",
+  down_payment: "0",
   payment_status: PAYMENT_STATUSES[1] as string,
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
   salary_dues_status: YES_NO_EXISTS_F[1] as string,
-  salary_dues_amount: "",
+  salary_dues_amount: "0",
   worker_condition: "",
   worker_location: LOCATIONS[0] as string,
   notes: "",
@@ -298,10 +298,6 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
               value={form.worker_condition}
               onChange={(e) => set("worker_condition")(e.target.value)}
             />
-          </Field>
-          <Field label="ملاحظات" className="sm:col-span-2">
-
-            <Textarea rows={2} value={form.notes} onChange={(e) => set("notes")(e.target.value)} />
           </Field>
           <DialogFooter className="sm:col-span-3 sm:justify-start">
             <Button type="submit" disabled={save.isPending}>

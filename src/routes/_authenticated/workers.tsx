@@ -136,18 +136,6 @@ function WorkersPage() {
         cell: ({ getValue }) => formatDate(getValue() as string | null),
       },
       {
-        id: "flight_group",
-        accessorKey: "flight_group",
-        header: "مجموعة الرحلة",
-        meta: { editable: true },
-        cell: ({ getValue }) =>
-          (getValue() as string) ? (
-            <span className="pill pill-neutral">{getValue() as string}</span>
-          ) : (
-            <span className="text-ink/30">—</span>
-          ),
-      },
-      {
         id: "arrival_status",
         accessorKey: "arrival_status",
         header: "حالة الوصول",

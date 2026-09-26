@@ -124,12 +124,14 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
   const { data: transfers } = useQuery(transfersQuery);
   const { data: requests } = useQuery(requestsQuery);
   const sponsors = useMemo(
-    () =>
-      mergeContacts(
+    () => [
+      { name: "الشركة", phone: "" },
+      ...mergeContacts(
         transfers?.map((t) => ({ name: t.new_sponsor_name, phone: t.new_sponsor_phone })),
         workers.map((w) => ({ name: w.current_sponsor_name, phone: w.current_sponsor_phone })),
         requests?.map((r) => ({ name: r.customer_name, phone: r.phone })),
-      ),
+      ).filter((c) => c.name !== "الشركة"),
+    ],
     [transfers, workers, requests],
   );
 
@@ -272,7 +274,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             <div>
               <p className="text-ink/45">الكفيل القديم</p>
               <p className="font-medium">
-                {transfer?.old_sponsor_name || selectedWorker?.current_sponsor_name || "—"}
+                {transfer?.old_sponsor_name || selectedWorker?.current_sponsor_name || (selectedWorker ? "الشركة" : "—")}
               </p>
             </div>
             <div dir="ltr" className="text-right">
@@ -285,21 +287,30 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             </div>
           </div>
 
-          <ComboField
-            label="اسم الكفيل الجديد"
-            listId="new-sponsors-list"
-            value={form.new_sponsor_name}
-            onChange={set("new_sponsor_name")}
-            options={sponsors}
-            onPick={(c) =>
-              setForm((f) => ({
-                ...f,
-                new_sponsor_name: c.name,
-                new_sponsor_phone: c.phone || f.new_sponsor_phone,
-              }))
-            }
-            required
-          />
+          <div>
+            <ComboField
+              label="اسم الكفيل الجديد"
+              listId="new-sponsors-list"
+              value={form.new_sponsor_name}
+              onChange={set("new_sponsor_name")}
+              options={sponsors}
+              onPick={(c) =>
+                setForm((f) => ({
+                  ...f,
+                  new_sponsor_name: c.name,
+                  new_sponsor_phone: c.phone || f.new_sponsor_phone,
+                }))
+              }
+              required
+            />
+            <button
+              type="button"
+              className="mt-1 text-[12px] font-semibold text-brand hover:underline"
+              onClick={() => setForm((f) => ({ ...f, new_sponsor_name: "الشركة", new_sponsor_phone: "" }))}
+            >
+              النقل إلى الشركة (بدون كفيل)
+            </button>
+          </div>
           <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
           <SelectField label="نوع النقل" value={form.transfer_type} onChange={set("transfer_type")} options={TRANSFER_TYPES} />

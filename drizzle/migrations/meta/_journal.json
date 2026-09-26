@@ -57,6 +57,13 @@
       "when": 1790441304624,
       "tag": "0007_security_events",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790442223764,
+      "tag": "0008_company_as_default_sponsor",
+      "breakpoints": true
     }
   ]
 }

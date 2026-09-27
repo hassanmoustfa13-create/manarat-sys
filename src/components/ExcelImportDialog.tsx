@@ -39,7 +39,7 @@ export function ExcelImportDialog({
   onOpenChange: (v: boolean) => void;
   onImported: () => void;
 }) {
-  const target: ImportTarget = IMPORT_TARGETS[targetKey];
+  const target: ImportTarget = IMPORT_TARGETS[targetKey]!;
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 

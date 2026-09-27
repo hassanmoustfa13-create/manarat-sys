@@ -141,7 +141,7 @@ export function DataGrid<T extends { id: string }>({
                   colSpan={table.getVisibleLeafColumns().length + 1 + (rowActions ? 1 : 0)}
                   className="px-4 py-16 text-center text-base text-muted-foreground"
                 >
-                  {emptyMessage}
+                  {search.trim() ? `لا توجد نتائج مطابقة لـ «${search.trim()}»` : emptyMessage}
                 </td>
               </tr>
             )}

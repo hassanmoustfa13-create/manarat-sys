@@ -86,14 +86,29 @@ function WorkersPage() {
 
 
   const remove = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (id: string): Promise<"deleted" | "deactivated"> => {
+      const { count, error: cErr } = await supabase
+        .from("transfers")
+        .select("id", { count: "exact", head: true })
+        .eq("worker_id", id);
+      if (cErr) throw cErr;
+      if ((count ?? 0) > 0) {
+        const { error } = await supabase.from("workers").update({ transfer_status: "غير نشط" }).eq("id", id);
+        if (error) throw error;
+        return "deactivated";
+      }
       const { error } = await supabase.from("workers").delete().eq("id", id);
       if (error) throw error;
+      return "deleted";
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       qc.invalidateQueries({ queryKey: ["workers"] });
       qc.invalidateQueries({ queryKey: ["transfers"] });
-      toast.success("تم حذف السجل");
+      if (result === "deactivated") {
+        toast.info("لدى العامل/ـة عمليات نقل كفالة مرتبطة — تم تغيير الحالة إلى «غير نشط» بدلاً من الحذف");
+      } else {
+        toast.success("تم حذف السجل");
+      }
       setDeleting(null);
     },
     onError: (e) => toast.error(errorMessage(e)),
@@ -352,7 +367,7 @@ function WorkersPage() {
         open={Boolean(deleting)}
         onOpenChange={(o) => !o && setDeleting(null)}
         title="حذف سجل العامل/ـة؟"
-        description={`سيتم حذف "${deleting?.name ?? ""}" وجميع عمليات نقل الكفالة المرتبطة به نهائياً.`}
+        description={`سيتم حذف "${deleting?.name ?? ""}" نهائياً. ملاحظة: إذا كان لديه عمليات نقل كفالة مرتبطة فلن يتم الحذف — احذف عمليات النقل أولاً من صفحة نقل الكفالة.`}
         pending={remove.isPending}
         onConfirm={() => deleting && remove.mutate(deleting.id)}
       />

@@ -144,7 +144,7 @@ function WorkersPage() {
       {
         id: "arrival_date",
         accessorKey: "arrival_date",
-        header: "تاريخ الوصول",
+        header: "تاريخ دخول المكتب",
         meta: { editable: admin, type: "date", ltr: true, className: "tabular-nums" },
         cell: ({ getValue }) => formatDate(getValue() as string | null),
       },

@@ -162,11 +162,11 @@ export function ExcelImportDialog({
         if (errors.length === 0) {
           const key =
             target.table === "workers"
-              ? normalizeAr(String(record.passport_number ?? ""))
+              ? normalizeAr(String(record["passport_number"] ?? ""))
               : target.table === "requests"
-                ? `${normalizeAr(String(record.customer_name ?? ""))}|${normalizeAr(String(record.phone ?? ""))}`
+                ? `${normalizeAr(String(record["customer_name"] ?? ""))}|${normalizeAr(String(record["phone"] ?? ""))}`
                 : target.table === "office_visas"
-                  ? normalizeAr(String(record.visa_number ?? ""))
+                  ? normalizeAr(String(record["visa_number"] ?? ""))
                   : dedupeKey(record, ["worker_id", "new_sponsor_name", "transfer_date"]);
           const emptyKey = key.replace(/\|/g, "") === "";
           if (!emptyKey && (existing.has(key) || seen.has(key))) duplicate = true;

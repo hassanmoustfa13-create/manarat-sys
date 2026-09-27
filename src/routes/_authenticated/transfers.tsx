@@ -133,6 +133,25 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
           ),
       },
       {
+        id: "passport_number",
+        accessorFn: (r) => r.worker?.passport_number ?? "",
+        header: "رقم الجواز",
+        meta: { width: 130 },
+        cell: ({ row }) =>
+          row.original.worker ? (
+            <button
+              type="button"
+              onClick={() => setProfileWorker(row.original.worker)}
+              className="font-medium tabular-nums text-brand underline-offset-2 hover:underline"
+              dir="ltr"
+            >
+              {row.original.worker.passport_number || "—"}
+            </button>
+          ) : (
+            "—"
+          ),
+      },
+      {
         id: "days_in_saudi",
         accessorFn: (r) => daysInSaudi(r.worker?.arrival_date ?? null),
         header: "أيام العاملة في السعودية",

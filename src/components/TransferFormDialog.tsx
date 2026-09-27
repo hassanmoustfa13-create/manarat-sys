@@ -321,20 +321,20 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
           <SelectField label="نوع النقل" value={form.transfer_type} onChange={set("transfer_type")} options={TRANSFER_TYPES} />
-          <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
           {needsPeriod && (
             <>
               <TextField
-                label="تاريخ بداية المدة"
+                label="تاريخ بداية التجربة"
                 type="date"
                 ltr
                 value={form.period_start}
                 onChange={set("period_start")}
                 required
               />
-              <TextField label="تاريخ انتهاء المدة (تلقائي: 10 أيام)" type="date" ltr value={form.period_start ? addDays(form.period_start, 10) : ""} onChange={() => {}} disabled />
+              <TextField label="تاريخ انتهاء التجربة (تلقائي: 10 أيام)" type="date" ltr value={form.period_start ? addDays(form.period_start, 10) : ""} onChange={() => {}} disabled />
             </>
           )}
+          <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
           <SelectField
             label="حالة النقل"
             value={form.transfer_stage}

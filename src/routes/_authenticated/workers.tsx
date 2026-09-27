@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowLeftRight, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeftRight, CheckCircle2, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,6 +63,21 @@ function WorkersPage() {
   const [profileWorker, setProfileWorker] = useState<Worker | null>(null);
   const [sponsor, setSponsor] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Worker | null>(null);
+  const [completing, setCompleting] = useState<Worker | null>(null);
+
+  const complete = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("workers").update({ transfer_status: "تم النقل" }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["workers"] });
+      qc.invalidateQueries({ queryKey: ["transfers"] });
+      toast.success("تم إتمام النقل وإضافته إلى جدول نقل الكفالة");
+      setCompleting(null);
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
 
   const filtered = useMemo(
     () => (statusFilter ? workers.filter((w) => w.transfer_status === statusFilter) : workers),
@@ -282,6 +297,11 @@ function WorkersPage() {
           search={search}
           rowActions={(w) => (
             <>
+              {w.transfer_status !== "تم النقل" && w.current_sponsor_name && (
+                <IconBtn title="إتمام النقل" onClick={() => setCompleting(w)}>
+                  <CheckCircle2 className="size-3.5" />
+                </IconBtn>
+              )}
               <IconBtn title="نقل الكفالة" onClick={() => setTransferFor(w)}>
                 <ArrowLeftRight className="size-3.5" />
               </IconBtn>
@@ -335,6 +355,14 @@ function WorkersPage() {
         description={`سيتم حذف "${deleting?.name ?? ""}" وجميع عمليات نقل الكفالة المرتبطة به نهائياً.`}
         pending={remove.isPending}
         onConfirm={() => deleting && remove.mutate(deleting.id)}
+      />
+      <ConfirmDelete
+        open={Boolean(completing)}
+        onOpenChange={(o) => !o && setCompleting(null)}
+        title="إتمام نقل الكفالة؟"
+        description={`سيتم اعتبار "${completing?.name ?? ""}" منقولة إلى الكفيل "${completing?.current_sponsor_name ?? ""}" وإضافة العملية إلى جدول نقل الكفالة ${completing && ["عاملة مهنية", "مهني"].includes(completing.profession ?? "") ? "المهنية" : "المنزلية"}.`}
+        pending={complete.isPending}
+        onConfirm={() => completing && complete.mutate(completing.id)}
       />
     </main>
   );

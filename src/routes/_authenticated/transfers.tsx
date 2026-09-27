@@ -424,6 +424,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         title="إتمام نقل الكفالة؟"
         description={`سيصبح "${completing?.new_sponsor_name ?? ""}" هو الكفيل الحالي لـ "${completing?.worker_name ?? ""}" وتتحول الحالة إلى "تم النقل".`}
         pending={complete.isPending}
+        confirmLabel="نعم، تم النقل"
         onConfirm={() => completing && complete.mutate(completing.id)}
       />
     </main>

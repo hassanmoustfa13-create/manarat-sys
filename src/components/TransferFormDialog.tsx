@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
 import {
   LOCATIONS,
+  PASSPORT_HOLDERS,
   PAYMENT_STATUSES,
   TRANSFER_STAGES,
   TRANSFER_TYPES,
@@ -64,6 +65,7 @@ const empty = {
   salary_dues_amount: "0",
   worker_condition: "",
   worker_location: LOCATIONS[0] as string,
+  passport_holder: "المكتب" as string,
   notes: "",
 };
 
@@ -102,10 +104,11 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             salary_dues_amount: String(transfer.salary_dues_amount ?? 0),
             worker_condition: transfer.worker_condition ?? "",
             worker_location: transfer.worker_location ?? LOCATIONS[0],
+            passport_holder: transfer.passport_holder ?? "المكتب",
             notes: transfer.notes,
 
           }
-        : { ...empty, worker_id: worker?.id ?? "" },
+        : { ...empty, worker_id: worker?.id ?? "", passport_holder: worker?.passport_holder ?? "المكتب" },
     );
   }, [open, worker, transfer]);
 
@@ -175,6 +178,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         salary_dues_amount: Number(form.salary_dues_amount || 0),
         worker_condition: form.worker_condition.trim(),
         worker_location: form.worker_location,
+        passport_holder: form.passport_holder,
         notes: form.notes.trim(),
         category,
       };
@@ -190,6 +194,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           .insert({ ...common, worker_id: form.worker_id });
         if (error) throw error;
       }
+      // keep the worker's passport holder in sync with the transfer
+      await supabase.from("workers").update({ passport_holder: form.passport_holder }).eq("id", form.worker_id);
     },
     onSuccess: () => {
       toast.success(editing ? "تم حفظ التعديلات" : "تم تسجيل طلب نقل الكفالة");
@@ -348,6 +354,12 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             value={form.worker_location}
             onChange={set("worker_location")}
             options={LOCATIONS}
+          />
+          <SelectField
+            label="الجواز لدى"
+            value={form.passport_holder}
+            onChange={set("passport_holder")}
+            options={PASSPORT_HOLDERS}
           />
 
           <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={setAmount("old_sponsor_dues")} />

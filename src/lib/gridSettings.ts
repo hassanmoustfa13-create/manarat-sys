@@ -45,6 +45,7 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
     ["current_sponsor_phone", "هاتف الكفيل"],
     ["transfer_status", "حالة النقل"],
     ["notes", "ملاحظات"],
+    ["passport_holder", "الجواز لدى"],
     ...AUDIT,
   ],
   requests: [
@@ -107,6 +108,7 @@ const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
     current_sponsor_phone: 110,
     transfer_status: 100,
     notes: 160,
+    passport_holder: 90,
     created_by: 110,
     updated_by: 110,
   },

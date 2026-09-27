@@ -85,6 +85,13 @@
       "when": 1790503821116,
       "tag": "0011_office_visas",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1790505130284,
+      "tag": "0012_auto_transfer_on_complete",
+      "breakpoints": true
     }
   ]
 }

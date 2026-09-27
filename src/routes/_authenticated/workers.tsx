@@ -149,6 +149,21 @@ function WorkersPage() {
         cell: ({ getValue }) => formatDate(getValue() as string | null),
       },
       {
+        id: "entry_date",
+        accessorKey: "entry_date",
+        header: "تاريخ دخولها السعودية",
+        meta: { editable: admin, type: "date", ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => formatDate(getValue() as string | null),
+      },
+      {
+        id: "residency_number",
+        accessorKey: "residency_number",
+        header: "رقم الإقامة",
+        meta: { editable: true, ltr: true, className: "tabular-nums" },
+        cell: ({ row }) =>
+          row.original.residency_status === "يوجد" ? row.original.residency_number || "—" : "—",
+      },
+      {
         id: "arrival_status",
         accessorKey: "arrival_status",
         header: "حالة الوصول",

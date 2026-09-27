@@ -36,6 +36,8 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
     ["profession", "المهنة"],
     ["visa_type", "نوع التأشيرة"],
     ["arrival_date", "تاريخ الوصول"],
+    ["entry_date", "تاريخ دخولها السعودية"],
+    ["residency_number", "رقم الإقامة"],
     ["arrival_status", "حالة الوصول"],
     ["current_location", "الموقع الحالي"],
     ["days_remaining", "المتبقي للوصول"],

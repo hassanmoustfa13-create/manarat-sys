@@ -98,6 +98,8 @@ const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
     profession: 100,
     visa_type: 90,
     arrival_date: 100,
+    entry_date: 110,
+    residency_number: 100,
     arrival_status: 90,
     current_location: 100,
     days_remaining: 90,

@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FileSpreadsheet, Loader2, Upload, Download, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { categoryOfProfession } from "@/lib/data";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {

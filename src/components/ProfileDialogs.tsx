@@ -66,6 +66,24 @@ export function WorkerProfileDialog({
   );
   const days = daysUntil(worker?.arrival_date ?? null);
 
+  /* Sponsor chain: every sponsor the worker was transferred to, in order,
+     with transfer type and how long the worker stayed with each sponsor */
+  const chain = useMemo(() => {
+    const asc = [...history].reverse(); // oldest first
+    const startOf = (t: (typeof asc)[number]) => t.period_start || t.transfer_date || null;
+    const diffDays = (a: string, b: string) =>
+      Math.round((new Date(b + "T00:00:00").getTime() - new Date(a + "T00:00:00").getTime()) / 86_400_000);
+    const today = new Date().toISOString().slice(0, 10);
+    return asc.map((t, i) => {
+      const start = startOf(t);
+      const nextStart = i + 1 < asc.length ? startOf(asc[i + 1]) : null;
+      const isCurrent = i === asc.length - 1 && worker?.current_sponsor_name === t.new_sponsor_name;
+      const end = nextStart ?? (isCurrent ? today : null);
+      const duration = start && end ? diffDays(start, end) : null;
+      return { t, start, end: nextStart, isCurrent, duration };
+    });
+  }, [history, worker?.current_sponsor_name]);
+
   return (
     <Dialog open={Boolean(worker)} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">

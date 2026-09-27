@@ -284,6 +284,7 @@ export type Database = {
           current_location: string
           current_sponsor_name: string
           current_sponsor_phone: string
+          entry_date: string | null
           flight_group: string
           id: string
           monthly_salary: number
@@ -292,6 +293,8 @@ export type Database = {
           notes: string
           passport_number: string
           profession: string
+          residency_number: string
+          residency_status: string
           transfer_status: string
           updated_at: string
           updated_by: string | null
@@ -306,6 +309,7 @@ export type Database = {
           current_location?: string
           current_sponsor_name?: string
           current_sponsor_phone?: string
+          entry_date?: string | null
           flight_group?: string
           id?: string
           monthly_salary?: number
@@ -314,6 +318,8 @@ export type Database = {
           notes?: string
           passport_number: string
           profession?: string
+          residency_number?: string
+          residency_status?: string
           transfer_status?: string
           updated_at?: string
           updated_by?: string | null
@@ -328,6 +334,7 @@ export type Database = {
           current_location?: string
           current_sponsor_name?: string
           current_sponsor_phone?: string
+          entry_date?: string | null
           flight_group?: string
           id?: string
           monthly_salary?: number
@@ -336,6 +343,8 @@ export type Database = {
           notes?: string
           passport_number?: string
           profession?: string
+          residency_number?: string
+          residency_status?: string
           transfer_status?: string
           updated_at?: string
           updated_by?: string | null

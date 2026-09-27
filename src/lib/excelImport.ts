@@ -220,23 +220,23 @@ export function buildRecord(
   }
 
   // العمالة: اسم أو جواز على الأقل
-  if (target.table === "workers" && !record.name && !record.passport_number) {
+  if (target.table === "workers" && !record["name"] && !record["passport_number"]) {
     errors.push("يجب كتابة اسم العاملة أو رقم الجواز على الأقل");
   }
 
   // نقل الكفالة: ربط العاملة
   if (target.table === "transfers" && workerLookup) {
-    const w = String(record.__worker ?? "").trim();
+    const w = String(record["__worker"] ?? "").trim();
     if (w) {
       const hit = workerLookup.get(normalizeAr(w));
       if (!hit) errors.push(`العاملة «${w}» غير موجودة في جدول العمالة — أضفها أولًا`);
       else {
-        record.worker_id = hit.id;
-        record.category = hit.category;
-        if (!record.old_sponsor_name) record.old_sponsor_name = "الشركة";
+        record["worker_id"] = hit.id;
+        record["category"] = hit.category;
+        if (!record["old_sponsor_name"]) record["old_sponsor_name"] = "الشركة";
       }
     }
-    delete record.__worker;
+    delete record["__worker"];
   }
 
   return { record, errors };

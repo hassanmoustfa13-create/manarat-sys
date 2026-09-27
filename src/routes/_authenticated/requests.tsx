@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil, Trash2 } from "lucide-react";
+import { FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { DataGrid } from "@/components/DataGrid";
+import { Button } from "@/components/ui/button";
+import { ExcelImportDialog } from "@/components/ExcelImportDialog";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { RequestFormDialog } from "@/components/RequestFormDialog";
@@ -173,6 +175,8 @@ function RequestsPage() {
     [admin, nameOf],
   );
 
+  const [importOpen, setImportOpen] = useState(false);
+
   return (
     <main className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6">
       <GridToolbar
@@ -185,6 +189,13 @@ function RequestsPage() {
           setEditing(null);
           setFormOpen(true);
         }}
+        extra={
+          admin ? (
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setImportOpen(true)}>
+              <FileSpreadsheet className="size-4" /> استيراد من Excel
+            </Button>
+          ) : undefined
+        }
         filters={
           <>
             <FilterChip active={statusFilter === null} onClick={() => setStatusFilter(null)}>
@@ -230,6 +241,7 @@ function RequestsPage() {
       )}
 
       <RequestFormDialog open={formOpen} onOpenChange={setFormOpen} request={editing} isAdmin={admin} />
+      <ExcelImportDialog targetKey="requests" open={importOpen} onOpenChange={setImportOpen} onImported={() => qc.invalidateQueries()} />
       <SponsorProfileDialog
         sponsor={sponsor}
         onClose={() => setSponsor(null)}

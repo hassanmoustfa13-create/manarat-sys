@@ -82,7 +82,7 @@ export function ExcelImportDialog({
       setWorkbook(wb);
       setFileName(file.name);
       if (wb.SheetNames.length === 1) {
-        pickSheet(wb, wb.SheetNames[0]);
+        pickSheet(wb, wb.SheetNames[0]!);
       } else {
         setStep(2);
       }
@@ -95,7 +95,7 @@ export function ExcelImportDialog({
 
   // الخطوة 2: اختيار الورقة
   const pickSheet = (wb: XLSX.WorkBook, name: string) => {
-    const ws = wb.Sheets[name];
+    const ws = wb.Sheets[name]!;
     const grid = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: "", raw: true });
     const nonEmpty = grid.filter((r) => r.some((c) => c !== "" && c != null));
     if (nonEmpty.length < 2) {
@@ -205,15 +205,18 @@ export function ExcelImportDialog({
     const failed: { index: number; reason: string }[] = [];
     let added = 0;
     // إدراج على دفعات، وعند فشل الدفعة نعيد صفًا صفًا لتحديد الأخطاء
+    const table = supabase.from(target.table) as unknown as {
+      insert: (rows: Record<string, unknown> | Record<string, unknown>[]) => Promise<{ error: { message: string } | null }>;
+    };
     const CHUNK = 100;
     for (let i = 0; i < good.length; i += CHUNK) {
       const chunk = good.slice(i, i + CHUNK);
-      const { error } = await supabase.from(target.table).insert(chunk.map((r) => r.record));
+      const { error } = await table.insert(chunk.map((r) => r.record));
       if (!error) {
         added += chunk.length;
       } else {
         for (const r of chunk) {
-          const { error: e2 } = await supabase.from(target.table).insert(r.record);
+          const { error: e2 } = await table.insert(r.record);
           if (e2) failed.push({ index: r.index, reason: e2.message });
           else added += 1;
         }

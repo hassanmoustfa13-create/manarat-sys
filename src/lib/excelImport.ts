@@ -7,9 +7,10 @@ import {
   TRANSFER_STAGES,
   TRANSFER_TYPES,
   VISA_TYPES,
-  EXPERIENCE_OPTIONS,
   RELIGIONS,
 } from "@/lib/data";
+
+const EXPERIENCE_OPTIONS = ["سنة", "سنتان", "3 سنوات", "4 سنوات", "5 سنوات", "6 سنوات"];
 
 export type FieldType = "text" | "number" | "date" | "enum";
 

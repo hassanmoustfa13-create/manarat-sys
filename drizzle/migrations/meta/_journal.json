@@ -99,6 +99,13 @@
       "when": 1790505145563,
       "tag": "0013_auto_transfer_payment_label",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790505424631,
+      "tag": "0014_sync_transfer_on_status_revert",
+      "breakpoints": true
     }
   ]
 }

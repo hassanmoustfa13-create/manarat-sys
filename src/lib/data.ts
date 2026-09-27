@@ -99,6 +99,7 @@ export const workersQuery = queryOptions({
     const { data, error } = await supabase
       .from("workers")
       .select("*")
+      .eq("is_deleted", false)
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data;
@@ -111,6 +112,7 @@ export const transfersQuery = queryOptions({
     const { data, error } = await supabase
       .from("transfers")
       .select("*")
+      .eq("is_deleted", false)
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data;
@@ -200,6 +202,11 @@ export function mergeContacts(...lists: (Contact[] | undefined)[]): Contact[] {
 }
 
 export function errorMessage(e: unknown): string {
-  if (e && typeof e === "object" && "message" in e) return String((e as { message: unknown }).message);
+  if (e && typeof e === "object" && "message" in e) {
+    const msg = String((e as { message: unknown }).message);
+    if (msg.includes("transfers_one_active_per_worker"))
+      return "لدى هذا العامل/ـة طلب نقل كفالة فعّال بالفعل — أكمل الطلب الحالي أو عدّله بدلاً من إنشاء طلب جديد";
+    return msg;
+  }
   return "حدث خطأ غير متوقع";
 }

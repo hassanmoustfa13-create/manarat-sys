@@ -90,14 +90,17 @@ function WorkersPage() {
       const { count, error: cErr } = await supabase
         .from("transfers")
         .select("id", { count: "exact", head: true })
-        .eq("worker_id", id);
+        .eq("worker_id", id)
+        .eq("is_deleted", false)
+        .neq("transfer_stage", "تم النقل");
       if (cErr) throw cErr;
       if ((count ?? 0) > 0) {
         const { error } = await supabase.from("workers").update({ transfer_status: "غير نشط" }).eq("id", id);
         if (error) throw error;
         return "deactivated";
       }
-      const { error } = await supabase.from("workers").delete().eq("id", id);
+      // soft delete: keep the row and its transfer history
+      const { error } = await supabase.from("workers").update({ is_deleted: true }).eq("id", id);
       if (error) throw error;
       return "deleted";
     },

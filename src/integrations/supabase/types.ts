@@ -32,6 +32,54 @@ export type Database = {
         }
         Relationships: []
       }
+      office_visas: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          holder_name: string
+          holder_phone: string
+          id: string
+          new_sponsor_name: string
+          new_sponsor_phone: string
+          payment_status: string
+          seq: number
+          updated_at: string
+          updated_by: string | null
+          visa_number: string
+          visa_status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          holder_name?: string
+          holder_phone?: string
+          id?: string
+          new_sponsor_name?: string
+          new_sponsor_phone?: string
+          payment_status?: string
+          seq?: number
+          updated_at?: string
+          updated_by?: string | null
+          visa_number?: string
+          visa_status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          holder_name?: string
+          holder_phone?: string
+          id?: string
+          new_sponsor_name?: string
+          new_sponsor_phone?: string
+          payment_status?: string
+          seq?: number
+          updated_at?: string
+          updated_by?: string | null
+          visa_number?: string
+          visa_status?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

@@ -127,6 +127,13 @@
       "when": 1790507736616,
       "tag": "0017_passport_holder",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790507844237,
+      "tag": "0018_soft_delete_and_single_active_transfer",
+      "breakpoints": true
     }
   ]
 }

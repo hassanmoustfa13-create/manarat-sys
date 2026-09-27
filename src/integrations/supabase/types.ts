@@ -210,6 +210,7 @@ export type Database = {
           created_by: string | null
           down_payment: number
           id: string
+          is_deleted: boolean
           medical_exam: string
           new_sponsor_name: string
           new_sponsor_phone: string
@@ -241,6 +242,7 @@ export type Database = {
           created_by?: string | null
           down_payment?: number
           id?: string
+          is_deleted?: boolean
           medical_exam?: string
           new_sponsor_name?: string
           new_sponsor_phone?: string
@@ -272,6 +274,7 @@ export type Database = {
           created_by?: string | null
           down_payment?: number
           id?: string
+          is_deleted?: boolean
           medical_exam?: string
           new_sponsor_name?: string
           new_sponsor_phone?: string
@@ -338,6 +341,7 @@ export type Database = {
           entry_date: string | null
           flight_group: string
           id: string
+          is_deleted: boolean
           monthly_salary: number
           name: string
           nationality: string
@@ -364,6 +368,7 @@ export type Database = {
           entry_date?: string | null
           flight_group?: string
           id?: string
+          is_deleted?: boolean
           monthly_salary?: number
           name: string
           nationality?: string
@@ -390,6 +395,7 @@ export type Database = {
           entry_date?: string | null
           flight_group?: string
           id?: string
+          is_deleted?: boolean
           monthly_salary?: number
           name?: string
           nationality?: string

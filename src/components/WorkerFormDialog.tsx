@@ -42,6 +42,9 @@ const empty = {
   profession: PROFESSIONS[0] as string,
   visa_type: VISA_TYPES[0] as string,
   arrival_date: "",
+  entry_date: "",
+  residency_status: "لا يوجد",
+  residency_number: "",
   arrival_time: "",
   flight_group: "",
   arrival_status: ARRIVAL_STATUSES[0] as string,
@@ -82,6 +85,9 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             profession: worker.profession ?? "",
             visa_type: worker.visa_type ?? "",
             arrival_date: worker.arrival_date ?? "",
+            entry_date: worker.entry_date ?? "",
+            residency_status: worker.residency_status ?? "لا يوجد",
+            residency_number: worker.residency_number ?? "",
             arrival_time: worker.arrival_time ?? "",
             flight_group: worker.flight_group ?? "",
             arrival_status: worker.arrival_status ?? ARRIVAL_STATUSES[0],
@@ -109,6 +115,9 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
         profession: form.profession,
         visa_type: form.visa_type,
         arrival_date: form.arrival_date || null,
+        entry_date: form.entry_date || null,
+        residency_status: form.residency_status,
+        residency_number: form.residency_status === "يوجد" ? form.residency_number.trim() : "",
         arrival_time: form.arrival_time.trim(),
         flight_group: form.flight_group.trim(),
         arrival_status: form.arrival_status,
@@ -198,7 +207,29 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             onChange={set("arrival_date")}
             disabled={coreLocked}
           />
+          <TextField
+            label="تاريخ دخولها السعودية"
+            type="date"
+            ltr
+            value={form.entry_date}
+            onChange={set("entry_date")}
+            disabled={coreLocked}
+          />
           <SelectField label="المهنة" value={form.profession} onChange={set("profession")} options={PROFESSIONS} />
+          <SelectField
+            label="الإقامة"
+            value={form.residency_status}
+            onChange={set("residency_status")}
+            options={["يوجد", "لا يوجد"]}
+          />
+          {form.residency_status === "يوجد" && (
+            <TextField
+              label="رقم الإقامة"
+              value={form.residency_number}
+              onChange={set("residency_number")}
+              ltr
+            />
+          )}
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
           <SelectField
             label="حالة الوصول"

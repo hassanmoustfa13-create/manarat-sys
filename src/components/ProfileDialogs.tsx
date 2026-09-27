@@ -89,6 +89,11 @@ export function WorkerProfileDialog({
                 <Row label="الراتب الشهري" value={formatMoney(worker.monthly_salary)} ltr />
                 <h4 className="mb-2 mt-4 text-[11px] font-semibold text-ink/50">بيانات الوصول</h4>
                 <Row label="تاريخ الوصول" value={formatDate(worker.arrival_date)} ltr />
+                <Row label="تاريخ دخولها السعودية" value={formatDate(worker.entry_date)} ltr />
+                <Row label="الإقامة" value={worker.residency_status || "لا يوجد"} />
+                {worker.residency_status === "يوجد" && (
+                  <Row label="رقم الإقامة" value={worker.residency_number || "—"} ltr />
+                )}
                 <Row label="وقت الوصول" value={worker.arrival_time || "—"} ltr />
                 <Row label="حالة الوصول" value={<StatusBadge value={worker.arrival_status} />} />
                 <Row label="الموقع الحالي" value={<StatusBadge value={worker.current_location} />} />

@@ -153,11 +153,11 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
       },
       {
         id: "days_in_saudi",
-        accessorFn: (r) => daysInSaudi(r.worker?.arrival_date ?? null),
+        accessorFn: (r) => daysInSaudi(r.worker?.entry_date ?? r.worker?.arrival_date ?? null),
         header: "أيام العاملة في السعودية",
         meta: { width: 150 },
         cell: ({ row }) => {
-          const d = daysInSaudi(row.original.worker?.arrival_date ?? null);
+          const d = daysInSaudi(row.original.worker?.entry_date ?? row.original.worker?.arrival_date ?? null);
           const arrival = row.original.worker?.arrival_date;
           return (
             <div className="leading-tight">

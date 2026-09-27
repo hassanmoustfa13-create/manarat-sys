@@ -88,7 +88,7 @@ export function WorkerProfileDialog({
                 <Row label="نوع التأشيرة" value={worker.visa_type || "—"} />
                 <Row label="الراتب الشهري" value={formatMoney(worker.monthly_salary)} ltr />
                 <h4 className="mb-2 mt-4 text-[11px] font-semibold text-ink/50">بيانات الوصول</h4>
-                <Row label="تاريخ الوصول" value={formatDate(worker.arrival_date)} ltr />
+                <Row label="تاريخ دخول المكتب" value={formatDate(worker.arrival_date)} ltr />
                 <Row label="تاريخ دخولها السعودية" value={formatDate(worker.entry_date)} ltr />
                 <Row label="الإقامة" value={worker.residency_status || "لا يوجد"} />
                 {worker.residency_status === "يوجد" && (

@@ -164,7 +164,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
           <DialogTitle>{editing ? "تعديل بيانات العامل/ـة" : "إضافة عامل/ـة جديد"}</DialogTitle>
           <DialogDescription>
             {coreLocked
-              ? "البيانات الأساسية (الاسم، الجواز، الجنسية، تاريخ الوصول) للقراءة فقط — يمكن للمدير فقط تعديلها."
+              ? "البيانات الأساسية (الاسم، الجواز، الجنسية، تاريخ دخول المكتب) للقراءة فقط — يمكن للمدير فقط تعديلها."
               : "أدخل البيانات الأساسية وبيانات الكفيل الحالي."}
           </DialogDescription>
         </DialogHeader>
@@ -200,7 +200,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             hint="اكتب الجنسية أو اخترها من القائمة"
           />
           <TextField
-            label="تاريخ الوصول"
+            label="تاريخ دخول المكتب"
             type="date"
             ltr
             value={form.arrival_date}

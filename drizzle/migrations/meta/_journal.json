@@ -92,6 +92,13 @@
       "when": 1790505130284,
       "tag": "0012_auto_transfer_on_complete",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790505145563,
+      "tag": "0013_auto_transfer_payment_label",
+      "breakpoints": true
     }
   ]
 }

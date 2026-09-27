@@ -66,6 +66,25 @@ export function WorkerProfileDialog({
   );
   const days = daysUntil(worker?.arrival_date ?? null);
 
+  /* Sponsor chain: every sponsor the worker was transferred to, in order,
+     with transfer type and how long the worker stayed with each sponsor */
+  const chain = useMemo(() => {
+    const asc = [...history].reverse(); // oldest first
+    const startOf = (t: (typeof asc)[number]) => t.period_start || t.transfer_date || null;
+    const diffDays = (a: string, b: string) =>
+      Math.round((new Date(b + "T00:00:00").getTime() - new Date(a + "T00:00:00").getTime()) / 86_400_000);
+    const today = new Date().toISOString().slice(0, 10);
+    return asc.map((t, i) => {
+      const start = startOf(t);
+      const next = asc[i + 1];
+      const nextStart = next ? startOf(next) : null;
+      const isCurrent = i === asc.length - 1 && worker?.current_sponsor_name === t.new_sponsor_name;
+      const end = nextStart ?? (isCurrent ? today : null);
+      const duration = start && end ? diffDays(start, end) : null;
+      return { t, start, end: nextStart, isCurrent, duration };
+    });
+  }, [history, worker?.current_sponsor_name]);
+
   return (
     <Dialog open={Boolean(worker)} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
@@ -117,6 +136,39 @@ export function WorkerProfileDialog({
 
             {worker.notes && (
               <p className="glass rounded-xl p-3 text-[13px] text-ink/70">{worker.notes}</p>
+            )}
+
+            {chain.length > 0 && (
+              <section>
+                <h4 className="mb-2 text-[11px] font-semibold text-ink/50">
+                  سلسلة الكفلاء ({chain.length})
+                </h4>
+                <ol className="space-y-1.5">
+                  {chain.map(({ t, start, end, isCurrent, duration }, i) => (
+                    <li
+                      key={t.id}
+                      className="glass flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl px-3 py-2 text-[13px]"
+                    >
+                      <span className="pill pill-neutral">{i + 1}</span>
+                      <SponsorLink name={t.new_sponsor_name} onClick={onSponsorClick} />
+                      <span className="flex items-center gap-1 text-[11px]">
+                        <span className="text-ink/45">نوع النقل:</span>
+                        <StatusBadge value={t.transfer_type} />
+                      </span>
+                      <span className="text-[11px] tabular-nums text-ink/50" dir="ltr">
+                        {formatDate(start)} {end ? `← ${formatDate(end)}` : isCurrent ? "← حتى الآن" : ""}
+                      </span>
+                      <span className="ms-auto text-[12px] font-medium text-teal">
+                        {duration === null
+                          ? "—"
+                          : isCurrent
+                            ? `${duration} يوم (ما زالت عنده)`
+                            : `${duration} يوم`}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
             )}
 
             <section>

@@ -53,6 +53,7 @@ export const LANGUAGES = ["عربية", "إنجليزية", "عربية وإنج
 /* --- Module 2: arrivals --- */
 export const ARRIVAL_STATUSES = ["تم الوصول", "تم الإلغاء"] as const;
 export const LOCATIONS = ["السكن", "المكتب", "الكفيل القديم", "الكفيل الجديد"] as const;
+export const PASSPORT_HOLDERS = ["العاملة", "الكفيل", "المكتب"] as const;
 
 /* --- Module 3: transfer operations --- */
 export const VISA_TYPES = ["عادية", "تأهيل", "بديلة"] as const;

@@ -16,6 +16,7 @@ import { ComboField, Field, SelectField, SuggestField, TextField } from "@/compo
 import {
   ARRIVAL_STATUSES,
   LOCATIONS,
+  PASSPORT_HOLDERS,
   NATIONALITIES,
   PROFESSIONS,
   TRANSFER_STATUSES,
@@ -49,6 +50,7 @@ const empty = {
   flight_group: "",
   arrival_status: ARRIVAL_STATUSES[0] as string,
   current_location: LOCATIONS[0] as string,
+  passport_holder: "المكتب" as string,
   current_sponsor_name: "",
   current_sponsor_phone: "",
   transfer_status: TRANSFER_STATUSES[0] as string,
@@ -92,6 +94,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             flight_group: worker.flight_group ?? "",
             arrival_status: worker.arrival_status ?? ARRIVAL_STATUSES[0],
             current_location: worker.current_location ?? LOCATIONS[0],
+            passport_holder: worker.passport_holder ?? "المكتب",
             current_sponsor_name: worker.current_sponsor_name ?? "",
             current_sponsor_phone: worker.current_sponsor_phone ?? "",
             transfer_status: worker.transfer_status,
@@ -122,6 +125,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
         flight_group: form.flight_group.trim(),
         arrival_status: form.arrival_status,
         current_location: form.current_location,
+        passport_holder: form.passport_holder,
         current_sponsor_name: form.current_sponsor_name.trim(),
         current_sponsor_phone: form.current_sponsor_phone.trim(),
         transfer_status: form.transfer_status,
@@ -242,6 +246,12 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             value={form.current_location}
             onChange={set("current_location")}
             options={LOCATIONS}
+          />
+          <SelectField
+            label="الجواز لدى"
+            value={form.passport_holder}
+            onChange={set("passport_holder")}
+            options={PASSPORT_HOLDERS}
           />
 
           <SelectField

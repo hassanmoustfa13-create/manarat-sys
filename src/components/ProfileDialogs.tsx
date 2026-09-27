@@ -116,6 +116,7 @@ export function WorkerProfileDialog({
                 <Row label="وقت الوصول" value={worker.arrival_time || "—"} ltr />
                 <Row label="حالة الوصول" value={<StatusBadge value={worker.arrival_status} />} />
                 <Row label="الموقع الحالي" value={<StatusBadge value={worker.current_location} />} />
+                <Row label="الجواز لدى" value={worker.passport_holder || "—"} />
                 <Row label="الوقت المتبقي للوصول" value={formatDaysRemaining(days)} />
               </section>
 

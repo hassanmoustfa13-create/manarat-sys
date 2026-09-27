@@ -1,0 +1,2 @@
+ALTER TABLE public.workers ADD COLUMN IF NOT EXISTS passport_holder text NOT NULL DEFAULT 'المكتب';
+ALTER TABLE public.transfers ADD COLUMN IF NOT EXISTS passport_holder text NOT NULL DEFAULT 'المكتب';

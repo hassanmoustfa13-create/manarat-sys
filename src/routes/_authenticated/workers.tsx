@@ -252,6 +252,12 @@ function WorkersPage() {
         ),
       },
       {
+        id: "passport_holder",
+        accessorKey: "passport_holder",
+        header: "الجواز لدى",
+        cell: ({ getValue }) => <span className="pill pill-neutral">{(getValue() as string) || "—"}</span>,
+      },
+      {
         id: "created_by",
         accessorFn: (r) => nameOf(r.created_by),
         header: "تم الإضافة بواسطة",

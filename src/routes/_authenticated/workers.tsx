@@ -87,6 +87,16 @@ function WorkersPage() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
+      const { count, error: cErr } = await supabase
+        .from("transfers")
+        .select("id", { count: "exact", head: true })
+        .eq("worker_id", id);
+      if (cErr) throw cErr;
+      if ((count ?? 0) > 0) {
+        throw new Error(
+          `لا يمكن حذف هذا السجل لأنه مرتبط بـ ${count} عملية نقل كفالة. احذف عمليات النقل أولاً من صفحة نقل الكفالة ثم أعد المحاولة.`,
+        );
+      }
       const { error } = await supabase.from("workers").delete().eq("id", id);
       if (error) throw error;
     },
@@ -352,7 +362,7 @@ function WorkersPage() {
         open={Boolean(deleting)}
         onOpenChange={(o) => !o && setDeleting(null)}
         title="حذف سجل العامل/ـة؟"
-        description={`سيتم حذف "${deleting?.name ?? ""}" وجميع عمليات نقل الكفالة المرتبطة به نهائياً.`}
+        description={`سيتم حذف "${deleting?.name ?? ""}" نهائياً. ملاحظة: إذا كان لديه عمليات نقل كفالة مرتبطة فلن يتم الحذف — احذف عمليات النقل أولاً من صفحة نقل الكفالة.`}
         pending={remove.isPending}
         onConfirm={() => deleting && remove.mutate(deleting.id)}
       />

@@ -64,6 +64,7 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
   ],
   transfers: [
     ["worker_name", "اسم العاملة"],
+    ["passport_number", "رقم الجواز"],
     ["days_in_saudi", "أيام العاملة في السعودية"],
     ["old_sponsor_name", "الكفيل القديم"],
     ["new_sponsor_name", "الكفيل الجديد"],
@@ -125,6 +126,7 @@ const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
   },
   transfers: {
     worker_name: 130,
+    passport_number: 100,
     days_in_saudi: 110,
     old_sponsor_name: 120,
     new_sponsor_name: 120,

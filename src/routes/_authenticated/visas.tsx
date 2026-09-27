@@ -79,7 +79,6 @@ function VisasPage() {
 
   const columns = useMemo<ColumnDef<OfficeVisa & { idx: number }, unknown>[]>(
     () => [
-      { id: "idx", accessorKey: "idx", header: "م", meta: { width: 50, className: "tabular-nums" } },
       {
         id: "holder_name",
         accessorKey: "holder_name",

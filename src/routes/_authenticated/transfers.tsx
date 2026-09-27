@@ -90,7 +90,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("transfers").delete().eq("id", id);
+      const { error } = await supabase.from("transfers").update({ is_deleted: true }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {

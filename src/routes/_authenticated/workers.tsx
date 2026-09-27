@@ -361,6 +361,7 @@ function WorkersPage() {
         onOpenChange={(o) => !o && setCompleting(null)}
         title="إتمام نقل الكفالة؟"
         description={`سيتم اعتبار "${completing?.name ?? ""}" منقولة إلى الكفيل "${completing?.current_sponsor_name ?? ""}" وإضافة العملية إلى جدول نقل الكفالة ${completing && ["عاملة مهنية", "مهني"].includes(completing.profession ?? "") ? "المهنية" : "المنزلية"}.`}
+        confirmLabel="نعم، تم النقل"
         pending={complete.isPending}
         onConfirm={() => completing && complete.mutate(completing.id)}
       />

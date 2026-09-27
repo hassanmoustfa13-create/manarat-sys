@@ -16,6 +16,7 @@ export function ConfirmDelete({
   description,
   pending,
   onConfirm,
+  confirmLabel,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -23,6 +24,7 @@ export function ConfirmDelete({
   description: string;
   pending?: boolean;
   onConfirm: () => void;
+  confirmLabel?: string;
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -40,7 +42,7 @@ export function ConfirmDelete({
             }}
             className="bg-terracotta text-white hover:bg-terracotta/90"
           >
-            نعم، احذف
+            {confirmLabel ?? "نعم، احذف"}
           </AlertDialogAction>
           <AlertDialogCancel>إلغاء</AlertDialogCancel>
         </AlertDialogFooter>

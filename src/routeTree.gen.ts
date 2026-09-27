@@ -19,6 +19,7 @@ import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated/transfers'
 import { Route as AuthenticatedTransfersProRouteImport } from './routes/_authenticated/transfers-pro'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
+import { Route as AuthenticatedVisasRouteImport } from './routes/_authenticated/visas'
 import { Route as AuthenticatedWorkersRouteImport } from './routes/_authenticated/workers'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,6 +72,11 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVisasRoute = AuthenticatedVisasRouteImport.update({
+  id: '/visas',
+  path: '/visas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedWorkersRoute = AuthenticatedWorkersRouteImport.update({
   id: '/workers',
   path: '/workers',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/transfers': typeof AuthenticatedTransfersRoute
   '/transfers-pro': typeof AuthenticatedTransfersProRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/visas': typeof AuthenticatedVisasRoute
   '/workers': typeof AuthenticatedWorkersRoute
 }
 export interface FileRoutesByTo {
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/transfers': typeof AuthenticatedTransfersRoute
   '/transfers-pro': typeof AuthenticatedTransfersProRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/visas': typeof AuthenticatedVisasRoute
   '/workers': typeof AuthenticatedWorkersRoute
 }
 export interface FileRoutesById {
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
   '/_authenticated/transfers-pro': typeof AuthenticatedTransfersProRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
+  '/_authenticated/visas': typeof AuthenticatedVisasRoute
   '/_authenticated/workers': typeof AuthenticatedWorkersRoute
 }
 export interface FileRouteTypes {
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/transfers'
     | '/transfers-pro'
     | '/users'
+    | '/visas'
     | '/workers'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/transfers'
     | '/transfers-pro'
     | '/users'
+    | '/visas'
     | '/workers'
   id:
     | '__root__'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/transfers'
     | '/_authenticated/transfers-pro'
     | '/_authenticated/users'
+    | '/_authenticated/visas'
     | '/_authenticated/workers'
   fileRoutesById: FileRoutesById
 }
@@ -233,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/visas': {
+      id: '/_authenticated/visas'
+      path: '/visas'
+      fullPath: '/visas'
+      preLoaderRoute: typeof AuthenticatedVisasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/workers': {
       id: '/_authenticated/workers'
       path: '/workers'
@@ -251,6 +270,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
   AuthenticatedTransfersProRoute: typeof AuthenticatedTransfersProRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
+  AuthenticatedVisasRoute: typeof AuthenticatedVisasRoute
   AuthenticatedWorkersRoute: typeof AuthenticatedWorkersRoute
 }
 
@@ -262,6 +282,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
   AuthenticatedTransfersProRoute: AuthenticatedTransfersProRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
+  AuthenticatedVisasRoute: AuthenticatedVisasRoute,
   AuthenticatedWorkersRoute: AuthenticatedWorkersRoute,
 }
 

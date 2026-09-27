@@ -78,6 +78,13 @@
       "when": 1790491651643,
       "tag": "0010_worker_residency_entry",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1790503821116,
+      "tag": "0011_office_visas",
+      "breakpoints": true
     }
   ]
 }

@@ -334,7 +334,9 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
               <TextField label="تاريخ انتهاء التجربة (تلقائي: 10 أيام)" type="date" ltr value={form.period_start ? addDays(form.period_start, 10) : ""} onChange={() => {}} disabled />
             </>
           )}
-          <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
+          {form.transfer_stage === "تم النقل" && (
+            <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
+          )}
           <SelectField
             label="حالة النقل"
             value={form.transfer_stage}

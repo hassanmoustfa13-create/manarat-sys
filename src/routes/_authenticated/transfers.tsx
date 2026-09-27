@@ -160,14 +160,8 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         meta: { width: 150 },
         cell: ({ row }) => {
           const d = daysInSaudi(row.original.worker?.entry_date ?? row.original.worker?.arrival_date ?? null);
-          const arrival = row.original.worker?.arrival_date;
           return (
-            <div className="leading-tight">
-              <span className="font-semibold tabular-nums text-brand">{formatDaysInSaudi(d)}</span>
-              {arrival && (
-                <div className="text-[11px] text-ink/45 tabular-nums">وصول: {formatDate(arrival)}</div>
-              )}
-            </div>
+            <span className="font-semibold tabular-nums text-brand">{formatDaysInSaudi(d)}</span>
           );
         },
       },

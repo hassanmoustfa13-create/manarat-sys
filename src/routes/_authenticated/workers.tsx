@@ -32,6 +32,7 @@ import {
   profileNameMap,
   profilesQuery,
   workersQuery,
+  workerCategory,
 } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/workers")({
@@ -384,7 +385,7 @@ function WorkersPage() {
         open={Boolean(completing)}
         onOpenChange={(o) => !o && setCompleting(null)}
         title="إتمام نقل الكفالة؟"
-        description={`سيتم اعتبار "${completing?.name ?? ""}" منقولة إلى الكفيل "${completing?.current_sponsor_name ?? ""}" وإضافة العملية إلى جدول نقل الكفالة ${completing && ["عاملة مهنية", "مهني"].includes(completing.profession ?? "") ? "المهنية" : "المنزلية"}.`}
+        description={`سيتم اعتبار "${completing?.name ?? ""}" منقولة إلى الكفيل "${completing?.current_sponsor_name ?? ""}" وإضافة العملية إلى جدول نقل الكفالة ${workerCategory(completing) === "مهنية" ? "المهنية" : "المنزلية"}.`}
         confirmLabel="نعم، تم النقل"
         pending={complete.isPending}
         onConfirm={() => completing && complete.mutate(completing.id)}

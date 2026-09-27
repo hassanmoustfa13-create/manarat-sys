@@ -145,9 +145,8 @@ export function ExcelImportDialog({
       } else if (target.table === "transfers") {
         const { data: ws } = await supabase.from("workers").select("id, name, passport_number, profession");
         workerLookup = new Map();
-        const PRO = ["عاملة مهنية", "مهني"];
         for (const w of ws ?? []) {
-          const cat = PRO.includes(w.profession) ? "مهنية" : "منزلية";
+          const cat = categoryOfProfession(w.profession);
           if (w.name) workerLookup.set(normalizeAr(w.name), { id: w.id, category: cat });
           if (w.passport_number) workerLookup.set(normalizeAr(w.passport_number), { id: w.id, category: cat });
         }

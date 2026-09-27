@@ -76,7 +76,8 @@ export function WorkerProfileDialog({
     const today = new Date().toISOString().slice(0, 10);
     return asc.map((t, i) => {
       const start = startOf(t);
-      const nextStart = i + 1 < asc.length ? startOf(asc[i + 1]) : null;
+      const next = asc[i + 1];
+      const nextStart = next ? startOf(next) : null;
       const isCurrent = i === asc.length - 1 && worker?.current_sponsor_name === t.new_sponsor_name;
       const end = nextStart ?? (isCurrent ? today : null);
       const duration = start && end ? diffDays(start, end) : null;

@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle2, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle2, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { DataGrid } from "@/components/DataGrid";
+import { Button } from "@/components/ui/button";
+import { ExcelImportDialog } from "@/components/ExcelImportDialog";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { TransferFormDialog } from "@/components/TransferFormDialog";
@@ -319,6 +321,8 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
     [admin, nameOf],
   );
 
+  const [importOpen, setImportOpen] = useState(false);
+
   return (
     <main className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6">
       <GridToolbar
@@ -331,6 +335,13 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
           setEditing(null);
           setFormOpen(true);
         }}
+        extra={
+          admin ? (
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setImportOpen(true)}>
+              <FileSpreadsheet className="size-4" /> استيراد من Excel
+            </Button>
+          ) : undefined
+        }
         filters={
           <>
             <FilterChip active={payFilter === null} onClick={() => setPayFilter(null)}>
@@ -382,6 +393,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
       )}
 
       <TransferFormDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} isAdmin={admin} category={category} />
+      <ExcelImportDialog targetKey="transfers" open={importOpen} onOpenChange={setImportOpen} onImported={() => qc.invalidateQueries()} />
       <WorkerProfileDialog
         worker={profileWorker}
         onClose={() => setProfileWorker(null)}

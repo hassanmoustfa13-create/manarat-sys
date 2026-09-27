@@ -217,6 +217,7 @@ export type Database = {
           old_sponsor_dues: number
           old_sponsor_name: string
           old_sponsor_phone: string
+          passport_holder: string
           payment_status: string
           period_end: string | null
           period_start: string | null
@@ -247,6 +248,7 @@ export type Database = {
           old_sponsor_dues?: number
           old_sponsor_name?: string
           old_sponsor_phone?: string
+          passport_holder?: string
           payment_status?: string
           period_end?: string | null
           period_start?: string | null
@@ -277,6 +279,7 @@ export type Database = {
           old_sponsor_dues?: number
           old_sponsor_name?: string
           old_sponsor_phone?: string
+          passport_holder?: string
           payment_status?: string
           period_end?: string | null
           period_start?: string | null
@@ -339,6 +342,7 @@ export type Database = {
           name: string
           nationality: string
           notes: string
+          passport_holder: string
           passport_number: string
           profession: string
           residency_number: string
@@ -364,6 +368,7 @@ export type Database = {
           name: string
           nationality?: string
           notes?: string
+          passport_holder?: string
           passport_number: string
           profession?: string
           residency_number?: string
@@ -389,6 +394,7 @@ export type Database = {
           name?: string
           nationality?: string
           notes?: string
+          passport_holder?: string
           passport_number?: string
           profession?: string
           residency_number?: string

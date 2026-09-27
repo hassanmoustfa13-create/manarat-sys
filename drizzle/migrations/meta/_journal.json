@@ -120,6 +120,13 @@
       "when": 1790507584247,
       "tag": "0016_auto_transfer_only_on_status_change",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790507736616,
+      "tag": "0017_passport_holder",
+      "breakpoints": true
     }
   ]
 }

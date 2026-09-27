@@ -134,6 +134,13 @@
       "when": 1790507844237,
       "tag": "0018_soft_delete_and_single_active_transfer",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790527722175,
+      "tag": "0019_domestic_professions_category",
+      "breakpoints": true
     }
   ]
 }

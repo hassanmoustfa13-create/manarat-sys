@@ -137,6 +137,39 @@ export function WorkerProfileDialog({
               <p className="glass rounded-xl p-3 text-[13px] text-ink/70">{worker.notes}</p>
             )}
 
+            {chain.length > 0 && (
+              <section>
+                <h4 className="mb-2 text-[11px] font-semibold text-ink/50">
+                  سلسلة الكفلاء ({chain.length})
+                </h4>
+                <ol className="space-y-1.5">
+                  {chain.map(({ t, start, end, isCurrent, duration }, i) => (
+                    <li
+                      key={t.id}
+                      className="glass flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl px-3 py-2 text-[13px]"
+                    >
+                      <span className="pill pill-neutral">{i + 1}</span>
+                      <SponsorLink name={t.new_sponsor_name} onClick={onSponsorClick} />
+                      <span className="flex items-center gap-1 text-[11px]">
+                        <span className="text-ink/45">نوع النقل:</span>
+                        <StatusBadge value={t.transfer_type} />
+                      </span>
+                      <span className="text-[11px] tabular-nums text-ink/50" dir="ltr">
+                        {formatDate(start)} {end ? `← ${formatDate(end)}` : isCurrent ? "← حتى الآن" : ""}
+                      </span>
+                      <span className="ms-auto text-[12px] font-medium text-teal">
+                        {duration === null
+                          ? "—"
+                          : isCurrent
+                            ? `${duration} يوم (ما زالت عنده)`
+                            : `${duration} يوم`}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
+
             <section>
               <h4 className="mb-2 text-[11px] font-semibold text-ink/50">
                 سجل نقل الكفالة ({history.length})

@@ -281,8 +281,7 @@ function ReportsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-7">
-        <StatCard icon={<ClipboardList className="size-4" />} label="طلبات الاستقدام" value={fRequests.length} />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
         <StatCard icon={<Users className="size-4" />} label="العمالة" value={fWorkers.length} tone="teal" />
         <StatCard
           icon={<Users className="size-4" />}
@@ -313,10 +312,7 @@ function ReportsPage() {
         />
       </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-3">
-        <Panel title="حالات الطلبات">
-          <BreakdownList rows={requestBreakdown} total={fRequests.length} />
-        </Panel>
+      <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <Panel title="مراحل النقل">
           <BreakdownList rows={stageBreakdown} total={fTransfers.length} />
         </Panel>

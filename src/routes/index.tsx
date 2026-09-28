@@ -1,4 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -11,8 +13,23 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  beforeLoad: () => {
-    throw redirect({ to: "/workers" });
-  },
-  component: () => null,
+  component: HomePage,
 });
+
+function HomePage() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      navigate({ to: data.session ? "/workers" : "/auth", replace: true });
+    });
+  }, [navigate]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="glass rounded-2xl p-8 text-center">
+        <p className="text-lg font-semibold text-foreground">منارات هجر للاستقدام</p>
+        <p className="mt-2 text-sm text-muted-foreground">جارٍ التحميل…</p>
+      </div>
+    </div>
+  );
+}

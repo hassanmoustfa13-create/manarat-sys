@@ -73,13 +73,14 @@ function AuthPage() {
           </div>
         </div>
 
-        <form onSubmit={submit} className="space-y-3">
+        <form onSubmit={submit} autoComplete="off" className="space-y-3">
           <div className="space-y-1.5">
             <Label htmlFor="email">اسم المستخدم أو البريد الإلكتروني</Label>
             <Input
               id="email"
               type="text"
-              autoComplete="username"
+              autoComplete="off"
+              name="login-id"
               dir="ltr"
               required
               value={email}
@@ -91,6 +92,8 @@ function AuthPage() {
             <Input
               id="password"
               type="password"
+              autoComplete="new-password"
+              name="login-pw"
               dir="ltr"
               required
               value={password}

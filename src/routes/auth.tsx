@@ -74,6 +74,9 @@ function AuthPage() {
         </div>
 
         <form onSubmit={submit} autoComplete="off" className="space-y-3">
+          {/* حقول وهمية مخفية تصرف انتباه المتصفح عن الحقول الحقيقية */}
+          <input type="text" name="fake-user" autoComplete="username" tabIndex={-1} aria-hidden="true" className="hidden" />
+          <input type="password" name="fake-pass" autoComplete="current-password" tabIndex={-1} aria-hidden="true" className="hidden" />
           <div className="space-y-1.5">
             <Label htmlFor="email">اسم المستخدم أو البريد الإلكتروني</Label>
             <Input
@@ -83,6 +86,11 @@ function AuthPage() {
               name="login-id"
               dir="ltr"
               required
+              readOnly
+              onFocus={(e) => e.target.removeAttribute("readonly")}
+              data-1p-ignore
+              data-lpignore="true"
+              data-bwignore="true"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -96,6 +104,11 @@ function AuthPage() {
               name="login-pw"
               dir="ltr"
               required
+              readOnly
+              onFocus={(e) => e.target.removeAttribute("readonly")}
+              data-1p-ignore
+              data-lpignore="true"
+              data-bwignore="true"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

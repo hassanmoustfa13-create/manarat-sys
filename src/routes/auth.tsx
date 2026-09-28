@@ -38,9 +38,9 @@ function AuthPage() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     // Browser autofill may fill inputs without updating state — read the live values too.
-    const inputs = Array.from(e.currentTarget.querySelectorAll("input"));
-    const idVal = (email || inputs.find((i) => i.type !== "password")?.value || "").trim();
-    const pwVal = password || inputs.find((i) => i.type === "password")?.value || "";
+    const form = e.currentTarget;
+    const idVal = (email || (form.querySelector("#email") as HTMLInputElement | null)?.value || "").trim();
+    const pwVal = password || (form.querySelector("#password") as HTMLInputElement | null)?.value || "";
     if (!idVal || !pwVal) {
       toast.error("أدخل اسم المستخدم وكلمة المرور");
       return;
@@ -97,11 +97,12 @@ function AuthPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">كلمة المرور</Label>
+            {/* حقل نص عادي مع إخفاء الأحرف بالتنسيق — لا يتعرف عليه المتصفح كحقل كلمة مرور فلا يقترح المحفوظ */}
             <Input
               id="password"
-              type="password"
-              autoComplete="new-password"
-              name="login-pw"
+              type="text"
+              autoComplete="off"
+              name="field-x2"
               dir="ltr"
               required
               readOnly
@@ -109,6 +110,8 @@ function AuthPage() {
               data-1p-ignore
               data-lpignore="true"
               data-bwignore="true"
+              data-form-type="other"
+              style={{ WebkitTextSecurity: "disc", textSecurity: "disc" } as React.CSSProperties}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

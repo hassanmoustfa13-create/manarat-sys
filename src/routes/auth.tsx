@@ -97,11 +97,12 @@ function AuthPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">كلمة المرور</Label>
+            {/* حقل نص عادي مع إخفاء الأحرف بالتنسيق — لا يتعرف عليه المتصفح كحقل كلمة مرور فلا يقترح المحفوظ */}
             <Input
               id="password"
-              type="password"
-              autoComplete="new-password"
-              name="login-pw"
+              type="text"
+              autoComplete="off"
+              name="field-x2"
               dir="ltr"
               required
               readOnly
@@ -109,6 +110,8 @@ function AuthPage() {
               data-1p-ignore
               data-lpignore="true"
               data-bwignore="true"
+              data-form-type="other"
+              style={{ WebkitTextSecurity: "disc", textSecurity: "disc" } as React.CSSProperties}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

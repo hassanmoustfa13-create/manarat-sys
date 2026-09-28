@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedColumnsRouteImport } from './routes/_authenticated/columns'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
-import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedTransfersRouteImport } from './routes/_authenticated/transfers'
 import { Route as AuthenticatedTransfersProRouteImport } from './routes/_authenticated/transfers-pro'
@@ -44,11 +43,6 @@ const AuthenticatedColumnsRoute = AuthenticatedColumnsRouteImport.update({
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSecurityRoute = AuthenticatedSecurityRouteImport.update({
@@ -88,7 +82,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
   '/reports': typeof AuthenticatedReportsRoute
-  '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/transfers': typeof AuthenticatedTransfersRoute
   '/transfers-pro': typeof AuthenticatedTransfersProRoute
@@ -101,7 +94,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
   '/reports': typeof AuthenticatedReportsRoute
-  '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/transfers': typeof AuthenticatedTransfersRoute
   '/transfers-pro': typeof AuthenticatedTransfersProRoute
@@ -116,7 +108,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/columns': typeof AuthenticatedColumnsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
-  '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
   '/_authenticated/transfers': typeof AuthenticatedTransfersRoute
   '/_authenticated/transfers-pro': typeof AuthenticatedTransfersProRoute
@@ -131,7 +122,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/columns'
     | '/reports'
-    | '/requests'
     | '/security'
     | '/transfers'
     | '/transfers-pro'
@@ -144,7 +134,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/columns'
     | '/reports'
-    | '/requests'
     | '/security'
     | '/transfers'
     | '/transfers-pro'
@@ -158,7 +147,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/columns'
     | '/_authenticated/reports'
-    | '/_authenticated/requests'
     | '/_authenticated/security'
     | '/_authenticated/transfers'
     | '/_authenticated/transfers-pro'
@@ -210,13 +198,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/requests': {
-      id: '/_authenticated/requests'
-      path: '/requests'
-      fullPath: '/requests'
-      preLoaderRoute: typeof AuthenticatedRequestsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/security': {
       id: '/_authenticated/security'
       path: '/security'
@@ -265,7 +246,6 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedColumnsRoute: typeof AuthenticatedColumnsRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
-  AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
   AuthenticatedTransfersRoute: typeof AuthenticatedTransfersRoute
   AuthenticatedTransfersProRoute: typeof AuthenticatedTransfersProRoute
@@ -277,7 +257,6 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedColumnsRoute: AuthenticatedColumnsRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
-  AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,
   AuthenticatedTransfersRoute: AuthenticatedTransfersRoute,
   AuthenticatedTransfersProRoute: AuthenticatedTransfersProRoute,

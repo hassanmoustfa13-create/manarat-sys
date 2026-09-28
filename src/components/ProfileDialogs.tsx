@@ -354,10 +354,6 @@ export function SponsorProfileDialog({
                 </p>
               </div>
               <div>
-                <p className="text-ink/45">طلبات استقدام</p>
-                <p className="text-lg font-semibold text-ink/70">{info.requests.length}</p>
-              </div>
-              <div>
                 <p className="text-ink/45">إجمالي العمالة</p>
                 <p className="text-lg font-semibold text-brand">{info.totalWorkers}</p>
               </div>
@@ -367,30 +363,6 @@ export function SponsorProfileDialog({
               </div>
             </div>
             <div className="space-y-4">
-              <section>
-                <h4 className="mb-1.5 text-[11px] font-semibold text-ink/50">
-                  طلبات الاستقدام ({info.requests.length})
-                </h4>
-                {info.requests.length === 0 ? (
-                  <p className="text-[12px] text-ink/40">لا يوجد</p>
-                ) : (
-                  <ul className="divide-y divide-black/5 overflow-hidden rounded-xl ring-1 ring-black/6">
-                    {info.requests.map((r) => (
-                      <li key={r.id} className="flex items-center gap-3 bg-white/50 px-3 py-2 text-[13px]">
-                        <span className="text-ink/45 tabular-nums" dir="ltr">
-                          {formatDate(r.request_date)}
-                        </span>
-                        <span className="font-medium">{r.profession}</span>
-                        <span className="text-ink/45">{r.nationality}</span>
-                        <span className="text-ink/45">{r.request_type}</span>
-                        <span className="ms-auto">
-                          <StatusBadge value={r.action_status} />
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
               <List title="العمالة الحالية" items={info.current} tone="pill pill-brand" />
               <List title="قيد النقل إليه" items={info.incoming} tone="pill pill-teal" />
               <List title="عمالة سابقة" items={info.past} tone="pill pill-neutral" />

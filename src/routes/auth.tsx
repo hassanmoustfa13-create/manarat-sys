@@ -35,11 +35,19 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // Browser autofill may fill inputs without updating state — read the live values too.
+    const inputs = Array.from(e.currentTarget.querySelectorAll("input"));
+    const idVal = (email || inputs.find((i) => i.type !== "password")?.value || "").trim();
+    const pwVal = password || inputs.find((i) => i.type === "password")?.value || "";
+    if (!idVal || !pwVal) {
+      toast.error("أدخل اسم المستخدم وكلمة المرور");
+      return;
+    }
     setBusy(true);
     try {
-      const tokens = await signInWithIdentifier({ data: { identifier: email, password } });
+      const tokens = await signInWithIdentifier({ data: { identifier: idVal, password: pwVal } });
       const { error } = await supabase.auth.setSession(tokens);
       if (error) throw error;
       navigate({ to: "/workers", replace: true });

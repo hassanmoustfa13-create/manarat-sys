@@ -38,9 +38,9 @@ function AuthPage() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     // Browser autofill may fill inputs without updating state — read the live values too.
-    const inputs = Array.from(e.currentTarget.querySelectorAll("input"));
-    const idVal = (email || inputs.find((i) => i.type !== "password")?.value || "").trim();
-    const pwVal = password || inputs.find((i) => i.type === "password")?.value || "";
+    const form = e.currentTarget;
+    const idVal = (email || (form.querySelector("#email") as HTMLInputElement | null)?.value || "").trim();
+    const pwVal = password || (form.querySelector("#password") as HTMLInputElement | null)?.value || "";
     if (!idVal || !pwVal) {
       toast.error("أدخل اسم المستخدم وكلمة المرور");
       return;

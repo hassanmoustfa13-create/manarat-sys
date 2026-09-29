@@ -81,9 +81,17 @@ function WorkersPage() {
     onError: (e) => toast.error(errorMessage(e)),
   });
 
+  const nationalities = useMemo(
+    () => Array.from(new Set(workers.map((w) => w.nationality).filter(Boolean))).sort((a, b) => a.localeCompare(b, "ar")),
+    [workers],
+  );
+
   const filtered = useMemo(
-    () => (statusFilter ? workers.filter((w) => w.transfer_status === statusFilter) : workers),
-    [workers, statusFilter],
+    () =>
+      workers
+        .filter((w) => (statusFilter ? w.transfer_status === statusFilter : true))
+        .filter((w) => (natFilter ? w.nationality === natFilter : true)),
+    [workers, statusFilter, natFilter],
   );
 
 

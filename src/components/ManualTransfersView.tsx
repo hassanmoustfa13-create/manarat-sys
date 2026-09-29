@@ -342,7 +342,7 @@ function ManualTransferDialog({
         return_to_office_date: form.return_to_office_date || null,
         old_sponsor_dues: Number(form.old_sponsor_dues || 0),
         down_payment: Number(form.down_payment || 0),
-        payment_status: form.payment_status,
+        payment_status: PAYMENT_STATUSES[0],
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
         residency_number: hasResidency ? form.residency_number.trim() : "",

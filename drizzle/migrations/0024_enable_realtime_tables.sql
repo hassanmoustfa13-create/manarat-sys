@@ -1,0 +1,1 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.workers, public.transfers, public.manual_transfers, public.requests, public.flights, public.office_visas, public.grid_settings;

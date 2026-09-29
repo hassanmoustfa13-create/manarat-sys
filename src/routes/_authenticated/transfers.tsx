@@ -64,6 +64,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
 
   const [search, setSearch] = useState("");
   const [payFilter, setPayFilter] = useState<string | null>(null);
+  const [natFilter, setNatFilter] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Transfer | null>(null);
   const [profileWorker, setProfileWorker] = useState<Worker | null>(null);
@@ -71,16 +72,29 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
   const [deleting, setDeleting] = useState<Row | null>(null);
   const [completing, setCompleting] = useState<Row | null>(null);
 
+  const nationalities = useMemo(() => {
+    const set = new Set<string>();
+    for (const t of transfers) {
+      if (((t as any).category ?? "منزلية") !== category) continue;
+      const nat = (t as any).worker?.nationality as string | null | undefined;
+      if (nat && nat.trim()) set.add(nat.trim());
+    }
+    return [...set].sort((a, b) => a.localeCompare(b, "ar"));
+  }, [transfers, category]);
+
   const rows = useMemo<Row[]>(() => {
     const byId = new Map(workers.map((w) => [w.id, w]));
     return transfers
       .filter((t) => ((t as any).category ?? "منزلية") === category)
       .map((t) => {
-        const worker = byId.get(t.worker_id) ?? null;
-        return { ...t, worker, worker_name: worker?.name ?? "—" };
+        const worker = (t as any).worker as Worker | undefined;
+        return { ...t, worker: worker ?? null, worker_name: worker?.name ?? "—" };
       })
-      .filter((r) => (payFilter ? r.payment_status === payFilter : true));
-  }, [transfers, workers, payFilter]);
+      .filter((r) => (payFilter ? r.payment_status === payFilter : true))
+      .filter((r) =>
+        natFilter ? (r.worker?.nationality ?? "").trim() === natFilter : true,
+      );
+  }, [transfers, workers, payFilter, natFilter]);
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["transfers"] });

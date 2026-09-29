@@ -23,6 +23,7 @@ import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
 type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
@@ -98,6 +99,7 @@ function UserBlock() {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
+  useRealtimeSync();
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const pathname = useRouterState({ select: (r) => r.location.pathname });

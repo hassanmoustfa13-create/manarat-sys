@@ -387,7 +387,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
       )}
 
       <TransferFormDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} isAdmin={admin} category={category} />
-      <ExcelImportDialog targetKey="transfers" open={importOpen} onOpenChange={setImportOpen} onImported={() => qc.invalidateQueries()} />
+      <ExcelImportDialog targetKey="transfers" tableLabel={category === "مهنية" ? "نقل الكفالة المهنية" : "نقل كفالة العمالة المنزلية"} open={importOpen} onOpenChange={setImportOpen} onImported={() => qc.invalidateQueries()} />
       <WorkerProfileDialog
         worker={profileWorker}
         onClose={() => setProfileWorker(null)}

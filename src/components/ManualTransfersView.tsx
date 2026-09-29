@@ -342,7 +342,7 @@ function ManualTransferDialog({
         return_to_office_date: form.return_to_office_date || null,
         old_sponsor_dues: Number(form.old_sponsor_dues || 0),
         down_payment: Number(form.down_payment || 0),
-        payment_status: PAYMENT_STATUSES[0],
+        payment_status: form.payment_status || PAYMENT_STATUSES[0],
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
         residency_number: hasResidency ? form.residency_number.trim() : "",
@@ -423,13 +423,7 @@ function ManualTransferDialog({
               {formatMoney(remaining)}
             </div>
           </Field>
-          <Field label="حالة الدفع (تلقائي)">
-            <div
-              className="flex h-9 items-center rounded-md border border-dashed border-success/40 px-3 text-sm font-semibold text-success"
-            >
-              {PAYMENT_STATUSES[0]}
-            </div>
-          </Field>
+          <SelectField label="حالة الدفع" value={form.payment_status} onChange={set("payment_status")} options={PAYMENT_STATUSES} />
           <SelectField label="الفحص الطبي" value={form.medical_exam} onChange={set("medical_exam")} options={YES_NO_EXISTS} />
           <SelectField label="الإقامة" value={form.residency_status} onChange={set("residency_status")} options={YES_NO_EXISTS_F} />
           {hasResidency && (

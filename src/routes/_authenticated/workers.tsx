@@ -324,6 +324,15 @@ function WorkersPage() {
                 {s}
               </FilterChip>
             ))}
+            <span className="mx-1 h-5 w-px bg-ink/15" aria-hidden />
+            <FilterChip active={natFilter === null} onClick={() => setNatFilter(null)}>
+              كل الجنسيات
+            </FilterChip>
+            {nationalities.map((n) => (
+              <FilterChip key={n} active={natFilter === n} onClick={() => setNatFilter(natFilter === n ? null : n)}>
+                {n}
+              </FilterChip>
+            ))}
           </>
         }
       />

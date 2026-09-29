@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Field, SelectField, TextField } from "@/components/FormFields";
 import {
   LOCATIONS,
+  NATIONALITIES,
   PASSPORT_HOLDERS,
   PAYMENT_STATUSES,
   TRANSFER_STAGES,
@@ -99,6 +100,12 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const [deleting, setDeleting] = useState<MT | null>(null);
 
   const mine = useMemo(() => all.filter((t) => t.category === category), [all, category]);
+  const nationalityOptions = useMemo(
+    () => [...new Set([...NATIONALITIES, ...all.map((t) => t.nationality.trim()).filter(Boolean)])].sort((a, b) =>
+      a === "أخرى" ? 1 : b === "أخرى" ? -1 : a.localeCompare(b, "ar"),
+    ),
+    [all],
+  );
   const nationalities = useMemo(
     () => [...new Set(mine.map((t) => t.nationality.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ar")),
     [mine],

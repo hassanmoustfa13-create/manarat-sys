@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +10,6 @@ import { DataGrid } from "@/components/DataGrid";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, SelectField, TextField } from "@/components/FormFields";
-import { Input } from "@/components/ui/input";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { IconBtn } from "@/routes/_authenticated/workers";

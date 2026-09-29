@@ -73,7 +73,7 @@ const empty = () => ({
   return_to_office_date: "",
   old_sponsor_dues: "0",
   down_payment: "0",
-  payment_status: PAYMENT_STATUSES[1] as string,
+  payment_status: PAYMENT_STATUSES[0] as string,
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
   residency_number: "",
@@ -315,12 +315,6 @@ function ManualTransferDialog({
   }, [open, transfer]);
 
   const set = (k: keyof Form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
-  const setAmount = (k: "old_sponsor_dues" | "down_payment") => (v: string) =>
-    setForm((f) => {
-      const next = { ...f, [k]: v };
-      const left = Number(next.old_sponsor_dues || 0) - Number(next.down_payment || 0);
-      return { ...next, payment_status: left > 0 ? PAYMENT_STATUSES[1] : PAYMENT_STATUSES[0] };
-    });
 
   const remaining = Number(form.old_sponsor_dues || 0) - Number(form.down_payment || 0);
   const needsPeriod = form.transfer_type !== TRANSFER_TYPE_OTHER;
@@ -348,7 +342,7 @@ function ManualTransferDialog({
         return_to_office_date: form.return_to_office_date || null,
         old_sponsor_dues: Number(form.old_sponsor_dues || 0),
         down_payment: Number(form.down_payment || 0),
-        payment_status: form.payment_status,
+        payment_status: PAYMENT_STATUSES[0],
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
         residency_number: hasResidency ? form.residency_number.trim() : "",
@@ -419,8 +413,8 @@ function ManualTransferDialog({
           <TextField label="تاريخ رجوعها المكتب" type="date" ltr value={form.return_to_office_date} onChange={set("return_to_office_date")} />
           <SelectField label="موقع العاملة" value={form.worker_location} onChange={set("worker_location")} options={LOCATIONS} />
           <SelectField label="الجواز لدى" value={form.passport_holder} onChange={set("passport_holder")} options={PASSPORT_HOLDERS} />
-          <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={setAmount("old_sponsor_dues")} />
-          <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={setAmount("down_payment")} />
+          <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={set("old_sponsor_dues")} />
+          <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
           <Field label="المتبقي (تلقائي)">
             <div
               className={`flex h-9 items-center rounded-md border border-dashed px-3 text-sm font-semibold tabular-nums ${remaining > 0 ? "border-terracotta/40 text-terracotta" : "border-success/40 text-success"}`}
@@ -429,7 +423,13 @@ function ManualTransferDialog({
               {formatMoney(remaining)}
             </div>
           </Field>
-          <SelectField label="حالة الدفع" value={form.payment_status} onChange={set("payment_status")} options={PAYMENT_STATUSES} />
+          <Field label="حالة الدفع (تلقائي)">
+            <div
+              className="flex h-9 items-center rounded-md border border-dashed border-success/40 px-3 text-sm font-semibold text-success"
+            >
+              {PAYMENT_STATUSES[0]}
+            </div>
+          </Field>
           <SelectField label="الفحص الطبي" value={form.medical_exam} onChange={set("medical_exam")} options={YES_NO_EXISTS} />
           <SelectField label="الإقامة" value={form.residency_status} onChange={set("residency_status")} options={YES_NO_EXISTS_F} />
           {hasResidency && (

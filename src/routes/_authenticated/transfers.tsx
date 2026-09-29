@@ -83,7 +83,6 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
   }, [transfers, category]);
 
   const rows = useMemo<Row[]>(() => {
-    const byId = new Map(workers.map((w) => [w.id, w]));
     return transfers
       .filter((t) => ((t as any).category ?? "منزلية") === category)
       .map((t) => {
@@ -358,6 +357,15 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
             {PAYMENT_STATUSES.map((s) => (
               <FilterChip key={s} active={payFilter === s} onClick={() => setPayFilter(s)}>
                 {s}
+              </FilterChip>
+            ))}
+            <span className="mx-1 hidden h-4 w-px bg-black/10 sm:inline-block" />
+            <FilterChip active={natFilter === null} onClick={() => setNatFilter(null)}>
+              كل الجنسيات
+            </FilterChip>
+            {nationalities.map((n) => (
+              <FilterChip key={n} active={natFilter === n} onClick={() => setNatFilter(natFilter === n ? null : n)}>
+                {n}
               </FilterChip>
             ))}
           </>

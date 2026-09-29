@@ -31,16 +31,19 @@ interface Report {
 
 export function ExcelImportDialog({
   targetKey,
+  tableLabel,
   open,
   onOpenChange,
   onImported,
 }: {
   targetKey: keyof typeof IMPORT_TARGETS;
+  tableLabel?: string;
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onImported: () => void;
 }) {
   const target: ImportTarget = IMPORT_TARGETS[targetKey]!;
+  const displayLabel = tableLabel ?? target.label;
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -320,8 +323,41 @@ export function ExcelImportDialog({
         {step === 3 && (
           <div className="space-y-3">
             <p className="text-sm text-ink/60">
-              الورقة: <b>{sheetName}</b> — {rows.length} صف. طابق أعمدة الملف مع حقول «{target.label}» (المطابقة التلقائية جاهزة ويمكن تعديلها):
+              الورقة: <b>{sheetName}</b> — {rows.length} صف. طابق أعمدة الملف مع أعمدة جدول «{displayLabel}» (المطابقة التلقائية جاهزة ويمكن تعديلها):
             </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg p-3 ring-1 ring-black/8">
+                <div className="mb-2 flex items-center gap-1.5 text-[13px] font-semibold">
+                  <FileSpreadsheet className="size-4 text-brand" /> أعمدة ملف Excel ({headers.filter(Boolean).length})
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {headers.map((h, i) => {
+                    const k = mapping[i];
+                    const f = target.fields.find((x) => x.key === k);
+                    return (
+                      <span key={i} title={f ? `= ${f.label}` : "غير مطابق"} className={`rounded-md px-2 py-1 text-[12px] ring-1 ${f ? "bg-teal-50 text-teal-900 ring-teal-200" : "bg-amber-50 text-amber-900 ring-amber-200"}`}>
+                        {h || `عمود ${i + 1}`}{f ? ` ← ${f.label}` : ""}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="rounded-lg p-3 ring-1 ring-black/8">
+                <div className="mb-2 text-[13px] font-semibold">أعمدة جدول «{displayLabel}» ({target.fields.length})</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {target.fields.map((f) => {
+                    const col = Object.entries(mapping).find(([, k]) => k === f.key)?.[0];
+                    const h = col != null ? headers[Number(col)] || `عمود ${Number(col) + 1}` : null;
+                    return (
+                      <span key={f.key} className={`rounded-md px-2 py-1 text-[12px] ring-1 ${h ? "bg-teal-50 text-teal-900 ring-teal-200" : "bg-black/4 text-ink/55 ring-black/10"}`}>
+                        {f.label}{f.required ? " *" : ""}{h ? ` = ${h}` : ""}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <p className="text-[12px] text-ink/50">الأخضر = مطابق، الأصفر = عمود في الملف غير مطابق، الرمادي = عمود في الجدول لم يُربط بأي عمود من الملف.</p>
             <div className="overflow-x-auto rounded-lg ring-1 ring-black/8">
               <table className="w-full text-sm">
                 <thead>

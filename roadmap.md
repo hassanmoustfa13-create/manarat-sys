@@ -1,4 +1,3 @@
-# Task Roadmap
-
-- [x] تحسين شكل صفحة 404
-- [x] فحص routing الدومين transfer.manarathajer.sa — لا يوجد 404 فعلي؛ يلزم Publish → Update لتحديث النسخة المنشورة
+# Roadmap
+- [x] Manual transfer pages (domestic/professional) with free-text worker/sponsors, return-to-office date, residency number
+- [x] Admin page to show/hide menu pages (e.g. hide workers temporarily)

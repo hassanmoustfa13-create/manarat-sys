@@ -12,25 +12,32 @@ import {
   X,
   type LucideIcon,
   Stamp,
+  EyeOff,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useRouterState } from "@tanstack/react-router";
+import { hiddenPagesQuery } from "@/lib/pageVisibility";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/visas" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/reports" | "/users" | "/columns" | "/security" | "/pages"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
-const NAV: NavItem[] = [
+export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
   { to: "/workers", label: "العمالة", icon: Users },
   { to: "/transfers", label: "نقل الكفالة (منزلية)", icon: ArrowLeftRight },
   { to: "/transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },
-  { to: "/visas", label: "تأشيرات المكتب", icon: Stamp },
+  { to: "/manual-transfers", label: "نقل الكفالة (منزلية)", icon: ArrowLeftRight, section: "نقل يدوي" },
+  { to: "/manual-transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },
+  { to: "/visas", label: "تأشيرات المكتب", icon: Stamp, section: "" },
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },
   { to: "/security", label: "سجل الأمان", icon: ShieldCheck, admin: true },
+  { to: "/pages", label: "إظهار وإخفاء الصفحات", icon: EyeOff, admin: true },
 ];
 
 const itemCls =
@@ -39,13 +46,21 @@ const activeCls =
   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20";
 
 function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
+  const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   return (
     <>
-      {NAV.filter((n) => !n.admin || isAdmin).map(({ to, label, icon: Icon }) => (
-        <Link key={to} to={to} onClick={onNavigate} className={itemCls} activeProps={{ className: activeCls }}>
-          <Icon className="size-4 shrink-0" />
-          <span className="truncate">{label}</span>
-        </Link>
+      {NAV.filter((n) => (!n.admin || isAdmin) && (isAdmin || !hidden.includes(n.to))).map(({ to, label, icon: Icon, section }) => (
+        <div key={to}>
+          {section !== undefined && (
+            <div className="mt-2 border-t border-black/5 px-3 pb-1 pt-3 text-[11px] font-semibold text-ink/40">
+              {section}
+            </div>
+          )}
+          <Link to={to} onClick={onNavigate} className={itemCls} activeProps={{ className: activeCls }}>
+            <Icon className="size-4 shrink-0" />
+            <span className={`truncate ${hidden.includes(to) ? "opacity-40 line-through" : ""}`}>{label}</span>
+          </Link>
+        </div>
       ))}
     </>
   );
@@ -82,6 +97,9 @@ function UserBlock() {
 export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { data: hidden = [] } = useQuery(hiddenPagesQuery);
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const blocked = !auth.loading && !auth.isAdmin && hidden.includes(pathname);
 
   return (
     <div className="flex min-h-screen">
@@ -146,7 +164,18 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <main className="min-w-0 flex-1 pt-14 md:pt-0">{children}</main>
+      <main className="min-w-0 flex-1 pt-14 md:pt-0">
+        {blocked ? (
+          <div className="grid min-h-[60vh] place-items-center text-center text-ink/60">
+            <div>
+              <EyeOff className="mx-auto mb-3 size-8 text-ink/30" />
+              <p>هذه الصفحة مخفية مؤقتًا من قِبل المدير.</p>
+            </div>
+          </div>
+        ) : (
+          children
+        )}
+      </main>
     </div>
   );
 }

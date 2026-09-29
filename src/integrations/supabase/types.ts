@@ -32,6 +32,120 @@ export type Database = {
         }
         Relationships: []
       }
+      manual_transfers: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          down_payment: number
+          id: string
+          is_deleted: boolean
+          medical_exam: string
+          nationality: string
+          new_sponsor_name: string
+          new_sponsor_phone: string
+          notes: string
+          old_sponsor_dues: number
+          old_sponsor_name: string
+          old_sponsor_phone: string
+          passport_holder: string
+          passport_number: string
+          payment_status: string
+          period_end: string | null
+          period_start: string | null
+          remaining_amount: number | null
+          residency_number: string
+          residency_status: string
+          return_to_office_date: string | null
+          salary_dues_amount: number
+          salary_dues_status: string
+          transfer_date: string | null
+          transfer_stage: string
+          transfer_type: string
+          updated_at: string
+          updated_by: string | null
+          visa_number: string
+          visa_type: string
+          worker_condition: string
+          worker_location: string
+          worker_name: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          down_payment?: number
+          id?: string
+          is_deleted?: boolean
+          medical_exam?: string
+          nationality?: string
+          new_sponsor_name?: string
+          new_sponsor_phone?: string
+          notes?: string
+          old_sponsor_dues?: number
+          old_sponsor_name?: string
+          old_sponsor_phone?: string
+          passport_holder?: string
+          passport_number?: string
+          payment_status?: string
+          period_end?: string | null
+          period_start?: string | null
+          remaining_amount?: number | null
+          residency_number?: string
+          residency_status?: string
+          return_to_office_date?: string | null
+          salary_dues_amount?: number
+          salary_dues_status?: string
+          transfer_date?: string | null
+          transfer_stage?: string
+          transfer_type?: string
+          updated_at?: string
+          updated_by?: string | null
+          visa_number?: string
+          visa_type?: string
+          worker_condition?: string
+          worker_location?: string
+          worker_name?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          down_payment?: number
+          id?: string
+          is_deleted?: boolean
+          medical_exam?: string
+          nationality?: string
+          new_sponsor_name?: string
+          new_sponsor_phone?: string
+          notes?: string
+          old_sponsor_dues?: number
+          old_sponsor_name?: string
+          old_sponsor_phone?: string
+          passport_holder?: string
+          passport_number?: string
+          payment_status?: string
+          period_end?: string | null
+          period_start?: string | null
+          remaining_amount?: number | null
+          residency_number?: string
+          residency_status?: string
+          return_to_office_date?: string | null
+          salary_dues_amount?: number
+          salary_dues_status?: string
+          transfer_date?: string | null
+          transfer_stage?: string
+          transfer_type?: string
+          updated_at?: string
+          updated_by?: string | null
+          visa_number?: string
+          visa_type?: string
+          worker_condition?: string
+          worker_location?: string
+          worker_name?: string
+        }
+        Relationships: []
+      }
       office_visas: {
         Row: {
           created_at: string

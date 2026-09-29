@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type GridKey = "workers" | "requests" | "transfers";
+export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers";
 export type ColAlign = "right" | "center" | "left";
 
 export interface ColumnSetting {
@@ -21,6 +21,7 @@ export const GRID_LABELS: Record<GridKey, string> = {
   workers: "جدول العمالة",
   requests: "جدول طلبات الاستقدام",
   transfers: "جدول نقل الكفالة",
+  manual_transfers: "جدول نقل الكفالة (يدوي)",
 };
 
 const AUDIT: [string, string][] = [
@@ -90,10 +91,22 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
     ["salary_dues_amount", "قيمة مستحقات الرواتب"],
     ...AUDIT,
   ],
+  manual_transfers: [
+    ["worker_name", "اسم العاملة"], ["passport_number", "رقم الجواز"], ["nationality", "الجنسية"],
+    ["old_sponsor_name", "الكفيل القديم"], ["new_sponsor_name", "الكفيل الجديد"], ["visa_type", "نوع التأشيرة"],
+    ["visa_number", "رقم التأشيرة"], ["transfer_type", "نوع النقل"], ["transfer_date", "تاريخ النقل"],
+    ["transfer_stage", "حالة النقل"], ["return_to_office_date", "تاريخ رجوعها المكتب"], ["worker_location", "موقع العاملة"],
+    ["old_sponsor_dues", "مستحقات القديم"], ["down_payment", "العربون"], ["remaining_amount", "المتبقي"],
+    ["payment_status", "حالة الدفع"], ["medical_exam", "الفحص الطبي"], ["residency_status", "الإقامة"],
+    ["residency_number", "رقم الإقامة"], ["salary_dues_status", "مستحقات الرواتب"], ["salary_dues_amount", "قيمة مستحقات الرواتب"],
+    ["passport_holder", "الجواز لدى"], ["worker_condition", "ملاحظات حالة العاملة"],
+    ...AUDIT,
+  ],
 };
 
 /** Default compact widths (~1.5 words) so the table stays narrow; text wraps nicely. */
 const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
+  manual_transfers: {},
   workers: {
     name: 130,
     passport_number: 110,

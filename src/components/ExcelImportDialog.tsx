@@ -273,7 +273,7 @@ export function ExcelImportDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="size-5 text-brand" />
-            استيراد من Excel — {target.label}
+            استيراد من Excel — {displayLabel}
           </DialogTitle>
         </DialogHeader>
 

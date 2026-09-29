@@ -283,7 +283,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
           )}
         />
       )}
-      <ManualTransferDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} category={category} />
+      <ManualTransferDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} category={category} nationalityOptions={nationalityOptions} />
       <ConfirmDelete
         open={Boolean(deleting)}
         onOpenChange={(o) => !o && setDeleting(null)}
@@ -297,8 +297,8 @@ export function ManualTransfersView({ category }: { category: Category }) {
 }
 
 function ManualTransferDialog({
-  open, onOpenChange, transfer, category,
-}: { open: boolean; onOpenChange: (o: boolean) => void; transfer: MT | null; category: Category }) {
+  open, onOpenChange, transfer, category, nationalityOptions,
+}: { open: boolean; onOpenChange: (o: boolean) => void; transfer: MT | null; category: Category; nationalityOptions: string[] }) {
   const qc = useQueryClient();
   const [form, setForm] = useState<Form>(empty);
 
@@ -385,7 +385,7 @@ function ManualTransferDialog({
         >
           <TextField label="اسم العاملة" value={form.worker_name} onChange={set("worker_name")} />
           <TextField label="رقم الجواز" ltr value={form.passport_number} onChange={set("passport_number")} />
-          <TextField label="الجنسية" value={form.nationality} onChange={set("nationality")} />
+          <SelectField label="الجنسية" value={form.nationality} onChange={set("nationality")} options={nationalityOptions} />
           <TextField label="اسم الكفيل القديم" value={form.old_sponsor_name} onChange={set("old_sponsor_name")} />
           <TextField label="هاتف الكفيل القديم" ltr value={form.old_sponsor_phone} onChange={set("old_sponsor_phone")} />
           <div className="hidden sm:block" />

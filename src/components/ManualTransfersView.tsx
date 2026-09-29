@@ -385,7 +385,12 @@ function ManualTransferDialog({
         >
           <TextField label="اسم العاملة" value={form.worker_name} onChange={set("worker_name")} />
           <TextField label="رقم الجواز" ltr value={form.passport_number} onChange={set("passport_number")} />
-          <SelectField label="الجنسية" value={form.nationality} onChange={set("nationality")} options={nationalityOptions} />
+          <SelectField
+            label="الجنسية"
+            value={form.nationality}
+            onChange={(v) => set("nationality")(v)}
+            options={["", ...nationalityOptions]}
+          />
           <TextField label="اسم الكفيل القديم" value={form.old_sponsor_name} onChange={set("old_sponsor_name")} />
           <TextField label="هاتف الكفيل القديم" ltr value={form.old_sponsor_phone} onChange={set("old_sponsor_phone")} />
           <div className="hidden sm:block" />

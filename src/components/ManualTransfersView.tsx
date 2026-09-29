@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Field, SelectField, TextField } from "@/components/FormFields";
 import {
   LOCATIONS,
+  NATIONALITIES,
   PASSPORT_HOLDERS,
   PAYMENT_STATUSES,
   TRANSFER_STAGES,
@@ -99,6 +100,12 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const [deleting, setDeleting] = useState<MT | null>(null);
 
   const mine = useMemo(() => all.filter((t) => t.category === category), [all, category]);
+  const nationalityOptions = useMemo(
+    () => [...new Set([...NATIONALITIES, ...all.map((t) => t.nationality.trim()).filter(Boolean)])].sort((a, b) =>
+      a === "أخرى" ? 1 : b === "أخرى" ? -1 : a.localeCompare(b, "ar"),
+    ),
+    [all],
+  );
   const nationalities = useMemo(
     () => [...new Set(mine.map((t) => t.nationality.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ar")),
     [mine],
@@ -276,7 +283,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
           )}
         />
       )}
-      <ManualTransferDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} category={category} />
+      <ManualTransferDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} category={category} nationalityOptions={nationalityOptions} />
       <ConfirmDelete
         open={Boolean(deleting)}
         onOpenChange={(o) => !o && setDeleting(null)}
@@ -290,8 +297,8 @@ export function ManualTransfersView({ category }: { category: Category }) {
 }
 
 function ManualTransferDialog({
-  open, onOpenChange, transfer, category,
-}: { open: boolean; onOpenChange: (o: boolean) => void; transfer: MT | null; category: Category }) {
+  open, onOpenChange, transfer, category, nationalityOptions,
+}: { open: boolean; onOpenChange: (o: boolean) => void; transfer: MT | null; category: Category; nationalityOptions: string[] }) {
   const qc = useQueryClient();
   const [form, setForm] = useState<Form>(empty);
 
@@ -378,7 +385,12 @@ function ManualTransferDialog({
         >
           <TextField label="اسم العاملة" value={form.worker_name} onChange={set("worker_name")} />
           <TextField label="رقم الجواز" ltr value={form.passport_number} onChange={set("passport_number")} />
-          <TextField label="الجنسية" value={form.nationality} onChange={set("nationality")} />
+          <SelectField
+            label="الجنسية"
+            value={form.nationality}
+            onChange={(v) => set("nationality")(v)}
+            options={["", ...nationalityOptions]}
+          />
           <TextField label="اسم الكفيل القديم" value={form.old_sponsor_name} onChange={set("old_sponsor_name")} />
           <TextField label="هاتف الكفيل القديم" ltr value={form.old_sponsor_phone} onChange={set("old_sponsor_phone")} />
           <div className="hidden sm:block" />

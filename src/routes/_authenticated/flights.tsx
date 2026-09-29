@@ -25,6 +25,7 @@ type Flight = {
   office_name: string;
   workers_count: number;
   clients: string[];
+  visa_clients: string[];
   status: string;
 };
 
@@ -123,6 +124,7 @@ function FlightsPage() {
               {row.original.clients.map((c, i) => (
                 <span key={i} className="rounded-full bg-primary/10 px-2 py-0.5 text-[12px]">
                   {c}
+                  {row.original.visa_clients.includes(c) && <span className="mr-1 font-bold text-primary">✓</span>}
                 </span>
               ))}
             </div>

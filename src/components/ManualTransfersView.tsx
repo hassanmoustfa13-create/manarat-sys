@@ -190,7 +190,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
       badge("transfer_type", "نوع النقل"),
       date("transfer_date", "تاريخ النقل"),
       badge("transfer_stage", "حالة النقل"),
-      date("return_to_office_date", "تاريخ رجوعها المكتب"),
+      date("return_to_office_date", "تاريخ رجوع العاملة المكتب المكتب"),
       badge("worker_location", "موقع العاملة"),
       money("old_sponsor_dues", "مستحقات القديم"),
       money("down_payment", "العربون"),
@@ -410,7 +410,7 @@ function ManualTransferDialog({
           )}
           <SelectField label="حالة النقل" value={form.transfer_stage} onChange={set("transfer_stage")} options={TRANSFER_STAGES} />
           <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
-          <TextField label="تاريخ رجوعها المكتب" type="date" ltr value={form.return_to_office_date} onChange={set("return_to_office_date")} />
+          <TextField label="تاريخ رجوع العاملة المكتب المكتب" type="date" ltr value={form.return_to_office_date} onChange={set("return_to_office_date")} />
           <SelectField label="موقع العاملة" value={form.worker_location} onChange={set("worker_location")} options={LOCATIONS} />
           <SelectField label="الجواز لدى" value={form.passport_holder} onChange={set("passport_holder")} options={PASSPORT_HOLDERS} />
           <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={set("old_sponsor_dues")} />

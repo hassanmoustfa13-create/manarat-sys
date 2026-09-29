@@ -42,6 +42,7 @@ const empty = {
   nationality: NATIONALITIES[0]!,
   profession: PROFESSIONS[0] as string,
   visa_type: VISA_TYPES[0] as string,
+  visa_number: "",
   arrival_date: "",
   entry_date: "",
   residency_status: "لا يوجد",
@@ -86,6 +87,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             nationality: worker.nationality,
             profession: worker.profession ?? "",
             visa_type: worker.visa_type ?? "",
+            visa_number: worker.visa_number ?? "",
             arrival_date: worker.arrival_date ?? "",
             entry_date: worker.entry_date ?? "",
             residency_status: worker.residency_status ?? "لا يوجد",
@@ -117,6 +119,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
         nationality: form.nationality,
         profession: form.profession,
         visa_type: form.visa_type,
+        visa_number: form.visa_number.trim(),
         arrival_date: form.arrival_date || null,
         entry_date: form.entry_date || null,
         residency_status: form.residency_status,
@@ -235,6 +238,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             />
           )}
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
+          <TextField label="رقم التأشيرة" value={form.visa_number} onChange={set("visa_number")} ltr />
           <SelectField
             label="حالة الوصول"
             value={form.arrival_status}

@@ -178,6 +178,13 @@ function WorkersPage() {
         meta: { editable: true, type: "select", options: VISA_TYPES },
       },
       {
+        id: "visa_number",
+        accessorKey: "visa_number",
+        header: "رقم التأشيرة",
+        meta: { ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => (getValue() as string) || "—",
+      },
+      {
         id: "arrival_date",
         accessorKey: "arrival_date",
         header: "تاريخ دخول المكتب",

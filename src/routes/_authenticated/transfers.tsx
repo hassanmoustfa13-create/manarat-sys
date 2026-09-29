@@ -215,6 +215,13 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         meta: { editable: true, type: "select", options: VISA_TYPES },
       },
       {
+        id: "visa_number",
+        accessorFn: (r) => r.worker?.visa_number ?? "",
+        header: "رقم التأشيرة",
+        meta: { ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => (getValue() as string) || "—",
+      },
+      {
         id: "transfer_type",
         accessorKey: "transfer_type",
         header: "نوع النقل",

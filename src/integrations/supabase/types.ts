@@ -354,6 +354,7 @@ export type Database = {
           transfer_status: string
           updated_at: string
           updated_by: string | null
+          visa_number: string
           visa_type: string
         }
         Insert: {
@@ -381,6 +382,7 @@ export type Database = {
           transfer_status?: string
           updated_at?: string
           updated_by?: string | null
+          visa_number?: string
           visa_type?: string
         }
         Update: {
@@ -408,6 +410,7 @@ export type Database = {
           transfer_status?: string
           updated_at?: string
           updated_by?: string | null
+          visa_number?: string
           visa_type?: string
         }
         Relationships: []

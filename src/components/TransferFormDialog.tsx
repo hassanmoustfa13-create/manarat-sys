@@ -326,6 +326,12 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           </div>
           <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
+          <div className="text-[12px]">
+            <p className="text-ink/45">رقم التأشيرة</p>
+            <p className="font-medium" dir="ltr" style={{ textAlign: "right" }}>
+              {selectedWorker?.visa_number || "—"}
+            </p>
+          </div>
           <SelectField label="نوع النقل" value={form.transfer_type} onChange={set("transfer_type")} options={TRANSFER_TYPES} />
           {needsPeriod && (
             <>

@@ -15,7 +15,7 @@ import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { errorMessage, formatDate } from "@/lib/data";
 
-export const FLIGHT_STATUSES = ["تم الوصول", "تم الإلغاء"];
+export const FLIGHT_STATUSES = ["—", "تم الوصول", "تم الإلغاء"];
 
 type Flight = {
   id: string;
@@ -136,15 +136,20 @@ function FlightsPage() {
         accessorKey: "status",
         header: "الحالة",
         meta: { width: 110 },
-        cell: ({ getValue }) => (
-          <span
-            className={`inline-block rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${
-              getValue() === FLIGHT_STATUSES[0] ? "bg-primary/15 text-primary" : "bg-destructive/15 text-destructive"
-            }`}
-          >
-            {getValue() as string}
-          </span>
-        ),
+        cell: ({ getValue }) => {
+          const s = getValue() as string;
+          const cls =
+            s === "تم الوصول"
+              ? "bg-primary/15 text-primary"
+              : s === "تم الإلغاء"
+                ? "bg-destructive/15 text-destructive"
+                : "bg-muted text-muted-foreground";
+          return (
+            <span className={`inline-block rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${cls}`}>
+              {s}
+            </span>
+          );
+        },
       },
     ],
     [],

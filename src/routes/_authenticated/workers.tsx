@@ -58,6 +58,7 @@ function WorkersPage() {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [natFilter, setNatFilter] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Worker | null>(null);
   const [transferFor, setTransferFor] = useState<Worker | null>(null);

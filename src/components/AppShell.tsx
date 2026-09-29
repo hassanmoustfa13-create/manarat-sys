@@ -12,6 +12,7 @@ import {
   X,
   type LucideIcon,
   Stamp,
+  Plane,
   EyeOff,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -23,7 +24,7 @@ import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/reports" | "/users" | "/columns" | "/security" | "/pages"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
 export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -33,6 +34,7 @@ export const NAV: NavItem[] = [
   { to: "/manual-transfers", label: "نقل الكفالة (منزلية)", icon: ArrowLeftRight, section: "نقل يدوي" },
   { to: "/manual-transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },
   { to: "/visas", label: "تأشيرات المكتب", icon: Stamp, section: "" },
+  { to: "/flights", label: "الرحلات", icon: Plane, section: "" },
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },

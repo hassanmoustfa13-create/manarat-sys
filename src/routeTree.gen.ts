@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedColumnsRouteImport } from './routes/_authenticated/columns'
+import { Route as AuthenticatedFlightsRouteImport } from './routes/_authenticated/flights'
 import { Route as AuthenticatedManualTransfersRouteImport } from './routes/_authenticated/manual-transfers'
 import { Route as AuthenticatedManualTransfersProRouteImport } from './routes/_authenticated/manual-transfers-pro'
 import { Route as AuthenticatedPagesRouteImport } from './routes/_authenticated/pages'
@@ -42,6 +43,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedColumnsRoute = AuthenticatedColumnsRouteImport.update({
   id: '/columns',
   path: '/columns',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFlightsRoute = AuthenticatedFlightsRouteImport.update({
+  id: '/flights',
+  path: '/flights',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedManualTransfersRoute =
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
+  '/flights': typeof AuthenticatedFlightsRoute
   '/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/pages': typeof AuthenticatedPagesRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
+  '/flights': typeof AuthenticatedFlightsRoute
   '/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/pages': typeof AuthenticatedPagesRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/columns': typeof AuthenticatedColumnsRoute
+  '/_authenticated/flights': typeof AuthenticatedFlightsRoute
   '/_authenticated/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/_authenticated/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/_authenticated/pages': typeof AuthenticatedPagesRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/columns'
+    | '/flights'
     | '/manual-transfers'
     | '/manual-transfers-pro'
     | '/pages'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/columns'
+    | '/flights'
     | '/manual-transfers'
     | '/manual-transfers-pro'
     | '/pages'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/columns'
+    | '/_authenticated/flights'
     | '/_authenticated/manual-transfers'
     | '/_authenticated/manual-transfers-pro'
     | '/_authenticated/pages'
@@ -239,6 +251,13 @@ declare module '@tanstack/react-router' {
       path: '/columns'
       fullPath: '/columns'
       preLoaderRoute: typeof AuthenticatedColumnsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/flights': {
+      id: '/_authenticated/flights'
+      path: '/flights'
+      fullPath: '/flights'
+      preLoaderRoute: typeof AuthenticatedFlightsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/manual-transfers': {
@@ -323,6 +342,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedColumnsRoute: typeof AuthenticatedColumnsRoute
+  AuthenticatedFlightsRoute: typeof AuthenticatedFlightsRoute
   AuthenticatedManualTransfersRoute: typeof AuthenticatedManualTransfersRoute
   AuthenticatedManualTransfersProRoute: typeof AuthenticatedManualTransfersProRoute
   AuthenticatedPagesRoute: typeof AuthenticatedPagesRoute
@@ -338,6 +358,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedColumnsRoute: AuthenticatedColumnsRoute,
+  AuthenticatedFlightsRoute: AuthenticatedFlightsRoute,
   AuthenticatedManualTransfersRoute: AuthenticatedManualTransfersRoute,
   AuthenticatedManualTransfersProRoute: AuthenticatedManualTransfersProRoute,
   AuthenticatedPagesRoute: AuthenticatedPagesRoute,

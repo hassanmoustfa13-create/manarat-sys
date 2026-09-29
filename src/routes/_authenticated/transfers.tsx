@@ -73,21 +73,23 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
   const [completing, setCompleting] = useState<Row | null>(null);
 
   const nationalities = useMemo(() => {
+    const byId = new Map(workers.map((w) => [w.id, w]));
     const set = new Set<string>();
     for (const t of transfers) {
       if (((t as any).category ?? "منزلية") !== category) continue;
-      const nat = (t as any).worker?.nationality as string | null | undefined;
+      const nat = byId.get(t.worker_id)?.nationality;
       if (nat && nat.trim()) set.add(nat.trim());
     }
     return [...set].sort((a, b) => a.localeCompare(b, "ar"));
-  }, [transfers, category]);
+  }, [transfers, workers, category]);
 
   const rows = useMemo<Row[]>(() => {
+    const byId = new Map(workers.map((w) => [w.id, w]));
     return transfers
       .filter((t) => ((t as any).category ?? "منزلية") === category)
       .map((t) => {
-        const worker = (t as any).worker as Worker | undefined;
-        return { ...t, worker: worker ?? null, worker_name: worker?.name ?? "—" };
+        const worker = byId.get(t.worker_id) ?? null;
+        return { ...t, worker, worker_name: worker?.name ?? "—" };
       })
       .filter((r) => (payFilter ? r.payment_status === payFilter : true))
       .filter((r) =>

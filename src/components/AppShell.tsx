@@ -19,9 +19,10 @@ import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 
-type NavItem = { to: "/workers" | "/transfers" | "/transfers-pro" | "/visas" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/visas" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
 
 const NAV: NavItem[] = [
+  { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
   { to: "/workers", label: "العمالة", icon: Users },
   { to: "/transfers", label: "نقل الكفالة (منزلية)", icon: ArrowLeftRight },
   { to: "/transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },

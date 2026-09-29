@@ -206,22 +206,24 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             disabled={coreLocked}
             hint="اكتب الجنسية أو اخترها من القائمة"
           />
-          <TextField
-            label="تاريخ دخول المكتب"
-            type="date"
-            ltr
-            value={form.arrival_date}
-            onChange={set("arrival_date")}
-            disabled={coreLocked}
-          />
-          <TextField
-            label="تاريخ دخولها السعودية"
-            type="date"
-            ltr
-            value={form.entry_date}
-            onChange={set("entry_date")}
-            disabled={coreLocked}
-          />
+          <div className="sm:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <TextField
+              label="تاريخ دخولها السعودية"
+              type="date"
+              ltr
+              value={form.entry_date}
+              onChange={set("entry_date")}
+              disabled={coreLocked}
+            />
+            <TextField
+              label="تاريخ دخول المكتب"
+              type="date"
+              ltr
+              value={form.arrival_date}
+              onChange={set("arrival_date")}
+              disabled={coreLocked}
+            />
+          </div>
           <SelectField label="المهنة" value={form.profession} onChange={set("profession")} options={PROFESSIONS} />
           <SelectField
             label="الإقامة"

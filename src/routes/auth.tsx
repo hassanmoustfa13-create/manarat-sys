@@ -31,7 +31,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/workers", replace: true });
+      if (data.session) navigate({ to: "/requests", replace: true });
     });
   }, [navigate]);
 
@@ -50,7 +50,7 @@ function AuthPage() {
       const tokens = await signInWithIdentifier({ data: { identifier: idVal, password: pwVal } });
       const { error } = await supabase.auth.setSession(tokens);
       if (error) throw error;
-      navigate({ to: "/workers", replace: true });
+      navigate({ to: "/requests", replace: true });
     } catch (err) {
       toast.error(errorMessage(err));
     } finally {

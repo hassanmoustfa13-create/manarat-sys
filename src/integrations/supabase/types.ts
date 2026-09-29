@@ -26,6 +26,7 @@ export type Database = {
           status: string
           updated_at: string
           updated_by: string | null
+          visa_clients: string[]
           workers_count: number
         }
         Insert: {
@@ -39,6 +40,7 @@ export type Database = {
           status?: string
           updated_at?: string
           updated_by?: string | null
+          visa_clients?: string[]
           workers_count?: number
         }
         Update: {
@@ -52,6 +54,7 @@ export type Database = {
           status?: string
           updated_at?: string
           updated_by?: string | null
+          visa_clients?: string[]
           workers_count?: number
         }
         Relationships: []

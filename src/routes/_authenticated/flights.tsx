@@ -223,8 +223,14 @@ function FlightDialog({ open, onOpenChange, flight }: { open: boolean; onOpenCha
   const [time, setTime] = useState("");
   const [office, setOffice] = useState("");
   const [count, setCount] = useState("0");
-  const [clients, setClients] = useState<string[]>([""]);
+  const [clientsText, setClientsText] = useState("");
+  const [visaClients, setVisaClients] = useState<string[]>([]);
   const [status, setStatus] = useState(FLIGHT_STATUSES[0]!);
+
+  const clientNames = useMemo(
+    () => [...new Set(clientsText.split("\n").map((c) => c.trim()).filter(Boolean))],
+    [clientsText],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -232,7 +238,8 @@ function FlightDialog({ open, onOpenChange, flight }: { open: boolean; onOpenCha
     setTime(flight?.flight_time ?? "");
     setOffice(flight?.office_name ?? "");
     setCount(String(flight?.workers_count ?? 0));
-    setClients(flight?.clients.length ? flight.clients : [""]);
+    setClientsText((flight?.clients ?? []).join("\n"));
+    setVisaClients(flight?.visa_clients ?? []);
     setStatus(flight?.status ?? FLIGHT_STATUSES[0]!);
   }, [open, flight]);
 
@@ -243,7 +250,8 @@ function FlightDialog({ open, onOpenChange, flight }: { open: boolean; onOpenCha
         flight_time: time.trim(),
         office_name: office.trim(),
         workers_count: Math.max(0, Math.floor(Number(count) || 0)),
-        clients: clients.map((c) => c.trim()).filter(Boolean),
+        clients: clientNames,
+        visa_clients: visaClients.filter((c) => clientNames.includes(c)),
         status,
       };
       const { error } = flight
@@ -281,27 +289,42 @@ function FlightDialog({ open, onOpenChange, flight }: { open: boolean; onOpenCha
           <TextField label="اسم المكتب الخارجي" value={office} onChange={setOffice} />
           <TextField label="عدد العاملات" type="number" ltr value={count} onChange={setCount} />
           <SelectField label="الحالة" value={status} onChange={setStatus} options={FLIGHT_STATUSES} />
-          <Field label="اسم العميل" className="sm:col-span-2">
-            <div className="space-y-2">
-              {clients.map((c, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Input
-                    value={c}
-                    onChange={(e) => setClients((l) => l.map((x, j) => (j === i ? e.target.value : x)))}
-                    placeholder={`العميل ${i + 1}`}
-                  />
-                  {clients.length > 1 && (
-                    <Button type="button" variant="ghost" size="icon" onClick={() => setClients((l) => l.filter((_, j) => j !== i))}>
-                      <X className="size-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => setClients((l) => [...l, ""])}>
-                <Plus className="size-4" /> إضافة عميل آخر
-              </Button>
-            </div>
+          <Field label="أسماء العملاء (كل اسم في سطر)" className="sm:col-span-2">
+            <textarea
+              value={clientsText}
+              onChange={(e) => setClientsText(e.target.value)}
+              rows={4}
+              placeholder={"أحمد محمد\nسارة علي\n..."}
+              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            />
           </Field>
+          {clientNames.length > 0 && (
+            <Field label="تابع لتأشيرات المكتب" className="sm:col-span-2" hint="ضع علامة صح بجانب العميل التابع لتأشيرات المكتب">
+              <div className="flex flex-wrap gap-2">
+                {clientNames.map((c) => {
+                  const checked = visaClients.includes(c);
+                  return (
+                    <label
+                      key={c}
+                      className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] ${
+                        checked ? "border-primary bg-primary/10 font-semibold text-primary" : "border-border"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="accent-primary"
+                        checked={checked}
+                        onChange={(e) =>
+                          setVisaClients((l) => (e.target.checked ? [...l, c] : l.filter((x) => x !== c)))
+                        }
+                      />
+                      {c}
+                    </label>
+                  );
+                })}
+              </div>
+            </Field>
+          )}
           <DialogFooter className="sm:col-span-2 sm:justify-start">
             <Button type="submit" disabled={save.isPending}>
               {flight ? "حفظ" : "إضافة"}

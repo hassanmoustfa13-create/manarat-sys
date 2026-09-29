@@ -325,6 +325,7 @@ function ManualTransferDialog({
   const remaining = Number(form.old_sponsor_dues || 0) - Number(form.down_payment || 0);
   const needsPeriod = form.transfer_type !== TRANSFER_TYPE_OTHER;
   const hasResidency = form.residency_status !== YES_NO_EXISTS_F[1];
+  const hasSalaryDues = form.salary_dues_status !== YES_NO_EXISTS_F[1];
 
   const save = useMutation({
     mutationFn: async () => {
@@ -380,7 +381,14 @@ function ManualTransferDialog({
           <DialogDescription>كل الخانات اختيارية — اكتب المتوفر فقط. المتبقي يُحسب تلقائياً.</DialogDescription>
         </DialogHeader>
         <form
-          onSubmit={(e) => { e.preventDefault(); save.mutate(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (hasSalaryDues && !(Number(form.salary_dues_amount) > 0)) {
+              toast.error("أدخل قيمة مستحقات الرواتب — الحقل مطلوب عند اختيار «توجد»");
+              return;
+            }
+            save.mutate();
+          }}
           className="grid grid-cols-1 gap-4 sm:grid-cols-3"
         >
           <TextField label="اسم العاملة" value={form.worker_name} onChange={set("worker_name")} />
@@ -427,8 +435,15 @@ function ManualTransferDialog({
           {hasResidency && (
             <TextField label="رقم الإقامة (اختياري)" ltr value={form.residency_number} onChange={set("residency_number")} />
           )}
-          <SelectField label="مستحقات رواتب العاملة" value={form.salary_dues_status} onChange={set("salary_dues_status")} options={YES_NO_EXISTS_F} />
-          <TextField label="قيمة مستحقات الرواتب" type="number" ltr value={form.salary_dues_amount} onChange={set("salary_dues_amount")} />
+          <SelectField
+            label="مستحقات رواتب العاملة"
+            value={form.salary_dues_status}
+            onChange={(v) => setForm((f) => ({ ...f, salary_dues_status: v, salary_dues_amount: v === YES_NO_EXISTS_F[1] ? "0" : f.salary_dues_amount }))}
+            options={YES_NO_EXISTS_F}
+          />
+          {hasSalaryDues && (
+            <TextField label="قيمة مستحقات الرواتب (مطلوب)" type="number" ltr value={form.salary_dues_amount} onChange={set("salary_dues_amount")} />
+          )}
           <Field label="ملاحظات حالة العاملة" className="sm:col-span-3">
             <Textarea rows={2} value={form.worker_condition} onChange={(e) => set("worker_condition")(e.target.value)} />
           </Field>

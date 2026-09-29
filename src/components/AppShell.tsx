@@ -19,14 +19,16 @@ import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/visas" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/reports" | "/users" | "/columns" | "/security"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
 const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
   { to: "/workers", label: "العمالة", icon: Users },
   { to: "/transfers", label: "نقل الكفالة (منزلية)", icon: ArrowLeftRight },
   { to: "/transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },
-  { to: "/visas", label: "تأشيرات المكتب", icon: Stamp },
+  { to: "/manual-transfers", label: "نقل الكفالة (منزلية)", icon: ArrowLeftRight, section: "نقل يدوي" },
+  { to: "/manual-transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },
+  { to: "/visas", label: "تأشيرات المكتب", icon: Stamp, section: "" },
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },
@@ -41,11 +43,18 @@ const activeCls =
 function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
   return (
     <>
-      {NAV.filter((n) => !n.admin || isAdmin).map(({ to, label, icon: Icon }) => (
-        <Link key={to} to={to} onClick={onNavigate} className={itemCls} activeProps={{ className: activeCls }}>
-          <Icon className="size-4 shrink-0" />
-          <span className="truncate">{label}</span>
-        </Link>
+      {NAV.filter((n) => !n.admin || isAdmin).map(({ to, label, icon: Icon, section }) => (
+        <div key={to}>
+          {section !== undefined && (
+            <div className="mt-2 border-t border-black/5 px-3 pb-1 pt-3 text-[11px] font-semibold text-ink/40">
+              {section}
+            </div>
+          )}
+          <Link to={to} onClick={onNavigate} className={itemCls} activeProps={{ className: activeCls }}>
+            <Icon className="size-4 shrink-0" />
+            <span className="truncate">{label}</span>
+          </Link>
+        </div>
       ))}
     </>
   );

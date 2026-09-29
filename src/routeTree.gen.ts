@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedColumnsRouteImport } from './routes/_authenticated/columns'
+import { Route as AuthenticatedManualTransfersRouteImport } from './routes/_authenticated/manual-transfers'
+import { Route as AuthenticatedManualTransfersProRouteImport } from './routes/_authenticated/manual-transfers-pro'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
@@ -41,6 +43,18 @@ const AuthenticatedColumnsRoute = AuthenticatedColumnsRouteImport.update({
   path: '/columns',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedManualTransfersRoute =
+  AuthenticatedManualTransfersRouteImport.update({
+    id: '/manual-transfers',
+    path: '/manual-transfers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedManualTransfersProRoute =
+  AuthenticatedManualTransfersProRouteImport.update({
+    id: '/manual-transfers-pro',
+    path: '/manual-transfers-pro',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -87,6 +101,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
+  '/manual-transfers': typeof AuthenticatedManualTransfersRoute
+  '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -100,6 +116,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
+  '/manual-transfers': typeof AuthenticatedManualTransfersRoute
+  '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -115,6 +133,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/columns': typeof AuthenticatedColumnsRoute
+  '/_authenticated/manual-transfers': typeof AuthenticatedManualTransfersRoute
+  '/_authenticated/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
@@ -130,6 +150,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/columns'
+    | '/manual-transfers'
+    | '/manual-transfers-pro'
     | '/reports'
     | '/requests'
     | '/security'
@@ -143,6 +165,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/columns'
+    | '/manual-transfers'
+    | '/manual-transfers-pro'
     | '/reports'
     | '/requests'
     | '/security'
@@ -157,6 +181,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/columns'
+    | '/_authenticated/manual-transfers'
+    | '/_authenticated/manual-transfers-pro'
     | '/_authenticated/reports'
     | '/_authenticated/requests'
     | '/_authenticated/security'
@@ -201,6 +227,20 @@ declare module '@tanstack/react-router' {
       path: '/columns'
       fullPath: '/columns'
       preLoaderRoute: typeof AuthenticatedColumnsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/manual-transfers': {
+      id: '/_authenticated/manual-transfers'
+      path: '/manual-transfers'
+      fullPath: '/manual-transfers'
+      preLoaderRoute: typeof AuthenticatedManualTransfersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/manual-transfers-pro': {
+      id: '/_authenticated/manual-transfers-pro'
+      path: '/manual-transfers-pro'
+      fullPath: '/manual-transfers-pro'
+      preLoaderRoute: typeof AuthenticatedManualTransfersProRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reports': {
@@ -264,6 +304,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedColumnsRoute: typeof AuthenticatedColumnsRoute
+  AuthenticatedManualTransfersRoute: typeof AuthenticatedManualTransfersRoute
+  AuthenticatedManualTransfersProRoute: typeof AuthenticatedManualTransfersProRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
@@ -276,6 +318,8 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedColumnsRoute: AuthenticatedColumnsRoute,
+  AuthenticatedManualTransfersRoute: AuthenticatedManualTransfersRoute,
+  AuthenticatedManualTransfersProRoute: AuthenticatedManualTransfersProRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,

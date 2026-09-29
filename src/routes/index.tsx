@@ -20,7 +20,7 @@ function HomePage() {
   const navigate = useNavigate();
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      navigate({ to: data.session ? "/workers" : "/auth", replace: true });
+      navigate({ to: data.session ? "/requests" : "/auth", replace: true });
     });
   }, [navigate]);
 

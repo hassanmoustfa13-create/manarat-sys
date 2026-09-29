@@ -257,7 +257,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
         <div className="glass h-64 animate-pulse rounded-2xl" />
       ) : (
         <DataGrid
-          gridKey={category === "مهنية" ? "manual_transfers_pro" : "manual_transfers"}
+          gridKey="manual_transfers"
           data={rows}
           columns={columns}
           search={search}

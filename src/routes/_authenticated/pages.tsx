@@ -44,14 +44,14 @@ function PagesSettings() {
       <h1 className="mb-1 text-xl font-semibold">إظهار وإخفاء الصفحات</h1>
       <p className="mb-5 text-sm text-ink/55">الصفحة المخفية تختفي من القائمة للموظفين ولا يمكنهم فتحها. المدير يراها باهتة ويستطيع فتحها. البيانات لا تُحذف.</p>
       <div className="glass divide-y divide-black/5 rounded-2xl">
-        {items.map(({ to, label, icon: Icon, section }) => {
+        {items.map(({ to, label, icon: Icon }) => {
           const off = hidden.includes(to);
           return (
             <div key={to} className="flex items-center gap-3 px-4 py-3">
               <Icon className="size-4 text-ink/50" />
               <span className="flex-1 text-sm">
                 {label}
-                {section ? <span className="text-ink/40"> — {section}</span> : null}
+                {to.startsWith("/manual") ? <span className="text-ink/40"> — نقل يدوي</span> : null}
               </span>
               <button
                 type="button"

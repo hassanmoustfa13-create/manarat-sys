@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedColumnsRouteImport } from './routes/_authenticated/columns'
 import { Route as AuthenticatedManualTransfersRouteImport } from './routes/_authenticated/manual-transfers'
 import { Route as AuthenticatedManualTransfersProRouteImport } from './routes/_authenticated/manual-transfers-pro'
+import { Route as AuthenticatedPagesRouteImport } from './routes/_authenticated/pages'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
@@ -55,6 +56,11 @@ const AuthenticatedManualTransfersProRoute =
     path: '/manual-transfers-pro',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPagesRoute = AuthenticatedPagesRouteImport.update({
+  id: '/pages',
+  path: '/pages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/columns': typeof AuthenticatedColumnsRoute
   '/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
+  '/pages': typeof AuthenticatedPagesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/columns': typeof AuthenticatedColumnsRoute
   '/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
+  '/pages': typeof AuthenticatedPagesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/requests': typeof AuthenticatedRequestsRoute
   '/security': typeof AuthenticatedSecurityRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/_authenticated/columns': typeof AuthenticatedColumnsRoute
   '/_authenticated/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/_authenticated/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
+  '/_authenticated/pages': typeof AuthenticatedPagesRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/requests': typeof AuthenticatedRequestsRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/columns'
     | '/manual-transfers'
     | '/manual-transfers-pro'
+    | '/pages'
     | '/reports'
     | '/requests'
     | '/security'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/columns'
     | '/manual-transfers'
     | '/manual-transfers-pro'
+    | '/pages'
     | '/reports'
     | '/requests'
     | '/security'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/_authenticated/columns'
     | '/_authenticated/manual-transfers'
     | '/_authenticated/manual-transfers-pro'
+    | '/_authenticated/pages'
     | '/_authenticated/reports'
     | '/_authenticated/requests'
     | '/_authenticated/security'
@@ -241,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/manual-transfers-pro'
       fullPath: '/manual-transfers-pro'
       preLoaderRoute: typeof AuthenticatedManualTransfersProRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pages': {
+      id: '/_authenticated/pages'
+      path: '/pages'
+      fullPath: '/pages'
+      preLoaderRoute: typeof AuthenticatedPagesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reports': {
@@ -306,6 +325,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedColumnsRoute: typeof AuthenticatedColumnsRoute
   AuthenticatedManualTransfersRoute: typeof AuthenticatedManualTransfersRoute
   AuthenticatedManualTransfersProRoute: typeof AuthenticatedManualTransfersProRoute
+  AuthenticatedPagesRoute: typeof AuthenticatedPagesRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
@@ -320,6 +340,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedColumnsRoute: AuthenticatedColumnsRoute,
   AuthenticatedManualTransfersRoute: AuthenticatedManualTransfersRoute,
   AuthenticatedManualTransfersProRoute: AuthenticatedManualTransfersProRoute,
+  AuthenticatedPagesRoute: AuthenticatedPagesRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,

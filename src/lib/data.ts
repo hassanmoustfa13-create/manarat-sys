@@ -140,7 +140,7 @@ export const profilesQuery = queryOptions({
 export function profileNameMap(profiles: Profile[] | undefined) {
   const map = new Map<string, string>();
   for (const p of profiles ?? []) map.set(p.id, p.full_name || p.email || "—");
-  return (id: string | null | undefined) => (id ? (map.get(id) ?? "—") : "—");
+  return (id: string | null | undefined) => (id ? (map.get(id) ?? "") : "");
 }
 
 /** Days remaining until arrival (negative = already arrived) */

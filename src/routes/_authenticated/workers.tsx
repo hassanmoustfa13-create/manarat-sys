@@ -58,6 +58,7 @@ function WorkersPage() {
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [natFilter, setNatFilter] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Worker | null>(null);
   const [transferFor, setTransferFor] = useState<Worker | null>(null);
@@ -80,9 +81,17 @@ function WorkersPage() {
     onError: (e) => toast.error(errorMessage(e)),
   });
 
+  const nationalities = useMemo(
+    () => Array.from(new Set(workers.map((w) => w.nationality).filter(Boolean))).sort((a, b) => a.localeCompare(b, "ar")),
+    [workers],
+  );
+
   const filtered = useMemo(
-    () => (statusFilter ? workers.filter((w) => w.transfer_status === statusFilter) : workers),
-    [workers, statusFilter],
+    () =>
+      workers
+        .filter((w) => (statusFilter ? w.transfer_status === statusFilter : true))
+        .filter((w) => (natFilter ? w.nationality === natFilter : true)),
+    [workers, statusFilter, natFilter],
   );
 
 
@@ -313,6 +322,15 @@ function WorkersPage() {
             {TRANSFER_STATUSES.map((s) => (
               <FilterChip key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
                 {s}
+              </FilterChip>
+            ))}
+            <span className="mx-1 h-5 w-px bg-ink/15" aria-hidden />
+            <FilterChip active={natFilter === null} onClick={() => setNatFilter(null)}>
+              كل الجنسيات
+            </FilterChip>
+            {nationalities.map((n) => (
+              <FilterChip key={n} active={natFilter === n} onClick={() => setNatFilter(natFilter === n ? null : n)}>
+                {n}
               </FilterChip>
             ))}
           </>

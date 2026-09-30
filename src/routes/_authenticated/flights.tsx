@@ -26,6 +26,8 @@ type Flight = {
   clients: string[];
   visa_clients: string[];
   status: string;
+  created_by: string | null;
+  updated_by: string | null;
 };
 
 export function dayName(date: string | null) {

@@ -10,6 +10,7 @@ import { DataGrid } from "@/components/DataGrid";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
+import { DynamicFormDialog } from "@/components/DynamicForm";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -283,7 +284,15 @@ export function ManualTransfersView({ category }: { category: Category }) {
           )}
         />
       )}
-      <ManualTransferDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} category={category} nationalityOptions={nationalityOptions} />
+      <DynamicFormDialog
+        formKey={category === "مهنية" ? "manual_pro" : "manual_domestic"}
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        record={editing as (Record<string, unknown> & { id: string }) | null}
+        title={`${editing ? "تعديل عملية نقل الكفالة" : "نقل كفالة جديد"} ${category === "مهنية" ? "(مهنية)" : "(عمالة منزلية)"}`}
+        queryKey={["manual_transfers"]}
+        successText="تم تسجيل نقل الكفالة"
+      />
       <ConfirmDelete
         open={Boolean(deleting)}
         onOpenChange={(o) => !o && setDeleting(null)}
@@ -293,166 +302,5 @@ export function ManualTransfersView({ category }: { category: Category }) {
         onConfirm={() => deleting && remove.mutate(deleting.id)}
       />
     </main>
-  );
-}
-
-function ManualTransferDialog({
-  open, onOpenChange, transfer, category, nationalityOptions,
-}: { open: boolean; onOpenChange: (o: boolean) => void; transfer: MT | null; category: Category; nationalityOptions: string[] }) {
-  const qc = useQueryClient();
-  const [form, setForm] = useState<Form>(empty);
-
-  useEffect(() => {
-    if (!open) return;
-    if (!transfer) return setForm(empty());
-    const f = empty();
-    const next = { ...f } as Record<string, string>;
-    for (const k of Object.keys(f)) {
-      const v = (transfer as Record<string, unknown>)[k];
-      next[k] = v == null ? "" : String(v);
-    }
-    setForm(next as Form);
-  }, [open, transfer]);
-
-  const set = (k: keyof Form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
-
-  const remaining = Number(form.old_sponsor_dues || 0) - Number(form.down_payment || 0);
-  const needsPeriod = form.transfer_type !== TRANSFER_TYPE_OTHER;
-  const hasResidency = form.residency_status !== YES_NO_EXISTS_F[1];
-  const hasSalaryDues = form.salary_dues_status !== YES_NO_EXISTS_F[1];
-
-  const save = useMutation({
-    mutationFn: async () => {
-      const body = {
-        category,
-        worker_name: form.worker_name.trim(),
-        passport_number: form.passport_number.trim(),
-        nationality: form.nationality.trim(),
-        visa_number: form.visa_number.trim(),
-        old_sponsor_name: form.old_sponsor_name.trim(),
-        old_sponsor_phone: form.old_sponsor_phone.trim(),
-        new_sponsor_name: form.new_sponsor_name.trim(),
-        new_sponsor_phone: form.new_sponsor_phone.trim(),
-        visa_type: form.visa_type,
-        transfer_type: form.transfer_type,
-        transfer_stage: form.transfer_stage,
-        transfer_date: form.transfer_date || null,
-        period_start: needsPeriod ? form.period_start || null : null,
-        period_end: needsPeriod && form.period_start ? addDays(form.period_start, 10) : null,
-        return_to_office_date: form.return_to_office_date || null,
-        old_sponsor_dues: Number(form.old_sponsor_dues || 0),
-        down_payment: Number(form.down_payment || 0),
-        payment_status: remaining > 0 ? PAYMENT_STATUSES[1] : PAYMENT_STATUSES[0],
-        medical_exam: form.medical_exam,
-        residency_status: form.residency_status,
-        residency_number: hasResidency ? form.residency_number.trim() : "",
-        salary_dues_status: form.salary_dues_status,
-        salary_dues_amount: Number(form.salary_dues_amount || 0),
-        worker_condition: form.worker_condition.trim(),
-        worker_location: form.worker_location,
-        passport_holder: form.passport_holder,
-      };
-      const { error } = transfer
-        ? await supabase.from("manual_transfers").update(body).eq("id", transfer.id)
-        : await supabase.from("manual_transfers").insert(body);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success(transfer ? "تم حفظ التعديلات" : "تم تسجيل نقل الكفالة");
-      qc.invalidateQueries({ queryKey: ["manual_transfers"] });
-      onOpenChange(false);
-    },
-    onError: (e) => toast.error(errorMessage(e)),
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
-        <DialogHeader className="text-right sm:text-right">
-          <DialogTitle>
-            {transfer ? "تعديل عملية نقل الكفالة" : "نقل كفالة جديد"} {category === "مهنية" ? "(مهنية)" : "(عمالة منزلية)"}
-          </DialogTitle>
-          <DialogDescription>كل الخانات اختيارية — اكتب المتوفر فقط. المتبقي يُحسب تلقائياً.</DialogDescription>
-        </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (hasSalaryDues && !(Number(form.salary_dues_amount) > 0)) {
-              toast.error("أدخل قيمة مستحقات الرواتب — الحقل مطلوب عند اختيار «توجد»");
-              return;
-            }
-            save.mutate();
-          }}
-          className="grid grid-cols-1 gap-4 sm:grid-cols-3"
-        >
-          <TextField label="اسم العاملة" value={form.worker_name} onChange={set("worker_name")} />
-          <TextField label="رقم الجواز" ltr value={form.passport_number} onChange={set("passport_number")} />
-          <SelectField
-            label="الجنسية"
-            value={form.nationality}
-            onChange={(v) => set("nationality")(v)}
-            options={["", ...nationalityOptions]}
-          />
-          <TextField label="اسم الكفيل القديم" value={form.old_sponsor_name} onChange={set("old_sponsor_name")} />
-          <TextField label="هاتف الكفيل القديم" ltr value={form.old_sponsor_phone} onChange={set("old_sponsor_phone")} />
-          <div className="hidden sm:block" />
-          <TextField label="اسم الكفيل الجديد" value={form.new_sponsor_name} onChange={set("new_sponsor_name")} />
-          <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
-          <div className="hidden sm:block" />
-          <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
-          <TextField label="رقم التأشيرة" ltr value={form.visa_number} onChange={set("visa_number")} />
-          <SelectField label="نوع النقل" value={form.transfer_type} onChange={set("transfer_type")} options={TRANSFER_TYPES} />
-          {needsPeriod && (
-            <>
-              <TextField label="تاريخ بداية التجربة" type="date" ltr value={form.period_start} onChange={set("period_start")} />
-              <TextField label="تاريخ انتهاء التجربة (تلقائي: 10 أيام)" type="date" ltr value={form.period_start ? addDays(form.period_start, 10) : ""} onChange={() => {}} disabled />
-            </>
-          )}
-          <SelectField label="حالة النقل" value={form.transfer_stage} onChange={set("transfer_stage")} options={TRANSFER_STAGES} />
-          <TextField label="تاريخ النقل" type="date" ltr value={form.transfer_date} onChange={set("transfer_date")} />
-          <TextField label="تاريخ رجوع العاملة المكتب" type="date" ltr value={form.return_to_office_date} onChange={set("return_to_office_date")} />
-          <SelectField label="موقع العاملة" value={form.worker_location} onChange={set("worker_location")} options={LOCATIONS} />
-          <SelectField label="الجواز لدى" value={form.passport_holder} onChange={set("passport_holder")} options={PASSPORT_HOLDERS} />
-          <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={set("old_sponsor_dues")} />
-          <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
-          <Field label="المتبقي (تلقائي)">
-            <div
-              className={`flex h-9 items-center rounded-md border border-dashed px-3 text-sm font-semibold tabular-nums ${remaining > 0 ? "border-terracotta/40 text-terracotta" : "border-success/40 text-success"}`}
-              dir="ltr"
-            >
-              {formatMoney(remaining)}
-            </div>
-          </Field>
-          <Field label="حالة الدفع (تلقائي)">
-            <div
-              className={`flex h-9 items-center rounded-md border border-dashed px-3 text-sm font-semibold ${remaining > 0 ? "border-terracotta/40 text-terracotta" : "border-success/40 text-success"}`}
-            >
-              {remaining > 0 ? PAYMENT_STATUSES[1] : PAYMENT_STATUSES[0]}
-            </div>
-          </Field>
-          <SelectField label="الفحص الطبي" value={form.medical_exam} onChange={set("medical_exam")} options={YES_NO_EXISTS} />
-          <SelectField label="الإقامة" value={form.residency_status} onChange={set("residency_status")} options={YES_NO_EXISTS_F} />
-          {hasResidency && (
-            <TextField label="رقم الإقامة (اختياري)" ltr value={form.residency_number} onChange={set("residency_number")} />
-          )}
-          <SelectField
-            label="مستحقات رواتب العاملة"
-            value={form.salary_dues_status}
-            onChange={(v) => setForm((f) => ({ ...f, salary_dues_status: v, salary_dues_amount: v === YES_NO_EXISTS_F[1] ? "0" : f.salary_dues_amount }))}
-            options={YES_NO_EXISTS_F}
-          />
-          {hasSalaryDues && (
-            <TextField label="قيمة مستحقات الرواتب (مطلوب)" type="number" ltr value={form.salary_dues_amount} onChange={set("salary_dues_amount")} />
-          )}
-          <Field label="ملاحظات حالة العاملة" className="sm:col-span-3">
-            <Textarea rows={2} value={form.worker_condition} onChange={(e) => set("worker_condition")(e.target.value)} />
-          </Field>
-          <DialogFooter className="sm:col-span-3 sm:justify-start">
-            <Button type="submit" disabled={save.isPending}>{transfer ? "حفظ" : "تسجيل النقل"}</Button>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>إلغاء</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }

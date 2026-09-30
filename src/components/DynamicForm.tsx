@@ -65,7 +65,10 @@ function FileInput({ value, onChange, formKey }: { value: string; onChange: (v: 
           const path = `${formKey}/${crypto.randomUUID()}-${file.name.replace(/[^\w.\-]+/g, "_")}`;
           const { error } = await supabase.storage.from("form-files").upload(path, file);
           setBusy(false);
-          if (error) return toast.error(errorMessage(error));
+          if (error) {
+            toast.error(errorMessage(error));
+            return;
+          }
           onChange(path);
           toast.success("تم رفع الملف");
         }}

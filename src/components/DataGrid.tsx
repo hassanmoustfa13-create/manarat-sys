@@ -35,6 +35,7 @@ interface DataGridProps<T extends { id: string }> {
   emptyMessage?: string;
   minWidth?: number;
   gridKey?: GridKey;
+  onRowClick?: (row: T) => void;
 }
 
 export function DataGrid<T extends { id: string }>({

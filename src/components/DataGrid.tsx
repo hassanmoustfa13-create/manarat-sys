@@ -94,6 +94,23 @@ export function DataGrid<T extends { id: string }>({
   const columnVisibility = Object.fromEntries(colSettings.map((c) => [c.id, c.visible]));
   const fontCls = saved?.fontSize === "sm" ? "text-[13px]" : saved?.fontSize === "lg" ? "text-[17px]" : "text-[15px]";
   const padCls = saved?.density === "compact" ? "py-1.5" : saved?.density === "comfortable" ? "py-5" : "py-3";
+  const auth = useAuth();
+  const qc = useQueryClient();
+  const inlineOn = !!gridKey && auth.isAdmin && saved?.inlineSelectEdit === true;
+  const optionsFor = (colId: string, metaOpts?: readonly string[]) =>
+    inlineOn ? (metaOpts ?? INLINE_OPTIONS[colId]) : undefined;
+  const saveCell = async (rowId: string, colId: string, value: string) => {
+    if (!gridKey) return;
+    const { error } = await supabase
+      .from(gridKey as "workers")
+      .update({ [colId]: value } as never)
+      .eq("id", rowId);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("تم الحفظ");
+      qc.invalidateQueries();
+    }
+  };
   const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;
   const alignOf = (id: string, ltr?: boolean) => {
     const a = setById.get(id)?.align;
@@ -203,7 +220,26 @@ export function DataGrid<T extends { id: string }>({
                         meta.ltr,
                       )} ${meta.className ?? ""}`}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {(() => {
+                        const opts = optionsFor(cell.column.id, meta.options);
+                        if (!opts) return flexRender(cell.column.columnDef.cell, cell.getContext());
+                        const v = String(cell.getValue() ?? "");
+                        const list = v && !opts.includes(v) ? [v, ...opts] : opts;
+                        return (
+                          <select
+                            value={v}
+                            onChange={(e) => saveCell(row.original.id, cell.column.id, e.target.value)}
+                            className="w-full min-w-[90px] rounded-md bg-white/70 px-1.5 py-1 ring-1 ring-black/10 focus:ring-brand"
+                          >
+                            {!v && <option value="">—</option>}
+                            {list.map((o) => (
+                              <option key={o} value={o}>
+                                {o}
+                              </option>
+                            ))}
+                          </select>
+                        );
+                      })()}
                     </td>
                   );
                 })}

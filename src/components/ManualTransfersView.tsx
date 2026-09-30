@@ -427,15 +427,15 @@ function ManualTransferDetails({
               <Section title="بيانات العملية">
                 <DetailRow label="اسم العاملة" value={record.worker_name || "—"} />
                 <DetailRow label="رقم الجواز" value={record.passport_number || "—"} ltr />
-                <DetailRow label="الجنسية" value={record.nationality || "—"} />
-                <DetailRow label="نوع التأشيرة" value={record.visa_type || "—"} />
+                <EditableSelectRow label="الجنسية" field="nationality" value={record.nationality} options={NATIONALITIES} record={record} onSaved={onSaved} />
+                <EditableSelectRow label="نوع التأشيرة" field="visa_type" value={record.visa_type} options={VISA_TYPES} record={record} onSaved={onSaved} />
                 <DetailRow label="رقم التأشيرة" value={record.visa_number || "—"} ltr />
-                <DetailRow label="نوع النقل" value={<StatusBadge value={record.transfer_type} />} />
+                <EditableSelectRow label="نوع النقل" field="transfer_type" value={record.transfer_type} options={TRANSFER_TYPES} record={record} onSaved={onSaved} />
                 <DetailRow label="تاريخ النقل" value={formatDate(record.transfer_date)} ltr />
                 <DetailRow label="بداية الفترة" value={formatDate(record.period_start)} ltr />
                 <DetailRow label="نهاية الفترة" value={formatDate(record.period_end)} ltr />
                 <DetailRow label="تاريخ رجوع العاملة المكتب" value={formatDate(record.return_to_office_date)} ltr />
-                <DetailRow label="الجواز لدى" value={record.passport_holder || "—"} />
+                <EditableSelectRow label="الجواز لدى" field="passport_holder" value={record.passport_holder} options={PASSPORT_HOLDERS} record={record} onSaved={onSaved} />
               </Section>
 
               <div className="space-y-4">
@@ -465,26 +465,19 @@ function ManualTransferDetails({
                   ltr
                 />
                 <DetailRow label="حالة الدفع" value={<StatusBadge value={record.payment_status} />} />
-                <DetailRow
-                  label="مستحقات الرواتب"
-                  value={
-                    <span className="flex items-center gap-2">
-                      <StatusBadge value={record.salary_dues_status} />
-                      {record.salary_dues_status === "توجد" && (
-                        <span className="tabular-nums" dir="ltr">{formatMoney(record.salary_dues_amount)}</span>
-                      )}
-                    </span>
-                  }
-                />
+                <EditableSelectRow label="مستحقات الرواتب" field="salary_dues_status" value={record.salary_dues_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
+                {record.salary_dues_status === "توجد" && (
+                  <DetailRow label="قيمة مستحقات الرواتب" value={formatMoney(record.salary_dues_amount)} ltr />
+                )}
               </Section>
 
               <Section title="حالة العاملة">
-                <DetailRow label="الفحص الطبي" value={<StatusBadge value={record.medical_exam} />} />
-                <DetailRow label="الإقامة" value={<StatusBadge value={record.residency_status} />} />
+                <EditableSelectRow label="الفحص الطبي" field="medical_exam" value={record.medical_exam} options={YES_NO_EXISTS} record={record} onSaved={onSaved} />
+                <EditableSelectRow label="الإقامة" field="residency_status" value={record.residency_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
                 {record.residency_status === "توجد" && (
                   <DetailRow label="رقم الإقامة" value={record.residency_number || "—"} ltr />
                 )}
-                <DetailRow label="موقع العاملة" value={<StatusBadge value={record.worker_location} />} />
+                <EditableSelectRow label="موقع العاملة" field="worker_location" value={record.worker_location} options={LOCATIONS} record={record} onSaved={onSaved} />
                 <DetailRow label="ملاحظات حالة العاملة" value={record.worker_condition || "—"} />
                 {record.notes && <DetailRow label="ملاحظات" value={record.notes} />}
               </Section>

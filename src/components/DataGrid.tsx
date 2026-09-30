@@ -10,45 +10,8 @@ import {
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  ACTION_STATUSES,
-  ARRIVAL_STATUSES,
-  LOCATIONS,
-  NATIONALITIES,
-  PASSPORT_HOLDERS,
-  PROFESSIONS,
-  REQUEST_TYPES,
-  TRANSFER_STAGES,
-  TRANSFER_STATUSES,
-  TRANSFER_TYPES,
-  VISA_TYPES,
-  YES_NO_EXISTS,
-  YES_NO_EXISTS_F,
-} from "@/lib/data";
-
-/** Dropdown options for columns that are select-based, keyed by column id. */
-const INLINE_OPTIONS: Record<string, readonly string[]> = {
-  nationality: NATIONALITIES,
-  profession: PROFESSIONS,
-  visa_type: VISA_TYPES,
-  arrival_status: ARRIVAL_STATUSES,
-  current_location: LOCATIONS,
-  worker_location: LOCATIONS,
-  transfer_status: TRANSFER_STATUSES,
-  transfer_type: TRANSFER_TYPES,
-  transfer_stage: TRANSFER_STAGES,
-  passport_holder: PASSPORT_HOLDERS,
-  medical_exam: YES_NO_EXISTS,
-  request_type: REQUEST_TYPES,
-  action_status: ACTION_STATUSES,
-  visa_status: ["تم عمل العقد", "لم يتم عمل العقد"],
-  status: ["—", "تم الوصول", "تم الإلغاء"],
-};
 
 export type CellType = "text" | "number" | "date" | "select" | "textarea";
 
@@ -94,23 +57,6 @@ export function DataGrid<T extends { id: string }>({
   const columnVisibility = Object.fromEntries(colSettings.map((c) => [c.id, c.visible]));
   const fontCls = saved?.fontSize === "sm" ? "text-[13px]" : saved?.fontSize === "lg" ? "text-[17px]" : "text-[15px]";
   const padCls = saved?.density === "compact" ? "py-1.5" : saved?.density === "comfortable" ? "py-5" : "py-3";
-  const auth = useAuth();
-  const qc = useQueryClient();
-  const inlineOn = !!gridKey && auth.isAdmin && saved?.inlineSelectEdit === true;
-  const optionsFor = (colId: string, metaOpts?: readonly string[]) =>
-    inlineOn ? (metaOpts ?? INLINE_OPTIONS[colId]) : undefined;
-  const saveCell = async (rowId: string, colId: string, value: string) => {
-    if (!gridKey) return;
-    const { error } = await supabase
-      .from(gridKey as "workers")
-      .update({ [colId]: value } as never)
-      .eq("id", rowId);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("تم الحفظ");
-      qc.invalidateQueries();
-    }
-  };
   const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;
   const alignOf = (id: string, ltr?: boolean) => {
     const a = setById.get(id)?.align;
@@ -213,33 +159,13 @@ export function DataGrid<T extends { id: string }>({
                   return (
                     <td
                       key={cell.id}
-                      onClick={optionsFor(cell.column.id, meta.options) ? (e) => e.stopPropagation() : undefined}
                       dir={meta.ltr ? "ltr" : undefined}
                       className={`border-l border-black/5 px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
                         cell.column.id,
                         meta.ltr,
                       )} ${meta.className ?? ""}`}
                     >
-                      {(() => {
-                        const opts = optionsFor(cell.column.id, meta.options);
-                        if (!opts) return flexRender(cell.column.columnDef.cell, cell.getContext());
-                        const v = String(cell.getValue() ?? "");
-                        const list = v && !opts.includes(v) ? [v, ...opts] : opts;
-                        return (
-                          <select
-                            value={v}
-                            onChange={(e) => saveCell(row.original.id, cell.column.id, e.target.value)}
-                            className="w-full min-w-[90px] rounded-md bg-white/70 px-1.5 py-1 ring-1 ring-black/10 focus:ring-brand"
-                          >
-                            {!v && <option value="">—</option>}
-                            {list.map((o) => (
-                              <option key={o} value={o}>
-                                {o}
-                              </option>
-                            ))}
-                          </select>
-                        );
-                      })()}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   );
                 })}

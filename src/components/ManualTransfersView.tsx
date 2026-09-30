@@ -309,6 +309,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
       <ManualTransferDetails
         record={viewing}
         onClose={() => setViewing(null)}
+        onSaved={(f, v) => setViewing((cur) => (cur ? { ...cur, [f]: v } : cur))}
         onEdit={(t) => {
           setViewing(null);
           setEditing(t);
@@ -330,6 +331,62 @@ function DetailRow({ label, value, ltr }: { label: string; value: ReactNode; ltr
   );
 }
 
+/** صف تفاصيل قابل للتعديل المباشر (للمدير فقط): قائمة منسدلة تُحفظ فور الاختيار. */
+function EditableSelectRow({
+  label,
+  field,
+  value,
+  options,
+  record,
+  onSaved,
+}: {
+  label: string;
+  field: keyof MT;
+  value: string;
+  options: readonly string[];
+  record: MT;
+  onSaved: (field: keyof MT, value: string) => void;
+}) {
+  const auth = useAuth();
+  const qc = useQueryClient();
+  const [saving, setSaving] = useState(false);
+  if (!auth.isAdmin) return <DetailRow label={label} value={<StatusBadge value={value} />} />;
+  const list = value && !options.includes(value) ? [value, ...options] : options;
+  const save = async (v: string) => {
+    if (v === value) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("manual_transfers")
+      .update({ [field]: v } as never)
+      .eq("id", record.id);
+    setSaving(false);
+    if (error) toast.error(errorMessage(error));
+    else {
+      toast.success("تم الحفظ");
+      onSaved(field, v);
+      qc.invalidateQueries({ queryKey: ["manual_transfers"] });
+    }
+  };
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-black/5 py-1.5 text-[13px] last:border-b-0">
+      <span className="text-ink/50">{label}</span>
+      <select
+        value={value}
+        disabled={saving}
+        onChange={(e) => void save(e.target.value)}
+        className="max-w-[60%] rounded-md bg-white/70 px-1.5 py-1 text-[13px] font-medium ring-1 ring-black/10 focus:ring-brand disabled:opacity-50"
+      >
+        {!value && <option value="">—</option>}
+        {list.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="glass rounded-xl p-4">
@@ -343,10 +400,12 @@ function ManualTransferDetails({
   record,
   onClose,
   onEdit,
+  onSaved,
 }: {
   record: MT | null;
   onClose: () => void;
   onEdit: (t: MT) => void;
+  onSaved: (field: keyof MT, value: string) => void;
 }) {
   const { data: profiles } = useQuery(profilesQuery);
   const nameOf = profileNameMap(profiles);
@@ -368,15 +427,16 @@ function ManualTransferDetails({
               <Section title="بيانات العملية">
                 <DetailRow label="اسم العاملة" value={record.worker_name || "—"} />
                 <DetailRow label="رقم الجواز" value={record.passport_number || "—"} ltr />
-                <DetailRow label="الجنسية" value={record.nationality || "—"} />
-                <DetailRow label="نوع التأشيرة" value={record.visa_type || "—"} />
+                <EditableSelectRow label="الجنسية" field="nationality" value={record.nationality} options={NATIONALITIES} record={record} onSaved={onSaved} />
+                <EditableSelectRow label="نوع التأشيرة" field="visa_type" value={record.visa_type} options={VISA_TYPES} record={record} onSaved={onSaved} />
                 <DetailRow label="رقم التأشيرة" value={record.visa_number || "—"} ltr />
-                <DetailRow label="نوع النقل" value={<StatusBadge value={record.transfer_type} />} />
+                <EditableSelectRow label="نوع النقل" field="transfer_type" value={record.transfer_type} options={TRANSFER_TYPES} record={record} onSaved={onSaved} />
+                <EditableSelectRow label="حالة النقل" field="transfer_stage" value={record.transfer_stage} options={TRANSFER_STAGES} record={record} onSaved={onSaved} />
                 <DetailRow label="تاريخ النقل" value={formatDate(record.transfer_date)} ltr />
                 <DetailRow label="بداية الفترة" value={formatDate(record.period_start)} ltr />
                 <DetailRow label="نهاية الفترة" value={formatDate(record.period_end)} ltr />
                 <DetailRow label="تاريخ رجوع العاملة المكتب" value={formatDate(record.return_to_office_date)} ltr />
-                <DetailRow label="الجواز لدى" value={record.passport_holder || "—"} />
+                <EditableSelectRow label="الجواز لدى" field="passport_holder" value={record.passport_holder} options={PASSPORT_HOLDERS} record={record} onSaved={onSaved} />
               </Section>
 
               <div className="space-y-4">
@@ -406,26 +466,19 @@ function ManualTransferDetails({
                   ltr
                 />
                 <DetailRow label="حالة الدفع" value={<StatusBadge value={record.payment_status} />} />
-                <DetailRow
-                  label="مستحقات الرواتب"
-                  value={
-                    <span className="flex items-center gap-2">
-                      <StatusBadge value={record.salary_dues_status} />
-                      {record.salary_dues_status === "توجد" && (
-                        <span className="tabular-nums" dir="ltr">{formatMoney(record.salary_dues_amount)}</span>
-                      )}
-                    </span>
-                  }
-                />
+                <EditableSelectRow label="مستحقات الرواتب" field="salary_dues_status" value={record.salary_dues_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
+                {record.salary_dues_status === "توجد" && (
+                  <DetailRow label="قيمة مستحقات الرواتب" value={formatMoney(record.salary_dues_amount)} ltr />
+                )}
               </Section>
 
               <Section title="حالة العاملة">
-                <DetailRow label="الفحص الطبي" value={<StatusBadge value={record.medical_exam} />} />
-                <DetailRow label="الإقامة" value={<StatusBadge value={record.residency_status} />} />
+                <EditableSelectRow label="الفحص الطبي" field="medical_exam" value={record.medical_exam} options={YES_NO_EXISTS} record={record} onSaved={onSaved} />
+                <EditableSelectRow label="الإقامة" field="residency_status" value={record.residency_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
                 {record.residency_status === "توجد" && (
                   <DetailRow label="رقم الإقامة" value={record.residency_number || "—"} ltr />
                 )}
-                <DetailRow label="موقع العاملة" value={<StatusBadge value={record.worker_location} />} />
+                <EditableSelectRow label="موقع العاملة" field="worker_location" value={record.worker_location} options={LOCATIONS} record={record} onSaved={onSaved} />
                 <DetailRow label="ملاحظات حالة العاملة" value={record.worker_condition || "—"} />
                 {record.notes && <DetailRow label="ملاحظات" value={record.notes} />}
               </Section>

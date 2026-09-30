@@ -274,6 +274,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
           columns={columns}
           search={search}
           emptyMessage="لا توجد عمليات نقل كفالة بعد"
+          onRowClick={(t) => setViewing(t)}
           rowActions={(t) => (
             <>
               <IconBtn title="تعديل" onClick={() => { setEditing(t); setFormOpen(true); }}>

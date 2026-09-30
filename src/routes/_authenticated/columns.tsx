@@ -47,6 +47,7 @@ function ColumnsPage() {
       fontSize: saved?.fontSize ?? "md",
       density: saved?.density ?? "normal",
       columns: resolveColumns(key, saved),
+      inlineSelectEdit: saved?.inlineSelectEdit ?? false,
     });
   }, [all, key]);
 

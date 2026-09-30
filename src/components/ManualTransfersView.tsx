@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -29,6 +29,7 @@ import {
   YES_NO_EXISTS_F,
   errorMessage,
   formatDate,
+  formatDateTime,
   formatMoney,
   profileNameMap,
   profilesQuery,
@@ -100,6 +101,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<MT | null>(null);
   const [deleting, setDeleting] = useState<MT | null>(null);
+  const [viewing, setViewing] = useState<MT | null>(null);
 
   const mine = useMemo(() => all.filter((t) => t.category === category), [all, category]);
   const nationalityOptions = useMemo(

@@ -330,6 +330,62 @@ function DetailRow({ label, value, ltr }: { label: string; value: ReactNode; ltr
   );
 }
 
+/** صف تفاصيل قابل للتعديل المباشر (للمدير فقط): قائمة منسدلة تُحفظ فور الاختيار. */
+function EditableSelectRow({
+  label,
+  field,
+  value,
+  options,
+  record,
+  onSaved,
+}: {
+  label: string;
+  field: keyof MT;
+  value: string;
+  options: readonly string[];
+  record: MT;
+  onSaved: (field: keyof MT, value: string) => void;
+}) {
+  const auth = useAuth();
+  const qc = useQueryClient();
+  const [saving, setSaving] = useState(false);
+  if (!auth.isAdmin) return <DetailRow label={label} value={<StatusBadge value={value} />} />;
+  const list = value && !options.includes(value) ? [value, ...options] : options;
+  const save = async (v: string) => {
+    if (v === value) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("manual_transfers")
+      .update({ [field]: v } as never)
+      .eq("id", record.id);
+    setSaving(false);
+    if (error) toast.error(errorMessage(error));
+    else {
+      toast.success("تم الحفظ");
+      onSaved(field, v);
+      qc.invalidateQueries({ queryKey: ["manual_transfers"] });
+    }
+  };
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-black/5 py-1.5 text-[13px] last:border-b-0">
+      <span className="text-ink/50">{label}</span>
+      <select
+        value={value}
+        disabled={saving}
+        onChange={(e) => void save(e.target.value)}
+        className="max-w-[60%] rounded-md bg-white/70 px-1.5 py-1 text-[13px] font-medium ring-1 ring-black/10 focus:ring-brand disabled:opacity-50"
+      >
+        {!value && <option value="">—</option>}
+        {list.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="glass rounded-xl p-4">

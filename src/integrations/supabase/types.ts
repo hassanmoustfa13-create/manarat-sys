@@ -307,6 +307,7 @@ export type Database = {
           old_sponsor_dues: number
           old_sponsor_name: string
           old_sponsor_phone: string
+          other_payments: number
           passport_holder: string
           passport_number: string
           payment_status: string
@@ -345,6 +346,7 @@ export type Database = {
           old_sponsor_dues?: number
           old_sponsor_name?: string
           old_sponsor_phone?: string
+          other_payments?: number
           passport_holder?: string
           passport_number?: string
           payment_status?: string
@@ -383,6 +385,7 @@ export type Database = {
           old_sponsor_dues?: number
           old_sponsor_name?: string
           old_sponsor_phone?: string
+          other_payments?: number
           passport_holder?: string
           passport_number?: string
           payment_status?: string
@@ -596,6 +599,7 @@ export type Database = {
           old_sponsor_dues: number
           old_sponsor_name: string
           old_sponsor_phone: string
+          other_payments: number
           passport_holder: string
           payment_status: string
           period_end: string | null
@@ -628,6 +632,7 @@ export type Database = {
           old_sponsor_dues?: number
           old_sponsor_name?: string
           old_sponsor_phone?: string
+          other_payments?: number
           passport_holder?: string
           payment_status?: string
           period_end?: string | null
@@ -660,6 +665,7 @@ export type Database = {
           old_sponsor_dues?: number
           old_sponsor_name?: string
           old_sponsor_phone?: string
+          other_payments?: number
           passport_holder?: string
           payment_status?: string
           period_end?: string | null

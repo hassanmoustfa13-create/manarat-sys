@@ -26,6 +26,7 @@ import { Route as AuthenticatedTransfersProRouteImport } from './routes/_authent
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedVisasRouteImport } from './routes/_authenticated/visas'
 import { Route as AuthenticatedWorkersRouteImport } from './routes/_authenticated/workers'
+import { Route as AuthenticatedFFormKeyRouteImport } from './routes/_authenticated/f.$formKey'
 import { Route as AuthenticatedFormsFormIdRouteImport } from './routes/_authenticated/forms.$formId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -115,6 +116,11 @@ const AuthenticatedWorkersRoute = AuthenticatedWorkersRouteImport.update({
   path: '/workers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFFormKeyRoute = AuthenticatedFFormKeyRouteImport.update({
+  id: '/f/$formKey',
+  path: '/f/$formKey',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFormsFormIdRoute =
   AuthenticatedFormsFormIdRouteImport.update({
     id: '/$formId',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedUsersRoute
   '/visas': typeof AuthenticatedVisasRoute
   '/workers': typeof AuthenticatedWorkersRoute
+  '/f/$formKey': typeof AuthenticatedFFormKeyRoute
   '/forms/$formId': typeof AuthenticatedFormsFormIdRoute
 }
 export interface FileRoutesByTo {
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersRoute
   '/visas': typeof AuthenticatedVisasRoute
   '/workers': typeof AuthenticatedWorkersRoute
+  '/f/$formKey': typeof AuthenticatedFFormKeyRoute
   '/forms/$formId': typeof AuthenticatedFormsFormIdRoute
 }
 export interface FileRoutesById {
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/visas': typeof AuthenticatedVisasRoute
   '/_authenticated/workers': typeof AuthenticatedWorkersRoute
+  '/_authenticated/f/$formKey': typeof AuthenticatedFFormKeyRoute
   '/_authenticated/forms/$formId': typeof AuthenticatedFormsFormIdRoute
 }
 export interface FileRouteTypes {
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/visas'
     | '/workers'
+    | '/f/$formKey'
     | '/forms/$formId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/visas'
     | '/workers'
+    | '/f/$formKey'
     | '/forms/$formId'
   id:
     | '__root__'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/_authenticated/users'
     | '/_authenticated/visas'
     | '/_authenticated/workers'
+    | '/_authenticated/f/$formKey'
     | '/_authenticated/forms/$formId'
   fileRoutesById: FileRoutesById
 }
@@ -369,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/f/$formKey': {
+      id: '/_authenticated/f/$formKey'
+      path: '/f/$formKey'
+      fullPath: '/f/$formKey'
+      preLoaderRoute: typeof AuthenticatedFFormKeyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/forms/$formId': {
       id: '/_authenticated/forms/$formId'
       path: '/$formId'
@@ -405,6 +424,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVisasRoute: typeof AuthenticatedVisasRoute
   AuthenticatedWorkersRoute: typeof AuthenticatedWorkersRoute
+  AuthenticatedFFormKeyRoute: typeof AuthenticatedFFormKeyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -422,6 +442,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVisasRoute: AuthenticatedVisasRoute,
   AuthenticatedWorkersRoute: AuthenticatedWorkersRoute,
+  AuthenticatedFFormKeyRoute: AuthenticatedFFormKeyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

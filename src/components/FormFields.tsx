@@ -199,6 +199,56 @@ export function SuggestField({
   );
 }
 
+/**
+ * Select with an "أخرى" option: choosing it (or loading a saved custom value)
+ * reveals a free-text input whose text becomes the saved value.
+ */
+export function SelectOrOtherField({
+  label,
+  value,
+  onChange,
+  options,
+  disabled,
+  className,
+  placeholder = "اكتب الموقع",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: readonly string[];
+  disabled?: boolean;
+  className?: string | undefined;
+  placeholder?: string;
+}) {
+  const isCustom = value !== "" && !options.includes(value);
+  const showInput = value === "أخرى" || isCustom;
+  return (
+    <Field label={label} className={className}>
+      <select
+        value={isCustom ? "أخرى" : value}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50"
+      >
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o || "— اختر —"}
+          </option>
+        ))}
+      </select>
+      {showInput && !disabled && (
+        <Input
+          className="mt-2"
+          value={isCustom ? value : ""}
+          placeholder={placeholder}
+          autoFocus={value === "أخرى"}
+          onChange={(e) => onChange(e.target.value || "أخرى")}
+        />
+      )}
+    </Field>
+  );
+}
+
 export function SelectField({
   label,
   value,

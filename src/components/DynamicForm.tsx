@@ -185,18 +185,35 @@ export function DynamicFields({
                 <textarea rows={3} value={v} placeholder={f.placeholder} onChange={(e) => set(f.field_key)(e.target.value)} className={inputCls} />
               </Field>
             );
-          case "select":
+          case "select": {
+            const defined = optionsOf(f, "");
+            const hasOther = defined.some((o) => o.value === "أخرى");
+            const isCustom = v !== "" && !defined.some((o) => o.value === v);
+            const showOtherInput = hasOther && (v === "أخرى" || isCustom);
             return (
               <Field key={f.id} label={label} hint={hint} className={cls}>
-                <select value={v} onChange={(e) => set(f.field_key)(e.target.value)} className={`${inputCls} h-9 py-1`}>
+                <select
+                  value={isCustom ? "أخرى" : v}
+                  onChange={(e) => set(f.field_key)(e.target.value)}
+                  className={`${inputCls} h-9 py-1`}
+                >
                   {!f.required && <option value="">— اختر —</option>}
                   {f.required && !v && <option value="">— اختر —</option>}
-                  {optionsOf(f, v).map((o) => (
+                  {defined.map((o) => (
                     <option key={o.value} value={o.value}>{o.label}</option>
                   ))}
                 </select>
+                {showOtherInput && (
+                  <Input
+                    className="mt-2"
+                    value={isCustom ? v : ""}
+                    placeholder={`اكتب ${f.label}`}
+                    onChange={(e) => set(f.field_key)(e.target.value || "أخرى")}
+                  />
+                )}
               </Field>
             );
+          }
           case "radio":
             return (
               <Field key={f.id} label={label} hint={hint} className={cls}>

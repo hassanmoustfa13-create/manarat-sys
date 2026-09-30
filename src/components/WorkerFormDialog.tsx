@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ComboField, Field, SelectField, SuggestField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, SelectOrOtherField, SuggestField, TextField } from "@/components/FormFields";
 import {
   ARRIVAL_STATUSES,
   LOCATIONS,
@@ -247,7 +247,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             onChange={set("arrival_status")}
             options={ARRIVAL_STATUSES}
           />
-          <SelectField
+          <SelectOrOtherField
             label="الموقع الحالي"
             value={form.current_location}
             onChange={set("current_location")}

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, SelectOrOtherField, TextField } from "@/components/FormFields";
 import {
   LOCATIONS,
   PASSPORT_HOLDERS,
@@ -359,7 +359,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             onChange={set("transfer_stage")}
             options={TRANSFER_STAGES}
           />
-          <SelectField
+          <SelectOrOtherField
             label="موقع العاملة"
             value={form.worker_location}
             onChange={set("worker_location")}

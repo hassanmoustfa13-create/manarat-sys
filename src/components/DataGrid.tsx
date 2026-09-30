@@ -35,6 +35,7 @@ interface DataGridProps<T extends { id: string }> {
   emptyMessage?: string;
   minWidth?: number;
   gridKey?: GridKey;
+  onRowClick?: (row: T) => void;
 }
 
 export function DataGrid<T extends { id: string }>({
@@ -45,6 +46,7 @@ export function DataGrid<T extends { id: string }>({
   emptyMessage = "لا توجد سجلات بعد",
   minWidth = 0,
   gridKey,
+  onRowClick,
 }: DataGridProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const { data: allSettings } = useQuery(gridSettingsQuery);
@@ -148,7 +150,8 @@ export function DataGrid<T extends { id: string }>({
             {rows.map((row, i) => (
               <tr
                 key={row.id}
-                className={`border-b border-black/5 transition-colors hover:bg-brand/[0.06] ${i % 2 === 0 ? "bg-black/[0.015]" : ""}`}
+                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                className={`border-b border-black/5 transition-colors hover:bg-brand/[0.06] ${onRowClick ? "cursor-pointer" : ""} ${i % 2 === 0 ? "bg-black/[0.015]" : ""}`}
               >
                 <td className={`px-3 ${padCls} text-center text-[13px] font-semibold text-ink/40`}>{i + 1}</td>
                 {row.getVisibleCells().map((cell) => {
@@ -167,7 +170,10 @@ export function DataGrid<T extends { id: string }>({
                   );
                 })}
                 {rowActions && (
-                  <td className="border-l border-black/5 px-3 py-2 align-middle">
+                  <td
+                    className="border-l border-black/5 px-3 py-2 align-middle"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="flex items-center justify-center gap-1.5">{rowActions(row.original)}</div>
                   </td>
                 )}

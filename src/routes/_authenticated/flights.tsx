@@ -13,7 +13,7 @@ import { Field, SelectField, TextField } from "@/components/FormFields";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { IconBtn } from "@/routes/_authenticated/workers";
-import { errorMessage, formatDate } from "@/lib/data";
+import { errorMessage, formatDate, profileNameMap, profilesQuery } from "@/lib/data";
 
 export const FLIGHT_STATUSES = ["—", "تم الوصول", "تم الإلغاء"];
 

@@ -133,7 +133,7 @@ export function initialValues(form: FormDef, record: Record<string, unknown> | n
 }
 
 export function remainingOf(values: Values) {
-  return Number(values["old_sponsor_dues"] || 0) - Number(values["down_payment"] || 0);
+  return Number(values["old_sponsor_dues"] || 0) - Number(values["down_payment"] || 0) - Number(values["other_payments"] || 0);
 }
 export const clientLines = (s: string) => [...new Set(s.split("\n").map((c) => c.trim()).filter(Boolean))];
 

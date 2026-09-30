@@ -58,6 +58,7 @@ const empty = {
   period_end: "",
   old_sponsor_dues: "0",
   down_payment: "0",
+  other_payments: "0",
   payment_status: PAYMENT_STATUSES[1] as string,
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
@@ -97,6 +98,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             period_end: transfer.period_end ?? "",
             old_sponsor_dues: String(transfer.old_sponsor_dues),
             down_payment: String(transfer.down_payment),
+            other_payments: String(transfer.other_payments ?? 0),
             payment_status: transfer.payment_status,
             medical_exam: transfer.medical_exam,
             residency_status: transfer.residency_status,
@@ -146,14 +148,15 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
 
   const dues = Number(form.old_sponsor_dues || 0);
   const deposit = Number(form.down_payment || 0);
-  const remaining = dues - deposit;
+  const otherPaid = Number(form.other_payments || 0);
+  const remaining = dues - deposit - otherPaid;
   const needsPeriod = form.transfer_type !== TRANSFER_TYPE_OTHER;
 
   /** Amounts drive the payment status automatically; it stays manually editable afterwards */
-  const setAmount = (k: "old_sponsor_dues" | "down_payment") => (v: string) =>
+  const setAmount = (k: "old_sponsor_dues" | "down_payment" | "other_payments") => (v: string) =>
     setForm((f) => {
       const next = { ...f, [k]: v };
-      const left = Number(next.old_sponsor_dues || 0) - Number(next.down_payment || 0);
+      const left = Number(next.old_sponsor_dues || 0) - Number(next.down_payment || 0) - Number(next.other_payments || 0);
       return { ...next, payment_status: left > 0 ? PAYMENT_STATUSES[1] : PAYMENT_STATUSES[0] };
     });
 
@@ -171,6 +174,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         period_end: needsPeriod && form.period_start ? addDays(form.period_start, 10) : null,
         old_sponsor_dues: dues,
         down_payment: deposit,
+        other_payments: otherPaid,
         payment_status: form.payment_status,
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
@@ -370,6 +374,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
 
           <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={setAmount("old_sponsor_dues")} />
           <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={setAmount("down_payment")} />
+          <TextField label="مدفوعات أخرى" type="number" ltr value={form.other_payments} onChange={setAmount("other_payments")} />
           <Field label="المتبقي (تلقائي)">
             <div
               className={`flex h-9 items-center rounded-md border border-dashed px-3 text-sm font-semibold tabular-nums ${remaining > 0 ? "border-terracotta/40 text-terracotta" : "border-success/40 text-success"}`}

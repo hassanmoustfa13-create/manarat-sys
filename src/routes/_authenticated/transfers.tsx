@@ -274,6 +274,13 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         cell: ({ getValue }) => formatMoney(getValue() as number),
       },
       {
+        id: "other_payments",
+        accessorKey: "other_payments",
+        header: "مدفوعات أخرى",
+        meta: { editable: true, type: "number", ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => formatMoney(getValue() as number),
+      },
+      {
         id: "remaining_amount",
         accessorKey: "remaining_amount",
         header: "المتبقي",

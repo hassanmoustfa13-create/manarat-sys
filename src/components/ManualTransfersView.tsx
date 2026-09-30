@@ -74,6 +74,7 @@ const empty = () => ({
   return_to_office_date: "",
   old_sponsor_dues: "0",
   down_payment: "0",
+  other_payments: "0",
   payment_status: PAYMENT_STATUSES[0] as string,
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
@@ -195,6 +196,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
       badge("worker_location", "موقع العاملة"),
       money("old_sponsor_dues", "مستحقات القديم"),
       money("down_payment", "العربون"),
+      money("other_payments", "مدفوعات أخرى"),
       {
         id: "remaining_amount",
         accessorKey: "remaining_amount",

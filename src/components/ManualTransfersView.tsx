@@ -309,6 +309,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
       <ManualTransferDetails
         record={viewing}
         onClose={() => setViewing(null)}
+        onSaved={(f, v) => setViewing((cur) => (cur ? { ...cur, [f]: v } : cur))}
         onEdit={(t) => {
           setViewing(null);
           setEditing(t);
@@ -399,10 +400,12 @@ function ManualTransferDetails({
   record,
   onClose,
   onEdit,
+  onSaved,
 }: {
   record: MT | null;
   onClose: () => void;
   onEdit: (t: MT) => void;
+  onSaved: (field: keyof MT, value: string) => void;
 }) {
   const { data: profiles } = useQuery(profilesQuery);
   const nameOf = profileNameMap(profiles);

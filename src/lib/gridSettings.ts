@@ -15,6 +15,8 @@ export interface GridSettings {
   fontSize?: "sm" | "md" | "lg" | undefined;
   density?: "compact" | "normal" | "comfortable" | undefined;
   columns?: ColumnSetting[] | undefined;
+  /** Admin-only: edit dropdown columns directly in the table. */
+  inlineSelectEdit?: boolean | undefined;
 }
 
 export const GRID_LABELS: Record<GridKey, string> = {

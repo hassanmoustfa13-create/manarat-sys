@@ -125,6 +125,14 @@ function ColumnsPage() {
             <option value="comfortable">واسع</option>
           </select>
         </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={draft.inlineSelectEdit === true}
+            onChange={(e) => setDraft((d) => ({ ...d, inlineSelectEdit: e.target.checked }))}
+          />
+          تعديل القوائم المنسدلة مباشرة من الجدول (للمدير فقط)
+        </label>
       </div>
 
       <div className="overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/8">

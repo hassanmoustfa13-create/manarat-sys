@@ -44,7 +44,6 @@ const INLINE_OPTIONS: Record<string, readonly string[]> = {
   transfer_stage: TRANSFER_STAGES,
   passport_holder: PASSPORT_HOLDERS,
   medical_exam: YES_NO_EXISTS,
-  residency_status: YES_NO_EXISTS_F,
   request_type: REQUEST_TYPES,
   action_status: ACTION_STATUSES,
   visa_status: ["تم عمل العقد", "لم يتم عمل العقد"],

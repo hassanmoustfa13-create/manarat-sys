@@ -13,7 +13,7 @@ import { Field, SelectField, TextField } from "@/components/FormFields";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { IconBtn } from "@/routes/_authenticated/workers";
-import { errorMessage, formatDate } from "@/lib/data";
+import { errorMessage, formatDate, profileNameMap, profilesQuery } from "@/lib/data";
 
 export const FLIGHT_STATUSES = ["—", "تم الوصول", "تم الإلغاء"];
 
@@ -26,6 +26,8 @@ type Flight = {
   clients: string[];
   visa_clients: string[];
   status: string;
+  created_by: string | null;
+  updated_by: string | null;
 };
 
 export function dayName(date: string | null) {
@@ -52,6 +54,8 @@ export const Route = createFileRoute("/_authenticated/flights")({
 function FlightsPage() {
   const { isAdmin: admin } = useAuth();
   const qc = useQueryClient();
+  const { data: profiles } = useQuery(profilesQuery);
+  const nameOf = profileNameMap(profiles);
   const { data: flights = [], isLoading } = useQuery({
     queryKey: ["flights"],
     queryFn: async () => {
@@ -151,8 +155,20 @@ function FlightsPage() {
           );
         },
       },
+      {
+        id: "created_by",
+        accessorFn: (r) => nameOf(r.created_by),
+        header: "تم الإضافة بواسطة",
+        cell: ({ getValue }) => <span className="text-[12px] text-ink/55">{(getValue() as string) || "—"}</span>,
+      },
+      {
+        id: "updated_by",
+        accessorFn: (r) => nameOf(r.updated_by),
+        header: "آخر تعديل بواسطة",
+        cell: ({ getValue }) => <span className="text-[12px] text-ink/55">{(getValue() as string) || "—"}</span>,
+      },
     ],
-    [],
+    [nameOf],
   );
 
   return (

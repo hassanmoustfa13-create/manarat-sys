@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ComboField, Field, SelectField, SuggestField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, SelectOrOtherField, SuggestField, TextField } from "@/components/FormFields";
 import {
   ARRIVAL_STATUSES,
   LOCATIONS,

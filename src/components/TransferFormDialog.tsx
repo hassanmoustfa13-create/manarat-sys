@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ComboField, Field, SelectField, TextField } from "@/components/FormFields";
+import { ComboField, Field, SelectField, SelectOrOtherField, TextField } from "@/components/FormFields";
 import {
   LOCATIONS,
   PASSPORT_HOLDERS,

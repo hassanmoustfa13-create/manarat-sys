@@ -166,6 +166,7 @@ function VisasPage() {
           data={rows}
           columns={columns}
           search={search}
+          gridKey="office_visas"
           emptyMessage="لا توجد تأشيرات بعد"
           rowActions={(r) => (
             <>

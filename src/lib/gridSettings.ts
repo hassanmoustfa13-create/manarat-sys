@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers";
+export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers" | "flights" | "office_visas";
 export type ColAlign = "right" | "center" | "left";
 
 export interface ColumnSetting {
@@ -22,6 +22,8 @@ export const GRID_LABELS: Record<GridKey, string> = {
   requests: "جدول طلبات الاستقدام",
   transfers: "جدول نقل الكفالة",
   manual_transfers: "جدول نقل الكفالة (يدوي)",
+  flights: "جدول الرحلات",
+  office_visas: "جدول تأشيرات المكتب",
 };
 
 const AUDIT: [string, string][] = [
@@ -95,18 +97,30 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
     ["worker_name", "اسم العاملة"], ["passport_number", "رقم الجواز"], ["nationality", "الجنسية"],
     ["old_sponsor_name", "الكفيل القديم"], ["new_sponsor_name", "الكفيل الجديد"], ["visa_type", "نوع التأشيرة"],
     ["visa_number", "رقم التأشيرة"], ["transfer_type", "نوع النقل"], ["transfer_date", "تاريخ النقل"],
-    ["transfer_stage", "حالة النقل"], ["return_to_office_date", "تاريخ رجوعها المكتب"], ["worker_location", "موقع العاملة"],
+    ["transfer_stage", "حالة النقل"], ["return_to_office_date", "تاريخ رجوع العاملة المكتب"], ["worker_location", "موقع العاملة"],
     ["old_sponsor_dues", "مستحقات القديم"], ["down_payment", "العربون"], ["remaining_amount", "المتبقي"],
     ["payment_status", "حالة الدفع"], ["medical_exam", "الفحص الطبي"], ["residency_status", "الإقامة"],
     ["residency_number", "رقم الإقامة"], ["salary_dues_status", "مستحقات الرواتب"], ["salary_dues_amount", "قيمة مستحقات الرواتب"],
     ["passport_holder", "الجواز لدى"], ["worker_condition", "ملاحظات حالة العاملة"],
     ...AUDIT,
   ],
+  flights: [
+    ["day", "اليوم"], ["flight_date", "التاريخ"], ["flight_time", "الوقت"],
+    ["office_name", "اسم المكتب الخارجي"], ["workers_count", "عدد العاملات"],
+    ["clients_text", "اسم العميل"], ["status", "الحالة"],
+    ...AUDIT,
+  ],
+  office_visas: [
+    ["holder_name", "اسم صاحب التأشيرة"], ["new_sponsor_name", "اسم الكفيل الجديد"],
+    ["visa_status", "حالة التأشيرة"], ["visa_number", "رقم التأشيرة"], ["payment_status", "حالة الدفع"],
+  ],
 };
 
 /** Default compact widths (~1.5 words) so the table stays narrow; text wraps nicely. */
 const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
   manual_transfers: {},
+  flights: { day: 100, flight_date: 110, flight_time: 90, office_name: 170, workers_count: 100, clients_text: 220, status: 110, created_by: 120, updated_by: 120 },
+  office_visas: { holder_name: 170, new_sponsor_name: 170, visa_status: 140, visa_number: 130, payment_status: 120 },
   workers: {
     name: 130,
     passport_number: 110,

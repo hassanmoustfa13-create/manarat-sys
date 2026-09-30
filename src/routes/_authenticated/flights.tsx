@@ -203,6 +203,7 @@ function FlightsPage() {
           data={rows}
           columns={columns}
           search={search}
+          gridKey="flights"
           emptyMessage="لا توجد رحلات بعد"
           rowActions={(r) => (
             <>

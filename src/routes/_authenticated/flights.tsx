@@ -155,8 +155,20 @@ function FlightsPage() {
           );
         },
       },
+      {
+        id: "created_by",
+        accessorFn: (r) => nameOf(r.created_by),
+        header: "تم الإضافة بواسطة",
+        cell: ({ getValue }) => <span className="text-[12px] text-ink/55">{(getValue() as string) || "—"}</span>,
+      },
+      {
+        id: "updated_by",
+        accessorFn: (r) => nameOf(r.updated_by),
+        header: "آخر تعديل بواسطة",
+        cell: ({ getValue }) => <span className="text-[12px] text-ink/55">{(getValue() as string) || "—"}</span>,
+      },
     ],
-    [],
+    [nameOf],
   );
 
   return (

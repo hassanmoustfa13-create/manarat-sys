@@ -359,7 +359,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             onChange={set("transfer_stage")}
             options={TRANSFER_STAGES}
           />
-          <SelectField
+          <SelectOrOtherField
             label="موقع العاملة"
             value={form.worker_location}
             onChange={set("worker_location")}

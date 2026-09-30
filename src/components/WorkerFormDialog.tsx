@@ -247,7 +247,7 @@ export function WorkerFormDialog({ open, onOpenChange, worker, isAdmin }: Props)
             onChange={set("arrival_status")}
             options={ARRIVAL_STATUSES}
           />
-          <SelectField
+          <SelectOrOtherField
             label="الموقع الحالي"
             value={form.current_location}
             onChange={set("current_location")}

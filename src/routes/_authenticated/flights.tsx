@@ -54,6 +54,8 @@ export const Route = createFileRoute("/_authenticated/flights")({
 function FlightsPage() {
   const { isAdmin: admin } = useAuth();
   const qc = useQueryClient();
+  const { data: profiles } = useQuery(profilesQuery);
+  const nameOf = profileNameMap(profiles);
   const { data: flights = [], isLoading } = useQuery({
     queryKey: ["flights"],
     queryFn: async () => {

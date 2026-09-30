@@ -431,6 +431,7 @@ function ManualTransferDetails({
                 <EditableSelectRow label="نوع التأشيرة" field="visa_type" value={record.visa_type} options={VISA_TYPES} record={record} onSaved={onSaved} />
                 <DetailRow label="رقم التأشيرة" value={record.visa_number || "—"} ltr />
                 <EditableSelectRow label="نوع النقل" field="transfer_type" value={record.transfer_type} options={TRANSFER_TYPES} record={record} onSaved={onSaved} />
+                <EditableSelectRow label="حالة النقل" field="transfer_stage" value={record.transfer_stage} options={TRANSFER_STAGES} record={record} onSaved={onSaved} />
                 <DetailRow label="تاريخ النقل" value={formatDate(record.transfer_date)} ltr />
                 <DetailRow label="بداية الفترة" value={formatDate(record.period_start)} ltr />
                 <DetailRow label="نهاية الفترة" value={formatDate(record.period_end)} ltr />

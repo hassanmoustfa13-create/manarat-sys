@@ -52,7 +52,16 @@ function ColumnsPage() {
   }, [all, key]);
 
   const save = useMutation({
-    mutationFn: (s: GridSettings) => saveGridSettings(key, s),
+    mutationFn: async (s: GridSettings) => {
+      await saveGridSettings(key, s);
+      // The inline dropdown switch applies to every table at once.
+      for (const k of KEYS) {
+        if (k === key) continue;
+        const other = all?.[k] ?? {};
+        if ((other.inlineSelectEdit ?? false) !== (s.inlineSelectEdit ?? false))
+          await saveGridSettings(k, { ...other, inlineSelectEdit: s.inlineSelectEdit ?? false });
+      }
+    },
     onSuccess: () => {
       toast.success("تم حفظ إعدادات الجدول");
       qc.invalidateQueries({ queryKey: gridSettingsQuery.queryKey });
@@ -132,7 +141,7 @@ function ColumnsPage() {
             checked={draft.inlineSelectEdit === true}
             onChange={(e) => setDraft((d) => ({ ...d, inlineSelectEdit: e.target.checked }))}
           />
-          تعديل القوائم المنسدلة مباشرة من الجدول (للمدير فقط)
+          تعديل القوائم المنسدلة مباشرة من الجدول في كل الجداول (للمدير فقط)
         </label>
       </div>
 

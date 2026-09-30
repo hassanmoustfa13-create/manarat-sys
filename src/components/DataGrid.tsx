@@ -196,6 +196,7 @@ export function DataGrid<T extends { id: string }>({
                   return (
                     <td
                       key={cell.id}
+                      onClick={optionsFor(cell.column.id, meta.options) ? (e) => e.stopPropagation() : undefined}
                       dir={meta.ltr ? "ltr" : undefined}
                       className={`border-l border-black/5 px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
                         cell.column.id,

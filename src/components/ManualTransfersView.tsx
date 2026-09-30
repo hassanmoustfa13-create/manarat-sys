@@ -306,6 +306,151 @@ export function ManualTransfersView({ category }: { category: Category }) {
         pending={remove.isPending}
         onConfirm={() => deleting && remove.mutate(deleting.id)}
       />
+      <ManualTransferDetails
+        record={viewing}
+        onClose={() => setViewing(null)}
+        onEdit={(t) => {
+          setViewing(null);
+          setEditing(t);
+          setFormOpen(true);
+        }}
+      />
     </main>
+  );
+}
+
+function DetailRow({ label, value, ltr }: { label: string; value: ReactNode; ltr?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-black/5 py-1.5 text-[13px] last:border-b-0">
+      <span className="text-ink/50">{label}</span>
+      <span className={`font-medium ${ltr ? "tabular-nums" : ""}`} dir={ltr ? "ltr" : undefined}>
+        {value ?? "—"}
+      </span>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="glass rounded-xl p-4">
+      <h4 className="mb-2 text-[11px] font-semibold text-ink/50">{title}</h4>
+      {children}
+    </section>
+  );
+}
+
+function ManualTransferDetails({
+  record,
+  onClose,
+  onEdit,
+}: {
+  record: MT | null;
+  onClose: () => void;
+  onEdit: (t: MT) => void;
+}) {
+  const { data: profiles } = useQuery(profilesQuery);
+  const nameOf = profileNameMap(profiles);
+  const remaining = Number(record?.remaining_amount ?? 0);
+  return (
+    <Dialog open={Boolean(record)} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl">
+        {record && (
+          <>
+            <DialogHeader className="text-right sm:text-right">
+              <DialogTitle className="flex items-center gap-2">
+                {record.worker_name || "—"}
+                <StatusBadge value={record.transfer_stage} />
+              </DialogTitle>
+              <DialogDescription>تفاصيل عملية نقل الكفالة</DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Section title="بيانات العملية">
+                <DetailRow label="اسم العاملة" value={record.worker_name || "—"} />
+                <DetailRow label="رقم الجواز" value={record.passport_number || "—"} ltr />
+                <DetailRow label="الجنسية" value={record.nationality || "—"} />
+                <DetailRow label="نوع التأشيرة" value={record.visa_type || "—"} />
+                <DetailRow label="رقم التأشيرة" value={record.visa_number || "—"} ltr />
+                <DetailRow label="نوع النقل" value={<StatusBadge value={record.transfer_type} />} />
+                <DetailRow label="تاريخ النقل" value={formatDate(record.transfer_date)} ltr />
+                <DetailRow label="بداية الفترة" value={formatDate(record.period_start)} ltr />
+                <DetailRow label="نهاية الفترة" value={formatDate(record.period_end)} ltr />
+                <DetailRow label="تاريخ رجوع العاملة المكتب" value={formatDate(record.return_to_office_date)} ltr />
+                <DetailRow label="الجواز لدى" value={record.passport_holder || "—"} />
+              </Section>
+
+              <div className="space-y-4">
+                <Section title="الكفيل القديم">
+                  <DetailRow label="الاسم" value={record.old_sponsor_name || "—"} />
+                  <DetailRow label="الهاتف" value={record.old_sponsor_phone || "—"} ltr />
+                </Section>
+                <Section title="الكفيل الجديد">
+                  <DetailRow label="الاسم" value={record.new_sponsor_name || "—"} />
+                  <DetailRow label="الهاتف" value={record.new_sponsor_phone || "—"} ltr />
+                </Section>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Section title="المالية">
+                <DetailRow label="مستحقات الكفيل القديم" value={formatMoney(record.old_sponsor_dues)} ltr />
+                <DetailRow label="العربون" value={formatMoney(record.down_payment)} ltr />
+                <DetailRow label="مدفوعات أخرى" value={formatMoney(record.other_payments)} ltr />
+                <DetailRow
+                  label="المتبقي"
+                  value={
+                    <span className={`font-semibold ${remaining > 0 ? "text-terracotta" : "text-success"}`}>
+                      {formatMoney(remaining)}
+                    </span>
+                  }
+                  ltr
+                />
+                <DetailRow label="حالة الدفع" value={<StatusBadge value={record.payment_status} />} />
+                <DetailRow
+                  label="مستحقات الرواتب"
+                  value={
+                    <span className="flex items-center gap-2">
+                      <StatusBadge value={record.salary_dues_status} />
+                      {record.salary_dues_status === "توجد" && (
+                        <span className="tabular-nums" dir="ltr">{formatMoney(record.salary_dues_amount)}</span>
+                      )}
+                    </span>
+                  }
+                />
+              </Section>
+
+              <Section title="حالة العاملة">
+                <DetailRow label="الفحص الطبي" value={<StatusBadge value={record.medical_exam} />} />
+                <DetailRow label="الإقامة" value={<StatusBadge value={record.residency_status} />} />
+                {record.residency_status === "توجد" && (
+                  <DetailRow label="رقم الإقامة" value={record.residency_number || "—"} ltr />
+                )}
+                <DetailRow label="موقع العاملة" value={<StatusBadge value={record.worker_location} />} />
+                <DetailRow label="ملاحظات حالة العاملة" value={record.worker_condition || "—"} />
+                {record.notes && <DetailRow label="ملاحظات" value={record.notes} />}
+              </Section>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Section title="سجل التدقيق">
+                <DetailRow label="تم الإضافة بواسطة" value={nameOf(record.created_by) || "—"} />
+                <DetailRow label="تاريخ الإضافة" value={formatDateTime(record.created_at)} ltr />
+                <DetailRow label="آخر تعديل بواسطة" value={nameOf(record.updated_by) || "—"} />
+                <DetailRow label="تاريخ آخر تعديل" value={formatDateTime(record.updated_at)} ltr />
+              </Section>
+              <div className="flex items-end">
+                <Button
+                  type="button"
+                  onClick={() => onEdit(record)}
+                  className="w-full"
+                >
+                  تعديل البيانات
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

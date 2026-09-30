@@ -26,6 +26,7 @@ const STATUS_CLASS: Record<string, string> = {
   "إجراءات رفع طلب النقل": "pill pill-brand",
   "إجراءات البصمة في أبشر": "pill pill-teal",
   "إجراءات الفحص الطبي": "pill pill-teal",
+  "إجراءات الإيواء": "pill pill-teal",
   إيجار: "pill pill-neutral",
   تجربة: "pill pill-brand",
   مؤقت: "pill pill-neutral",

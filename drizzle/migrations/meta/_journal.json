@@ -176,6 +176,13 @@
       "when": 1790711250548,
       "tag": "0024_enable_realtime_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790786192663,
+      "tag": "0025_dynamic_forms",
+      "breakpoints": true
     }
   ]
 }

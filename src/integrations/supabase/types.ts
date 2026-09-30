@@ -19,6 +19,7 @@ export type Database = {
           clients: string[]
           created_at: string
           created_by: string | null
+          extra: Json
           flight_date: string | null
           flight_time: string
           id: string
@@ -33,6 +34,7 @@ export type Database = {
           clients?: string[]
           created_at?: string
           created_by?: string | null
+          extra?: Json
           flight_date?: string | null
           flight_time?: string
           id?: string
@@ -47,6 +49,7 @@ export type Database = {
           clients?: string[]
           created_at?: string
           created_by?: string | null
+          extra?: Json
           flight_date?: string | null
           flight_time?: string
           id?: string
@@ -56,6 +59,216 @@ export type Database = {
           updated_by?: string | null
           visa_clients?: string[]
           workers_count?: number
+        }
+        Relationships: []
+      }
+      form_entries: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data: Json
+          form_id: string
+          id: string
+          is_deleted: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          form_id: string
+          id?: string
+          is_deleted?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          form_id?: string
+          id?: string
+          is_deleted?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_entries_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_field_options: {
+        Row: {
+          created_at: string
+          field_id: string
+          id: string
+          is_active: boolean
+          label: string
+          sort_order: number
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          field_id: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          sort_order?: number
+          value?: string
+        }
+        Update: {
+          created_at?: string
+          field_id?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          sort_order?: number
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_field_options_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "form_fields"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_fields: {
+        Row: {
+          behavior: string
+          column_name: string | null
+          conditions: Json
+          created_at: string
+          default_value: string
+          field_key: string
+          field_type: string
+          form_id: string
+          helper_text: string
+          id: string
+          is_active: boolean
+          is_system: boolean
+          label: string
+          max_value: number | null
+          min_value: number | null
+          placeholder: string
+          required: boolean
+          section: string
+          settings: Json
+          sort_order: number
+          updated_at: string
+          validation: Json
+        }
+        Insert: {
+          behavior?: string
+          column_name?: string | null
+          conditions?: Json
+          created_at?: string
+          default_value?: string
+          field_key: string
+          field_type?: string
+          form_id: string
+          helper_text?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          label?: string
+          max_value?: number | null
+          min_value?: number | null
+          placeholder?: string
+          required?: boolean
+          section?: string
+          settings?: Json
+          sort_order?: number
+          updated_at?: string
+          validation?: Json
+        }
+        Update: {
+          behavior?: string
+          column_name?: string | null
+          conditions?: Json
+          created_at?: string
+          default_value?: string
+          field_key?: string
+          field_type?: string
+          form_id?: string
+          helper_text?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          label?: string
+          max_value?: number | null
+          min_value?: number | null
+          placeholder?: string
+          required?: boolean
+          section?: string
+          settings?: Json
+          sort_order?: number
+          updated_at?: string
+          validation?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_fields_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          form_key: string
+          id: string
+          is_active: boolean
+          is_system: boolean
+          name: string
+          route: string
+          settings: Json
+          sort_order: number
+          target_table: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          form_key: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          name?: string
+          route?: string
+          settings?: Json
+          sort_order?: number
+          target_table?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          form_key?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          name?: string
+          route?: string
+          settings?: Json
+          sort_order?: number
+          target_table?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -83,6 +296,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           down_payment: number
+          extra: Json
           id: string
           is_deleted: boolean
           medical_exam: string
@@ -120,6 +334,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           down_payment?: number
+          extra?: Json
           id?: string
           is_deleted?: boolean
           medical_exam?: string
@@ -157,6 +372,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           down_payment?: number
+          extra?: Json
           id?: string
           is_deleted?: boolean
           medical_exam?: string
@@ -195,6 +411,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          extra: Json
           holder_name: string
           holder_phone: string
           id: string
@@ -210,6 +427,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          extra?: Json
           holder_name?: string
           holder_phone?: string
           id?: string
@@ -225,6 +443,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          extra?: Json
           holder_name?: string
           holder_phone?: string
           id?: string

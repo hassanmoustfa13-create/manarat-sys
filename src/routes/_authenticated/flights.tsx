@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field, SelectField, TextField } from "@/components/FormFields";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
+import { DynamicFormDialog } from "@/components/DynamicForm";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { errorMessage, formatDate, profileNameMap, profilesQuery } from "@/lib/data";
 
@@ -225,7 +226,15 @@ function FlightsPage() {
           )}
         />
       )}
-      <FlightDialog open={formOpen} onOpenChange={setFormOpen} flight={editing} />
+      <DynamicFormDialog
+        formKey="flights"
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        record={editing as (Record<string, unknown> & { id: string }) | null}
+        title={editing ? "تعديل الرحلة" : "رحلة جديدة"}
+        queryKey={["flights"]}
+        successText="تمت إضافة الرحلة"
+      />
       <ConfirmDelete
         open={Boolean(deleting)}
         onOpenChange={(o) => !o && setDeleting(null)}
@@ -235,127 +244,5 @@ function FlightsPage() {
         onConfirm={() => deleting && remove.mutate(deleting.id)}
       />
     </main>
-  );
-}
-
-function FlightDialog({ open, onOpenChange, flight }: { open: boolean; onOpenChange: (o: boolean) => void; flight: Flight | null }) {
-  const qc = useQueryClient();
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [office, setOffice] = useState("");
-  const [count, setCount] = useState("0");
-  const [clientsText, setClientsText] = useState("");
-  const [visaClients, setVisaClients] = useState<string[]>([]);
-  const [status, setStatus] = useState(FLIGHT_STATUSES[0]!);
-
-  const clientNames = useMemo(
-    () => [...new Set(clientsText.split("\n").map((c) => c.trim()).filter(Boolean))],
-    [clientsText],
-  );
-
-  useEffect(() => {
-    if (!open) return;
-    setDate(flight?.flight_date ?? "");
-    setTime(flight?.flight_time ?? "");
-    setOffice(flight?.office_name ?? "");
-    setCount(String(flight?.workers_count ?? 0));
-    setClientsText((flight?.clients ?? []).join("\n"));
-    setVisaClients(flight?.visa_clients ?? []);
-    setStatus(flight?.status ?? FLIGHT_STATUSES[0]!);
-  }, [open, flight]);
-
-  const save = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        flight_date: date || null,
-        flight_time: time.trim(),
-        office_name: office.trim(),
-        workers_count: Math.max(0, Math.floor(Number(count) || 0)),
-        clients: clientNames,
-        visa_clients: visaClients.filter((c) => clientNames.includes(c)),
-        status,
-      };
-      const { error } = flight
-        ? await supabase.from("flights").update(payload).eq("id", flight.id)
-        : await supabase.from("flights").insert(payload);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success(flight ? "تم حفظ التعديلات" : "تمت إضافة الرحلة");
-      qc.invalidateQueries({ queryKey: ["flights"] });
-      onOpenChange(false);
-    },
-    onError: (e) => toast.error(errorMessage(e)),
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl">
-        <DialogHeader className="text-right sm:text-right">
-          <DialogTitle>{flight ? "تعديل الرحلة" : "رحلة جديدة"}</DialogTitle>
-          <DialogDescription>اليوم يُحدَّد تلقائيًا من التاريخ، ويمكن إضافة أكثر من عميل.</DialogDescription>
-        </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            save.mutate();
-          }}
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-        >
-          <TextField label="التاريخ" type="date" ltr value={date} onChange={setDate} />
-          <Field label="اليوم (تلقائي)">
-            <div className="glass flex h-9 items-center rounded-md px-3 text-sm">{dayName(date) || "—"}</div>
-          </Field>
-          <TextField label="الوقت" type="time" ltr value={time} onChange={setTime} />
-          <TextField label="اسم المكتب الخارجي" value={office} onChange={setOffice} />
-          <TextField label="عدد العاملات" type="number" ltr value={count} onChange={setCount} />
-          <SelectField label="الحالة" value={status} onChange={setStatus} options={FLIGHT_STATUSES} />
-          <Field label="أسماء العملاء (كل اسم في سطر)" className="sm:col-span-2">
-            <textarea
-              value={clientsText}
-              onChange={(e) => setClientsText(e.target.value)}
-              rows={4}
-              placeholder={"أحمد محمد\nسارة علي\n..."}
-              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            />
-          </Field>
-          {clientNames.length > 0 && (
-            <Field label="تابع لتأشيرات المكتب" className="sm:col-span-2" hint="ضع علامة صح بجانب العميل التابع لتأشيرات المكتب">
-              <div className="flex flex-wrap gap-2">
-                {clientNames.map((c) => {
-                  const checked = visaClients.includes(c);
-                  return (
-                    <label
-                      key={c}
-                      className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] ${
-                        checked ? "border-primary bg-primary/10 font-semibold text-primary" : "border-border"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className="accent-primary"
-                        checked={checked}
-                        onChange={(e) =>
-                          setVisaClients((l) => (e.target.checked ? [...l, c] : l.filter((x) => x !== c)))
-                        }
-                      />
-                      {c}
-                    </label>
-                  );
-                })}
-              </div>
-            </Field>
-          )}
-          <DialogFooter className="sm:col-span-2 sm:justify-start">
-            <Button type="submit" disabled={save.isPending}>
-              {flight ? "حفظ" : "إضافة"}
-            </Button>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-              إلغاء
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }

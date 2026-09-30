@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedColumnsRouteImport } from './routes/_authenticated/columns'
 import { Route as AuthenticatedFlightsRouteImport } from './routes/_authenticated/flights'
+import { Route as AuthenticatedFormsRouteImport } from './routes/_authenticated/forms'
 import { Route as AuthenticatedManualTransfersRouteImport } from './routes/_authenticated/manual-transfers'
 import { Route as AuthenticatedManualTransfersProRouteImport } from './routes/_authenticated/manual-transfers-pro'
 import { Route as AuthenticatedPagesRouteImport } from './routes/_authenticated/pages'
@@ -25,6 +26,8 @@ import { Route as AuthenticatedTransfersProRouteImport } from './routes/_authent
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedVisasRouteImport } from './routes/_authenticated/visas'
 import { Route as AuthenticatedWorkersRouteImport } from './routes/_authenticated/workers'
+import { Route as AuthenticatedFFormKeyRouteImport } from './routes/_authenticated/f.$formKey'
+import { Route as AuthenticatedFormsFormIdRouteImport } from './routes/_authenticated/forms.$formId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,6 +51,11 @@ const AuthenticatedColumnsRoute = AuthenticatedColumnsRouteImport.update({
 const AuthenticatedFlightsRoute = AuthenticatedFlightsRouteImport.update({
   id: '/flights',
   path: '/flights',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFormsRoute = AuthenticatedFormsRouteImport.update({
+  id: '/forms',
+  path: '/forms',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedManualTransfersRoute =
@@ -108,12 +116,24 @@ const AuthenticatedWorkersRoute = AuthenticatedWorkersRouteImport.update({
   path: '/workers',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFFormKeyRoute = AuthenticatedFFormKeyRouteImport.update({
+  id: '/f/$formKey',
+  path: '/f/$formKey',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFormsFormIdRoute =
+  AuthenticatedFormsFormIdRouteImport.update({
+    id: '/$formId',
+    path: '/$formId',
+    getParentRoute: () => AuthenticatedFormsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
   '/flights': typeof AuthenticatedFlightsRoute
+  '/forms': typeof AuthenticatedFormsRouteWithChildren
   '/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/pages': typeof AuthenticatedPagesRoute
@@ -125,12 +145,15 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedUsersRoute
   '/visas': typeof AuthenticatedVisasRoute
   '/workers': typeof AuthenticatedWorkersRoute
+  '/f/$formKey': typeof AuthenticatedFFormKeyRoute
+  '/forms/$formId': typeof AuthenticatedFormsFormIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/columns': typeof AuthenticatedColumnsRoute
   '/flights': typeof AuthenticatedFlightsRoute
+  '/forms': typeof AuthenticatedFormsRouteWithChildren
   '/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/pages': typeof AuthenticatedPagesRoute
@@ -142,6 +165,8 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersRoute
   '/visas': typeof AuthenticatedVisasRoute
   '/workers': typeof AuthenticatedWorkersRoute
+  '/f/$formKey': typeof AuthenticatedFFormKeyRoute
+  '/forms/$formId': typeof AuthenticatedFormsFormIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +175,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/columns': typeof AuthenticatedColumnsRoute
   '/_authenticated/flights': typeof AuthenticatedFlightsRoute
+  '/_authenticated/forms': typeof AuthenticatedFormsRouteWithChildren
   '/_authenticated/manual-transfers': typeof AuthenticatedManualTransfersRoute
   '/_authenticated/manual-transfers-pro': typeof AuthenticatedManualTransfersProRoute
   '/_authenticated/pages': typeof AuthenticatedPagesRoute
@@ -161,6 +187,8 @@ export interface FileRoutesById {
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/visas': typeof AuthenticatedVisasRoute
   '/_authenticated/workers': typeof AuthenticatedWorkersRoute
+  '/_authenticated/f/$formKey': typeof AuthenticatedFFormKeyRoute
+  '/_authenticated/forms/$formId': typeof AuthenticatedFormsFormIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +197,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/columns'
     | '/flights'
+    | '/forms'
     | '/manual-transfers'
     | '/manual-transfers-pro'
     | '/pages'
@@ -180,12 +209,15 @@ export interface FileRouteTypes {
     | '/users'
     | '/visas'
     | '/workers'
+    | '/f/$formKey'
+    | '/forms/$formId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/columns'
     | '/flights'
+    | '/forms'
     | '/manual-transfers'
     | '/manual-transfers-pro'
     | '/pages'
@@ -197,6 +229,8 @@ export interface FileRouteTypes {
     | '/users'
     | '/visas'
     | '/workers'
+    | '/f/$formKey'
+    | '/forms/$formId'
   id:
     | '__root__'
     | '/'
@@ -204,6 +238,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/columns'
     | '/_authenticated/flights'
+    | '/_authenticated/forms'
     | '/_authenticated/manual-transfers'
     | '/_authenticated/manual-transfers-pro'
     | '/_authenticated/pages'
@@ -215,6 +250,8 @@ export interface FileRouteTypes {
     | '/_authenticated/users'
     | '/_authenticated/visas'
     | '/_authenticated/workers'
+    | '/_authenticated/f/$formKey'
+    | '/_authenticated/forms/$formId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -258,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/flights'
       fullPath: '/flights'
       preLoaderRoute: typeof AuthenticatedFlightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/forms': {
+      id: '/_authenticated/forms'
+      path: '/forms'
+      fullPath: '/forms'
+      preLoaderRoute: typeof AuthenticatedFormsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/manual-transfers': {
@@ -337,12 +381,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/f/$formKey': {
+      id: '/_authenticated/f/$formKey'
+      path: '/f/$formKey'
+      fullPath: '/f/$formKey'
+      preLoaderRoute: typeof AuthenticatedFFormKeyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/forms/$formId': {
+      id: '/_authenticated/forms/$formId'
+      path: '/$formId'
+      fullPath: '/forms/$formId'
+      preLoaderRoute: typeof AuthenticatedFormsFormIdRouteImport
+      parentRoute: typeof AuthenticatedFormsRoute
+    }
   }
 }
+
+interface AuthenticatedFormsRouteChildren {
+  AuthenticatedFormsFormIdRoute: typeof AuthenticatedFormsFormIdRoute
+}
+
+const AuthenticatedFormsRouteChildren: AuthenticatedFormsRouteChildren = {
+  AuthenticatedFormsFormIdRoute: AuthenticatedFormsFormIdRoute,
+}
+
+const AuthenticatedFormsRouteWithChildren =
+  AuthenticatedFormsRoute._addFileChildren(AuthenticatedFormsRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedColumnsRoute: typeof AuthenticatedColumnsRoute
   AuthenticatedFlightsRoute: typeof AuthenticatedFlightsRoute
+  AuthenticatedFormsRoute: typeof AuthenticatedFormsRouteWithChildren
   AuthenticatedManualTransfersRoute: typeof AuthenticatedManualTransfersRoute
   AuthenticatedManualTransfersProRoute: typeof AuthenticatedManualTransfersProRoute
   AuthenticatedPagesRoute: typeof AuthenticatedPagesRoute
@@ -354,11 +424,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVisasRoute: typeof AuthenticatedVisasRoute
   AuthenticatedWorkersRoute: typeof AuthenticatedWorkersRoute
+  AuthenticatedFFormKeyRoute: typeof AuthenticatedFFormKeyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedColumnsRoute: AuthenticatedColumnsRoute,
   AuthenticatedFlightsRoute: AuthenticatedFlightsRoute,
+  AuthenticatedFormsRoute: AuthenticatedFormsRouteWithChildren,
   AuthenticatedManualTransfersRoute: AuthenticatedManualTransfersRoute,
   AuthenticatedManualTransfersProRoute: AuthenticatedManualTransfersProRoute,
   AuthenticatedPagesRoute: AuthenticatedPagesRoute,
@@ -370,6 +442,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVisasRoute: AuthenticatedVisasRoute,
   AuthenticatedWorkersRoute: AuthenticatedWorkersRoute,
+  AuthenticatedFFormKeyRoute: AuthenticatedFFormKeyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

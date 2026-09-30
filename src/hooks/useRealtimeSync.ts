@@ -11,6 +11,10 @@ const TABLES: Record<string, string[][]> = {
   flights: [["flights"]],
   office_visas: [["office_visas"]],
   grid_settings: [["grid_settings"], ["hidden_pages"]],
+  forms: [["forms"]],
+  form_fields: [["forms"]],
+  form_field_options: [["forms"]],
+  form_entries: [["form_entries"]],
 };
 
 export function useRealtimeSync() {

@@ -14,7 +14,10 @@ import {
   Stamp,
   Plane,
   EyeOff,
+  FormInput,
+  FileText,
 } from "lucide-react";
+import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { hiddenPagesQuery } from "@/lib/pageVisibility";
@@ -25,7 +28,7 @@ import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages" | "/forms"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
 export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -41,6 +44,7 @@ export const NAV: NavItem[] = [
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },
   { to: "/security", label: "سجل الأمان", icon: ShieldCheck, admin: true },
   { to: "/pages", label: "إظهار وإخفاء الصفحات", icon: EyeOff, admin: true },
+  { to: "/forms", label: "إدارة النماذج", icon: FormInput, admin: true },
 ];
 
 const itemCls =
@@ -50,6 +54,8 @@ const activeCls =
 
 function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
+  const { data: forms = [] } = useQuery(formsQuery);
+  const custom = forms.filter((f) => !f.is_system && f.is_active);
   return (
     <>
       {NAV.filter((n) => (!n.admin || isAdmin) && (isAdmin || !hidden.includes(n.to))).map(({ to, label, icon: Icon, section }) => (
@@ -64,6 +70,22 @@ function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () =
             <span className={`truncate ${hidden.includes(to) ? "opacity-40 line-through" : ""}`}>{label}</span>
           </Link>
         </div>
+      ))}
+      {custom.length > 0 && (
+        <div className="mt-2 border-t border-black/5 px-3 pb-1 pt-3 text-[11px] font-semibold text-ink/40">نماذج إضافية</div>
+      )}
+      {custom.map((f) => (
+        <Link
+          key={f.id}
+          to="/f/$formKey"
+          params={{ formKey: f.form_key }}
+          onClick={onNavigate}
+          className={itemCls}
+          activeProps={{ className: activeCls }}
+        >
+          <FileText className="size-4 shrink-0" />
+          <span className="truncate">{f.name}</span>
+        </Link>
       ))}
     </>
   );

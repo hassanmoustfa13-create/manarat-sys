@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Add/edit dialogs are defined in DB tables forms/form_fields/form_field_options and rendered by src/components/DynamicForm.tsx; custom fields save to each table's extra jsonb (custom forms to form_entries) — why: admins manage forms without code changes.

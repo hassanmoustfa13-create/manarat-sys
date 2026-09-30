@@ -47,6 +47,7 @@ function ColumnsPage() {
       fontSize: saved?.fontSize ?? "md",
       density: saved?.density ?? "normal",
       columns: resolveColumns(key, saved),
+      inlineSelectEdit: saved?.inlineSelectEdit ?? false,
     });
   }, [all, key]);
 
@@ -124,6 +125,14 @@ function ColumnsPage() {
             <option value="normal">عادي</option>
             <option value="comfortable">واسع</option>
           </select>
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={draft.inlineSelectEdit === true}
+            onChange={(e) => setDraft((d) => ({ ...d, inlineSelectEdit: e.target.checked }))}
+          />
+          تعديل القوائم المنسدلة مباشرة من الجدول (للمدير فقط)
         </label>
       </div>
 

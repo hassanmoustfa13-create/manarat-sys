@@ -10,8 +10,45 @@ import {
 } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  ACTION_STATUSES,
+  ARRIVAL_STATUSES,
+  LOCATIONS,
+  NATIONALITIES,
+  PASSPORT_HOLDERS,
+  PROFESSIONS,
+  REQUEST_TYPES,
+  TRANSFER_STAGES,
+  TRANSFER_STATUSES,
+  TRANSFER_TYPES,
+  VISA_TYPES,
+  YES_NO_EXISTS,
+  YES_NO_EXISTS_F,
+} from "@/lib/data";
+
+/** Dropdown options for columns that are select-based, keyed by column id. */
+const INLINE_OPTIONS: Record<string, readonly string[]> = {
+  nationality: NATIONALITIES,
+  profession: PROFESSIONS,
+  visa_type: VISA_TYPES,
+  arrival_status: ARRIVAL_STATUSES,
+  current_location: LOCATIONS,
+  worker_location: LOCATIONS,
+  transfer_status: TRANSFER_STATUSES,
+  transfer_type: TRANSFER_TYPES,
+  transfer_stage: TRANSFER_STAGES,
+  passport_holder: PASSPORT_HOLDERS,
+  medical_exam: YES_NO_EXISTS,
+  request_type: REQUEST_TYPES,
+  action_status: ACTION_STATUSES,
+  visa_status: ["تم عمل العقد", "لم يتم عمل العقد"],
+  status: ["—", "تم الوصول", "تم الإلغاء"],
+};
 
 export type CellType = "text" | "number" | "date" | "select" | "textarea";
 

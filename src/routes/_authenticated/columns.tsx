@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, Eye, EyeOff, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, RotateCcw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { errorMessage } from "@/lib/data";
 import {
@@ -139,11 +139,34 @@ function ColumnsPage() {
         {cols.map((c, i) => (
           <div
             key={c.id}
-            className={`grid grid-cols-[60px_1fr_90px_130px_130px_90px] items-center gap-2 border-b border-black/5 px-4 py-2 text-sm ${
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", String(i));
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.add("bg-brand/10");
+            }}
+            onDragLeave={(e) => e.currentTarget.classList.remove("bg-brand/10")}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.remove("bg-brand/10");
+              const from = Number(e.dataTransfer.getData("text/plain"));
+              if (Number.isNaN(from) || from === i) return;
+              const next = [...cols];
+              const [item] = next.splice(from, 1);
+              next.splice(i, 0, item!);
+              setDraft((d) => ({ ...d, columns: next }));
+            }}
+            className={`grid cursor-grab grid-cols-[60px_1fr_90px_130px_130px_90px] items-center gap-2 border-b border-black/5 px-4 py-2 text-sm transition-colors active:cursor-grabbing ${
               c.visible ? "" : "opacity-50"
             }`}
           >
-            <span className="font-semibold text-ink/40">{i + 1}</span>
+            <span className="flex items-center gap-1 font-semibold text-ink/40">
+              <GripVertical className="size-4" />
+              {i + 1}
+            </span>
             <span className="font-medium">{labels[c.id]}</span>
             <button
               onClick={() => update(i, { visible: !c.visible })}

@@ -46,6 +46,7 @@ const manualTransfersQuery = queryOptions({
       .from("manual_transfers")
       .select("*")
       .eq("is_deleted", false)
+      .is("archived_at", null)
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data;

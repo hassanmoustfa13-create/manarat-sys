@@ -362,7 +362,7 @@ export function DynamicFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={`glass-strong max-h-[90vh] overflow-y-auto ${form?.settings.cols === 3 ? "max-w-3xl" : "max-w-2xl"}`} dir="rtl">
+      <DialogContent className={`glass-strong max-h-[90vh] overflow-y-auto ${form?.settings.cols === 3 ? "max-w-3xl" : "max-w-2xl"}`} dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader className="text-right sm:text-right">
           <DialogTitle>{title ?? (record ? `تعديل — ${form?.name ?? ""}` : `إضافة — ${form?.name ?? ""}`)}</DialogTitle>
           {form?.settings.description && <DialogDescription>{form.settings.description}</DialogDescription>}

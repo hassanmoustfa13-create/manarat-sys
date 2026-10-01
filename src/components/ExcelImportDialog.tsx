@@ -269,7 +269,7 @@ export function ExcelImportDialog({
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto" dir="rtl">
+      <DialogContent className="max-h-[92vh] max-w-4xl overflow-y-auto" dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="size-5 text-brand" />

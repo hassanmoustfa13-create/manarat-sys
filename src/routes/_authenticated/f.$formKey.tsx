@@ -5,6 +5,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { formResource } from "@/lib/permissions";
 import { useAuth } from "@/hooks/useAuth";
 import { DataGrid } from "@/components/DataGrid";
 import { GridToolbar } from "@/components/GridToolbar";
@@ -112,7 +113,7 @@ function DynamicFormPage() {
         search={search}
         onSearch={setSearch}
         addLabel="إضافة"
-        onAdd={can("custom_forms", "add") ? () => {
+        onAdd={can(formResource(formKey), "add") ? () => {
           setEditing(null);
           setOpen(true);
         } : undefined}
@@ -129,7 +130,7 @@ function DynamicFormPage() {
           search={search}
           rowActions={(r) => (
             <>
-              {can("custom_forms", "edit") && (
+              {can(formResource(formKey), "edit") && (
                 <IconBtn
                   title="تعديل"
                   onClick={() => {
@@ -140,7 +141,7 @@ function DynamicFormPage() {
                   <Pencil className="size-3.5" />
                 </IconBtn>
               )}
-              {can("custom_forms", "delete") && (
+              {can(formResource(formKey), "delete") && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(r)}>
                   <Trash2 className="size-3.5" />
                 </IconBtn>

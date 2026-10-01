@@ -352,7 +352,7 @@ function WorkersPage() {
           search={search}
           rowActions={(w) => (
             <>
-              {w.transfer_status !== "تم النقل" && w.current_sponsor_name && (
+              {auth.can("workers", "complete") && w.transfer_status !== "تم النقل" && w.current_sponsor_name && (
                 <IconBtn title="إتمام النقل" onClick={() => setCompleting(w)}>
                   <CheckCircle2 className="size-3.5" />
                 </IconBtn>

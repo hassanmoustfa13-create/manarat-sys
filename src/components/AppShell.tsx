@@ -22,7 +22,7 @@ import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { hiddenPagesQuery } from "@/lib/pageVisibility";
-import { ROLE_LABELS, ROUTE_RESOURCE } from "@/lib/permissions";
+import { ROLE_LABELS, ROUTE_RESOURCE, formResource } from "@/lib/permissions";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
@@ -59,14 +59,14 @@ function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () =
   const { can } = useAuth();
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const { data: forms = [] } = useQuery(formsQuery);
-  const custom = isAdmin || can("custom_forms", "view") ? forms.filter((f) => !f.is_system && f.is_active) : [];
+  const custom = forms.filter((f) => !f.is_system && f.is_active && (isAdmin || can(formResource(f.form_key), "view")));
   const visible = (to: string) => {
     const r = ROUTE_RESOURCE[to];
     return !r || can(r, "view");
   };
   return (
     <>
-      {NAV.filter((n) => (!n.admin || isAdmin) && (isAdmin || (!hidden.includes(n.to) && visible(n.to)))).map(({ to, label, icon: Icon, section }) => (
+      {NAV.filter((n) => isAdmin || (!hidden.includes(n.to) && (n.admin ? Boolean(ROUTE_RESOURCE[n.to]) && visible(n.to) : visible(n.to)))).map(({ to, label, icon: Icon, section }) => (
         <div key={to}>
           {section !== undefined && (
             <div className="mt-2 border-t border-black/5 px-3 pb-1 pt-3 text-[11px] font-semibold text-ink/40">
@@ -133,7 +133,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const routeRes = ROUTE_RESOURCE[pathname] ?? (pathname.startsWith("/f/") ? "custom_forms" : undefined);
+  const routeRes = ROUTE_RESOURCE[pathname] ?? (pathname.startsWith("/f/") ? formResource(decodeURIComponent(pathname.slice(3))) : undefined);
   const noAccess = !auth.loading && !auth.isAdmin && routeRes !== undefined && !auth.can(routeRes, "view");
   const blocked = noAccess || (!auth.loading && !auth.isAdmin && hidden.includes(pathname));
 

@@ -8,6 +8,7 @@ import {
   Settings2,
   ShieldCheck,
   UserCog,
+  KeyRound,
   Users,
   X,
   type LucideIcon,
@@ -21,6 +22,7 @@ import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { hiddenPagesQuery } from "@/lib/pageVisibility";
+import { ROLE_LABELS, ROUTE_RESOURCE } from "@/lib/permissions";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
@@ -28,7 +30,7 @@ import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages" | "/forms"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
 export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -41,6 +43,7 @@ export const NAV: NavItem[] = [
   { to: "/flights", label: "الرحلات", icon: Plane, section: "" },
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
+  { to: "/permissions", label: "الصلاحيات", icon: KeyRound, admin: true },
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },
   { to: "/security", label: "سجل الأمان", icon: ShieldCheck, admin: true },
   { to: "/pages", label: "إظهار وإخفاء الصفحات", icon: EyeOff, admin: true },
@@ -106,7 +109,7 @@ function UserBlock() {
           {auth.loading ? "…" : auth.fullName}
         </span>
         <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
-          {auth.isAdmin ? "مدير" : "موظف"}
+          {ROLE_LABELS[auth.role]}
         </span>
       </div>
       <div className="flex items-center justify-between">

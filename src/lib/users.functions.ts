@@ -167,7 +167,8 @@ export const deleteUser = createServerFn({ method: "POST" })
 export const listSecurityEvents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    const { data: allowed } = await context.supabase.rpc("can", { _uid: context.userId, _resource: "admin_security", _action: "view" });
+    if (!allowed) throw new Error("غير مسموح: ليس لديك صلاحية على سجل الأمان");
     const { data, error } = await context.supabase
       .from("security_events")
       .select("*")

@@ -30,7 +30,7 @@ export const RESOURCES: ResourceDef[] = [
   { key: "admin_columns", label: "إعدادات الجداول", actions: ["view"], group: "صفحات الإدارة" },
   { key: "admin_forms", label: "إدارة النماذج", actions: ["view"], group: "صفحات الإدارة" },
   { key: "admin_pages", label: "إظهار وإخفاء الصفحات", actions: ["view"], group: "صفحات الإدارة" },
-  { key: "admin_security", label: "سجل الأمان", actions: ["view"], group: "صفحات الإدارة" },
+  { key: "admin_security", label: "سجل الأمان", actions: ["view", "delete"], group: "صفحات الإدارة" },
   { key: "admin_users", label: "المستخدمون", actions: ["view", "add", "edit", "delete"], group: "صفحات الإدارة" },
 ];
 export type Resource = string;

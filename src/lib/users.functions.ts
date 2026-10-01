@@ -184,3 +184,16 @@ export const listSecurityEvents = createServerFn({ method: "GET" })
       actor_name: e.actor_user_id ? names.get(e.actor_user_id) ?? "" : "",
     }));
   });
+
+export const deleteSecurityEvents = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ ids: z.array(z.string().uuid()).max(1000).optional(), all: z.boolean().optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: allowed } = await context.supabase.rpc("can", { _uid: context.userId, _resource: "admin_security", _action: "delete" });
+    if (!allowed) throw new Error("غير مسموح: ليس لديك صلاحية حذف سجل الأمان");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const q = supabaseAdmin.from("security_events").delete();
+    const { error } = data.all ? await q.not("id", "is", null) : await q.in("id", data.ids ?? []);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

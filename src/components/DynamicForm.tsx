@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, SuggestField } from "@/components/FormFields";
-import { errorMessage, formatMoney, mergeContacts, requestsQuery, transfersQuery, workersQuery } from "@/lib/data";
+import { errorMessage, mergeContacts, requestsQuery, transfersQuery, workersQuery } from "@/lib/data";
 import {
   activeFields,
   addDays,
@@ -16,7 +16,6 @@ import {
   formsQuery,
   initialValues,
   isVisible,
-  remainingOf,
   validate,
   type FormDef,
   type FormField,
@@ -105,7 +104,6 @@ export function DynamicFields({
   const needsContacts = fields.some((f) => f.settings?.source === "contacts");
   const allContacts = useContacts(needsContacts, contacts);
   const set = (k: string) => (v: string) => setValues((s) => ({ ...s, [k]: v }));
-  const remaining = remainingOf(values);
   const full = form.settings.cols === 3 ? "sm:col-span-3" : form.settings.cols === 1 ? "" : "sm:col-span-2";
 
   return (
@@ -119,16 +117,6 @@ export function DynamicFields({
         const ltr = f.settings?.ltr || ["phone", "email", "number", "currency", "date", "time"].includes(f.field_type);
 
         // Built-in automatic fields
-        if (f.behavior === "remaining" || f.behavior === "payment_auto") {
-          const tone = remaining > 0 ? "border-terracotta/40 text-terracotta" : "border-success/40 text-success";
-          return (
-            <Field key={f.id} label={f.label} hint={hint}>
-              <div className={`flex h-9 items-center rounded-md border border-dashed px-3 text-sm font-semibold tabular-nums ${tone}`} dir={f.behavior === "remaining" ? "ltr" : undefined}>
-                {f.behavior === "remaining" ? formatMoney(remaining) : remaining > 0 ? "متبقي مبلغ" : "تم الدفع بالكامل"}
-              </div>
-            </Field>
-          );
-        }
         if (f.behavior === "period_end") {
           const start = values["period_start"] ?? "";
           return (

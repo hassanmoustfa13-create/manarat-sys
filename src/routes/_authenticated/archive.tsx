@@ -103,7 +103,7 @@ function ArchivePage() {
           <table className="w-full text-[13px]">
             <thead className="text-ink/55">
               <tr className="text-right">
-                {["العاملة", "الجواز", "النوع", "الفئة", "الكفيل القديم", "الكفيل الجديد", "المتبقي", "تاريخ الأرشفة", "أرشفها", ""].map((h) => (
+                {["العاملة", "الجواز", "النوع", "الفئة", "الكفيل القديم", "الكفيل الجديد", "حالة الدفع", "تاريخ الأرشفة", "أرشفها", ""].map((h) => (
                   <th key={h} className="p-2.5 font-medium">{h}</th>
                 ))}
               </tr>
@@ -117,7 +117,7 @@ function ArchivePage() {
                   <td className="p-2.5">{i.category}</td>
                   <td className="p-2.5">{i.r.old_sponsor_name || "—"}</td>
                   <td className="p-2.5">{i.r.new_sponsor_name || "—"}</td>
-                  <td className="p-2.5 tabular-nums" dir="ltr">{formatMoney(i.r.remaining_amount)}</td>
+                  <td className="p-2.5"><StatusBadge value={i.r.payment_status} /></td>
                   <td className="p-2.5 tabular-nums" dir="ltr">{formatDateTime(i.r.archived_at)}</td>
                   <td className="p-2.5">{nameOf(i.r.archived_by) || "—"}</td>
                   <td className="p-2.5" onClick={(e) => e.stopPropagation()}>
@@ -162,7 +162,6 @@ function Sec({ title, children }: { title: string; children: ReactNode }) {
 
 function Details({ item, nameOf, onRestore, pending }: { item: Item; nameOf: (id: string | null | undefined) => string; onRestore?: (() => void) | undefined; pending: boolean }) {
   const r = item.r;
-  const remaining = Number(r.remaining_amount ?? 0);
   return (
     <>
       <DialogHeader className="text-right sm:text-right">
@@ -198,8 +197,6 @@ function Details({ item, nameOf, onRestore, pending }: { item: Item; nameOf: (id
         <Sec title="المالية">
           <Row label="مستحقات الكفيل القديم" value={formatMoney(r.old_sponsor_dues)} ltr />
           <Row label="العربون" value={formatMoney(r.down_payment)} ltr />
-          <Row label="مدفوعات أخرى" value={formatMoney(r.other_payments)} ltr />
-          <Row label="المتبقي" value={<span className={remaining > 0 ? "text-terracotta" : "text-success"}>{formatMoney(remaining)}</span>} ltr />
           <Row label="حالة الدفع" value={<StatusBadge value={r.payment_status} />} />
           <Row label="مستحقات الرواتب" value={r.salary_dues_status} />
           {r.salary_dues_status === "توجد" && <Row label="قيمة مستحقات الرواتب" value={formatMoney(r.salary_dues_amount)} ltr />}
@@ -215,7 +212,7 @@ function Details({ item, nameOf, onRestore, pending }: { item: Item; nameOf: (id
       </div>
       <SponsorHistory
         transferId={item.id}
-        current={{ name: r.new_sponsor_name, phone: r.new_sponsor_phone, since: r.transfer_date, salaryStatus: r.salary_dues_status, salaryAmount: Number(r.salary_dues_amount ?? 0), remaining }}
+        current={{ name: r.new_sponsor_name, phone: r.new_sponsor_phone, since: r.transfer_date, salaryStatus: r.salary_dues_status, salaryAmount: Number(r.salary_dues_amount ?? 0) }}
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <Sec title="سجل التدقيق">

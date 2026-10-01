@@ -103,6 +103,7 @@ function UsersPage() {
 
   return (
     <main className="mx-auto grid max-w-[1100px] gap-4 px-4 py-5 lg:grid-cols-[360px_1fr]">
+      {canAdd && (
       <form
         className="glass h-fit space-y-3 rounded-2xl p-4"
         onSubmit={(e) => {
@@ -120,6 +121,7 @@ function UsersPage() {
           {m.isPending ? "جارٍ الإضافة…" : "إضافة"}
         </button>
       </form>
+      )}
       <section className="glass rounded-2xl p-4">
         <h2 className="mb-3 text-[15px] font-semibold">المستخدمون ({users.length})</h2>
         <div className="space-y-2">
@@ -130,15 +132,17 @@ function UsersPage() {
               <span dir="ltr" className="truncate text-ink/50">{u.email}</span>
               <span className="text-[11px] text-ink/40">{formatDate(u.created_at)}</span>
               <span className={u.isAdmin ? "pill pill-teal" : "pill pill-brand"}>{ROLE_LABELS[u.role]}</span>
-              {!u.isAdmin && (
+              {!u.isAdmin && auth.isAdmin && (
                 <button type="button" title="صلاحيات خاصة" onClick={() => setOverrideFor({ id: u.id, name: u.full_name, role: u.role })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
                   <KeyRound className="size-3.5" />
                 </button>
               )}
+              {canEdit && (
               <button type="button" title="تعديل" onClick={() => setEditing({ id: u.id, fullName: u.full_name, username: u.username ?? "", email: u.email, password: "", role: u.role })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
                 <Pencil className="size-3.5" />
               </button>
-              {u.id !== auth.userId && (
+              )}
+              {canDelete && u.id !== auth.userId && (
                 <button type="button" title="حذف" onClick={() => setDeleting({ id: u.id, name: u.full_name })} className="grid size-7 place-items-center rounded-lg text-terracotta/70 hover:bg-terracotta/10 hover:text-terracotta">
                   <Trash2 className="size-3.5" />
                 </button>

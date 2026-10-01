@@ -132,7 +132,7 @@ export function RequestFormDialog({ open, onOpenChange, request, isAdmin }: Prop
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
+      <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader className="text-right sm:text-right">
           <DialogTitle>{editing ? "تعديل طلب الاستقدام" : "طلب استقدام جديد"}</DialogTitle>
           <DialogDescription>بيانات العميل، نوع الطلب، وتفضيلات العامل/ـة المطلوبة.</DialogDescription>

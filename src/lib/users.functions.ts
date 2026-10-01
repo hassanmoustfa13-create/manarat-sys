@@ -12,6 +12,12 @@ async function assertAdmin(supabase: any, userId: string) {
   if (!data) throw new Error("غير مسموح: هذه العملية للمدير فقط");
 }
 
+/** المدير مسموح دائمًا؛ غيره يحتاج صلاحية admin_users:<action> */
+async function assertUsersPerm(supabase: any, userId: string, action: "view" | "add" | "edit" | "delete") {
+  const { data } = await supabase.rpc("can", { _uid: userId, _resource: "admin_users", _action: action });
+  if (!data) throw new Error("غير مسموح: ليس لديك صلاحية على صفحة المستخدمين");
+}
+
 async function setRole(admin: any, userId: string, role: "admin" | "supervisor" | "employee") {
   await admin.from("user_roles").delete().eq("user_id", userId).neq("role", role);
   await admin.from("user_roles").upsert({ user_id: userId, role }, { onConflict: "user_id,role" });

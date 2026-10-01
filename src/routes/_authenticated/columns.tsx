@@ -148,7 +148,7 @@ function ColumnsPage() {
       <div className="overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/8">
         <div className="grid grid-cols-[60px_1fr_90px_130px_130px_90px] gap-2 border-b border-black/10 px-4 py-3 text-[13px] font-bold text-ink/70">
           <span>الترتيب</span>
-          <span>العمود</span>
+          <span>اسم العمود (اكتب اسمًا جديدًا)</span>
           <span>الظهور</span>
           <span>العرض (بكسل)</span>
           <span>المحاذاة</span>

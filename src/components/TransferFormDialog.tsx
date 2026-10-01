@@ -81,6 +81,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
   const [workerOpen, setWorkerOpen] = useState(false);
   const [workerQuery, setWorkerQuery] = useState("");
   const editing = Boolean(transfer);
+  const draftKey = `draft:transfer:${category}`;
+  const [draftReady, setDraftReady] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -110,9 +112,26 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             notes: transfer.notes,
 
           }
-        : { ...empty, worker_id: worker?.id ?? "", passport_holder: worker?.passport_holder ?? "المكتب" },
+        : (() => {
+            const base = { ...empty, worker_id: worker?.id ?? "", passport_holder: worker?.passport_holder ?? "المكتب" };
+            try {
+              const raw = localStorage.getItem(draftKey);
+              if (raw) {
+                const d = JSON.parse(raw);
+                return { ...base, ...d, worker_id: worker?.id ?? d.worker_id ?? "" };
+              }
+            } catch { /* ignore */ }
+            return base;
+          })(),
     );
+    setDraftReady(true);
   }, [open, worker, transfer]);
+
+  useEffect(() => {
+    if (!open) { setDraftReady(false); return; }
+    if (!draftReady || editing) return;
+    try { localStorage.setItem(draftKey, JSON.stringify(form)); } catch { /* ignore */ }
+  }, [form, open, draftReady, editing, draftKey]);
 
   const set = (k: keyof typeof empty) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -203,6 +222,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
     },
     onSuccess: () => {
       toast.success(editing ? "تم حفظ التعديلات" : "تم تسجيل طلب نقل الكفالة");
+      if (!editing) localStorage.removeItem(draftKey);
       qc.invalidateQueries({ queryKey: ["transfers"] });
       qc.invalidateQueries({ queryKey: ["workers"] });
       onOpenChange(false);

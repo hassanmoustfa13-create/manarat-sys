@@ -58,6 +58,8 @@ const empty = {
   old_sponsor_dues: "0",
   down_payment: "0",
   payment_status: PAYMENT_STATUSES[1] as string,
+  new_sponsor_dues: "0",
+  new_sponsor_payment_status: PAYMENT_STATUSES[1] as string,
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
   salary_dues_status: YES_NO_EXISTS_F[1] as string,
@@ -99,6 +101,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             old_sponsor_dues: String(transfer.old_sponsor_dues),
             down_payment: String(transfer.down_payment),
             payment_status: transfer.payment_status,
+            new_sponsor_dues: String((transfer as any).new_sponsor_dues ?? 0),
+            new_sponsor_payment_status: (transfer as any).new_sponsor_payment_status ?? PAYMENT_STATUSES[1],
             medical_exam: transfer.medical_exam,
             residency_status: transfer.residency_status,
             salary_dues_status: transfer.salary_dues_status,
@@ -181,6 +185,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         old_sponsor_dues: dues,
         down_payment: deposit,
         payment_status: form.payment_status,
+        new_sponsor_dues: Number(form.new_sponsor_dues || 0),
+        new_sponsor_payment_status: form.new_sponsor_payment_status,
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
         salary_dues_status: form.salary_dues_status,
@@ -379,8 +385,10 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           />
 
           <TextField label="مستحقات الكفيل القديم" type="number" ltr value={form.old_sponsor_dues} onChange={set("old_sponsor_dues")} />
-          <TextField label="العربون" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
-          <SelectField label="حالة الدفع" value={form.payment_status} onChange={set("payment_status")} options={PAYMENT_STATUSES} />
+          <SelectField label="حالة الدفع للكفيل القديم" value={form.payment_status} onChange={set("payment_status")} options={PAYMENT_STATUSES} />
+          <TextField label="مستحقات المكتب من الكفيل الجديد" type="number" ltr value={form.new_sponsor_dues} onChange={set("new_sponsor_dues")} />
+          <TextField label="العربون (من الكفيل الجديد)" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
+          <SelectField label="حالة دفع الكفيل الجديد" value={form.new_sponsor_payment_status} onChange={set("new_sponsor_payment_status")} options={PAYMENT_STATUSES} />
           <SelectField label="الفحص الطبي" value={form.medical_exam} onChange={set("medical_exam")} options={YES_NO_EXISTS} />
           <SelectField label="الإقامة" value={form.residency_status} onChange={set("residency_status")} options={YES_NO_EXISTS_F} />
           <SelectField label="مستحقات رواتب العاملة" value={form.salary_dues_status} onChange={set("salary_dues_status")} options={YES_NO_EXISTS_F} />

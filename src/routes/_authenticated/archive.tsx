@@ -196,8 +196,10 @@ function Details({ item, nameOf, onRestore, pending }: { item: Item; nameOf: (id
       <div className="grid gap-4 sm:grid-cols-2">
         <Sec title="المالية">
           <Row label="مستحقات الكفيل القديم" value={formatMoney(r.old_sponsor_dues)} ltr />
-          <Row label="العربون" value={formatMoney(r.down_payment)} ltr />
-          <Row label="حالة الدفع" value={<StatusBadge value={r.payment_status} />} />
+          <Row label="حالة الدفع للكفيل القديم" value={<StatusBadge value={r.payment_status} />} />
+          <Row label="مستحقات المكتب من الكفيل الجديد" value={formatMoney(r.new_sponsor_dues)} ltr />
+          <Row label="العربون (من الكفيل الجديد)" value={formatMoney(r.down_payment)} ltr />
+          <Row label="حالة دفع الكفيل الجديد" value={<StatusBadge value={r.new_sponsor_payment_status} />} />
           <Row label="مستحقات الرواتب" value={r.salary_dues_status} />
           {r.salary_dues_status === "توجد" && <Row label="قيمة مستحقات الرواتب" value={formatMoney(r.salary_dues_amount)} ltr />}
         </Sec>

@@ -56,6 +56,11 @@ type Row = Transfer & { worker_name: string; worker: Worker | null };
 export function TransfersView({ category }: { category: "منزلية" | "مهنية" }) {
   const auth = useAuth();
   const admin = auth.isAdmin;
+  const permRes = (category === "مهنية" ? "transfers_pro" : "transfers") as const;
+  const canAdd = auth.can(permRes, "add");
+  const canEdit = auth.can(permRes, "edit");
+  const canDel = auth.can(permRes, "delete");
+  const canImport = auth.can(permRes, "import");
   const qc = useQueryClient();
   const { data: transfers = [], isLoading } = useQuery(transfersQuery);
   const { data: workers = [] } = useQuery(workersQuery);
@@ -354,12 +359,12 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         search={search}
         onSearch={setSearch}
         addLabel="نقل كفالة جديد"
-        onAdd={() => {
+        onAdd={canAdd ? () => {
           setEditing(null);
           setFormOpen(true);
-        }}
+        } : undefined}
         extra={
-          admin ? (
+          canImport ? (
             <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setImportOpen(true)}>
               <FileSpreadsheet className="size-4" /> استيراد من Excel
             </Button>
@@ -405,7 +410,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
                   <CheckCircle2 className="size-3.5" />
                 </IconBtn>
               )}
-              <IconBtn
+              {canEdit && (<IconBtn
                 title="تعديل"
                 onClick={() => {
                   setEditing(t);
@@ -413,8 +418,8 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
                 }}
               >
                 <Pencil className="size-3.5" />
-              </IconBtn>
-              {admin && (
+              </IconBtn>)}
+              {canDel && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(t)}>
                   <Trash2 className="size-3.5" />
                 </IconBtn>

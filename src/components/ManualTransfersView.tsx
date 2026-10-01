@@ -92,6 +92,11 @@ type Form = ReturnType<typeof empty>;
 export function ManualTransfersView({ category }: { category: Category }) {
   const auth = useAuth();
   const admin = auth.isAdmin;
+  const permRes = "manual_transfers" as const;
+  const canAdd = auth.can(permRes, "add");
+  const canEdit = auth.can(permRes, "edit");
+  const canDel = auth.can(permRes, "delete");
+  const canImport = auth.can(permRes, "import");
   const qc = useQueryClient();
   const { data: all = [], isLoading } = useQuery(manualTransfersQuery);
   const { data: profiles } = useQuery(profilesQuery);
@@ -248,10 +253,10 @@ export function ManualTransfersView({ category }: { category: Category }) {
         search={search}
         onSearch={setSearch}
         addLabel="نقل كفالة جديد"
-        onAdd={() => {
+        onAdd={canAdd ? () => {
           setEditing(null);
           setFormOpen(true);
-        }}
+        } : undefined}
         filters={
           <>
             <FilterChip active={payFilter === null} onClick={() => setPayFilter(null)}>الكل</FilterChip>
@@ -278,10 +283,10 @@ export function ManualTransfersView({ category }: { category: Category }) {
           onRowClick={(t) => setViewing(t)}
           rowActions={(t) => (
             <>
-              <IconBtn title="تعديل" onClick={() => { setEditing(t); setFormOpen(true); }}>
+              {canEdit && (<IconBtn title="تعديل" onClick={() => { setEditing(t); setFormOpen(true); }}>
                 <Pencil className="size-3.5" />
-              </IconBtn>
-              {admin && (
+              </IconBtn>)}
+              {canDel && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(t)}>
                   <Trash2 className="size-3.5" />
                 </IconBtn>

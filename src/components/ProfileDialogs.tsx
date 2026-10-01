@@ -209,10 +209,9 @@ export function WorkerProfileDialog({
                           </p>
                         </div>
                       </div>
-                      <div className="mt-2 grid grid-cols-3 gap-2 text-[12px]">
+                      <div className="mt-2 grid grid-cols-2 gap-2 text-[12px]">
                         <Row label="المستحقات" value={formatMoney(t.old_sponsor_dues)} ltr />
                         <Row label="العربون" value={formatMoney(t.down_payment)} ltr />
-                        <Row label="المتبقي" value={formatMoney(t.remaining_amount)} ltr />
                       </div>
                       <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
                         <span className="text-ink/45">نوع النقل:</span> <StatusBadge value={t.transfer_type} />

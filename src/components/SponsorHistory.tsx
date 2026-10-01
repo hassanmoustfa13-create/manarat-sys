@@ -8,7 +8,7 @@ export function SponsorHistory({
   current,
 }: {
   transferId: string;
-  current: { name: string; phone: string; since: string | null; salaryStatus: string; salaryAmount: number; remaining: number };
+  current: { name: string; phone: string; since: string | null; salaryStatus: string; salaryAmount: number };
 }) {
   const { data = [], isLoading } = useQuery({
     queryKey: ["sponsor_history", transferId],
@@ -32,11 +32,10 @@ export function SponsorHistory({
       to: h.ended_on as string | null,
       salaryStatus: h.salary_dues_status,
       salaryAmount: Number(h.salary_dues_amount),
-      remaining: Number(h.remaining_amount),
       isCurrent: false,
     })),
     ...(current.name
-      ? [{ key: "current", name: current.name, phone: current.phone, from: lastEnd, to: null, salaryStatus: current.salaryStatus, salaryAmount: current.salaryAmount, remaining: current.remaining, isCurrent: true }]
+      ? [{ key: "current", name: current.name, phone: current.phone, from: lastEnd, to: null, salaryStatus: current.salaryStatus, salaryAmount: current.salaryAmount, isCurrent: true }]
       : []),
   ];
 
@@ -57,7 +56,6 @@ export function SponsorHistory({
                 <th className="p-1.5 font-medium">ذهبت إليه</th>
                 <th className="p-1.5 font-medium">رجعت منه</th>
                 <th className="p-1.5 font-medium">مستحقات الرواتب</th>
-                <th className="p-1.5 font-medium">المتبقي</th>
               </tr>
             </thead>
             <tbody>
@@ -77,7 +75,6 @@ export function SponsorHistory({
                       r.salaryStatus || "—"
                     )}
                   </td>
-                  <td className={`p-1.5 tabular-nums ${r.remaining > 0 ? "text-terracotta" : "text-success"}`} dir="ltr">{formatMoney(r.remaining)}</td>
                 </tr>
               ))}
             </tbody>

@@ -23,14 +23,14 @@ export const NUMERIC_TYPES: FieldType[] = ["number", "currency"];
 
 /** Built-in automatic behaviours of the original forms (kept working, tied to the field). */
 export const BEHAVIORS: Record<string, string> = {
-  remaining: "المتبقي = المستحقات − العربون (تلقائي)",
-  payment_auto: "حالة الدفع تلقائية حسب المتبقي",
+  remaining: "حقل متوقف — لا يُستخدم في الحساب",
+  payment_auto: "حالة الدفع (اختيار يدوي)",
   period_start: "بداية التجربة (تُحسب النهاية +10 أيام)",
   period_end: "نهاية التجربة (تلقائي)",
   day_name: "اسم اليوم من التاريخ (تلقائي)",
   clients_lines: "عملاء سطرًا بسطر + علامة تأشيرات المكتب",
 };
-export const COMPUTED_BEHAVIORS = ["remaining", "payment_auto", "period_end", "day_name"];
+export const COMPUTED_BEHAVIORS = ["remaining", "period_end", "day_name"];
 
 export type FormOption = { id: string; field_id: string; value: string; label: string; sort_order: number; is_active: boolean };
 export type Condition = { field?: string; op?: "eq" | "neq"; value?: string };
@@ -132,9 +132,6 @@ export function initialValues(form: FormDef, record: Record<string, unknown> | n
   return out;
 }
 
-export function remainingOf(values: Values) {
-  return Number(values["old_sponsor_dues"] || 0) - Number(values["down_payment"] || 0) - Number(values["other_payments"] || 0);
-}
 export const clientLines = (s: string) => [...new Set(s.split("\n").map((c) => c.trim()).filter(Boolean))];
 
 /** Returns an error message, or null when valid. */
@@ -182,13 +179,11 @@ function coerce(f: FormField, v: string): unknown {
 export function buildPayload(form: FormDef, values: Values, existingExtra: Record<string, unknown> = {}) {
   const row: Record<string, unknown> = {};
   const extra: Record<string, unknown> = { ...existingExtra };
-  const remaining = remainingOf(values);
   for (const f of form.form_fields) {
     const visible = f.is_active && isVisible(f, values);
     const raw = values[f.field_key] ?? "";
     let val: unknown = visible ? coerce(f, raw) : coerce(f, NUMERIC_TYPES.includes(f.field_type) ? "0" : "");
     if (f.behavior === "remaining" || f.behavior === "day_name") continue;
-    if (f.behavior === "payment_auto") val = remaining > 0 ? "متبقي مبلغ" : "تم الدفع بالكامل";
     if (f.behavior === "period_end") {
       const start = values["period_start"] ?? "";
       row["period_end"] = visible && start ? addDays(start, 10) : null;

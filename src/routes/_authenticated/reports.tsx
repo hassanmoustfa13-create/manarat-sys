@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowLeftRight, CalendarClock, ClipboardList, Users, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowLeftRight, CalendarClock, ClipboardList, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { SponsorProfileDialog, WorkerProfileDialog } from "@/components/ProfileDialogs";
@@ -166,11 +166,6 @@ function ReportsPage() {
     [transfers, from, to, staff, status],
   );
 
-  const dues = fTransfers.reduce((s, t) => s + Number(t.old_sponsor_dues || 0), 0);
-  const paid = fTransfers.reduce((s, t) => s + Number(t.down_payment || 0), 0);
-  const remaining = fTransfers.reduce((s, t) => s + Number(t.remaining_amount ?? 0), 0);
-  const unpaidCount = fTransfers.filter((t) => t.payment_status === "متبقي مبلغ").length;
-
   const expired = useMemo(
     () => fTransfers.filter((t) => t.period_end && t.period_end < today),
     [fTransfers, today],
@@ -281,7 +276,7 @@ function ReportsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <StatCard icon={<Users className="size-4" />} label="العمالة" value={fWorkers.length} tone="teal" />
         <StatCard
           icon={<Users className="size-4" />}
@@ -291,13 +286,6 @@ function ReportsPage() {
           hint={`${fWorkers.filter((w) => !w.current_sponsor_name || w.current_sponsor_name === "الشركة").length} على كفالة الشركة`}
         />
         <StatCard icon={<ArrowLeftRight className="size-4" />} label="عمليات النقل" value={fTransfers.length} tone="teal" />
-        <StatCard
-          icon={<Wallet className="size-4" />}
-          label="المبالغ المتبقية"
-          value={formatMoney(remaining)}
-          tone="terracotta"
-          hint={`${unpaidCount} عملية غير مكتملة الدفع`}
-        />
         <StatCard
           icon={<AlertTriangle className="size-4" />}
           label="فترات منتهية"
@@ -321,42 +309,7 @@ function ReportsPage() {
         </Panel>
       </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-2">
-        <Panel title="ملخص المدفوعات">
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-xl bg-white/60 p-3 ring-1 ring-black/5">
-              <div className="text-[11px] text-ink/45">إجمالي المستحقات</div>
-              <div className="mt-1 text-lg font-semibold tabular-nums">{formatMoney(dues)}</div>
-            </div>
-            <div className="rounded-xl bg-white/60 p-3 ring-1 ring-black/5">
-              <div className="text-[11px] text-ink/45">المدفوع</div>
-              <div className="mt-1 text-lg font-semibold tabular-nums text-success">{formatMoney(paid)}</div>
-            </div>
-            <div className="rounded-xl bg-white/60 p-3 ring-1 ring-black/5">
-              <div className="text-[11px] text-ink/45">المتبقي</div>
-              <div className="mt-1 text-lg font-semibold tabular-nums text-terracotta">{formatMoney(remaining)}</div>
-            </div>
-          </div>
-          <div className="mt-3 space-y-2">
-            {fTransfers
-              .filter((t) => Number(t.remaining_amount ?? 0) > 0)
-              .slice(0, 6)
-              .map((t) => (
-                <div
-                  key={t.id}
-                  className="flex items-center gap-2 rounded-xl bg-white/50 px-3 py-2 text-[12.5px] ring-1 ring-black/5"
-                >
-                  <span className="flex-1 truncate">{t.new_sponsor_name || "—"}</span>
-                  <StatusBadge value={t.payment_status} />
-                  <span className="tabular-nums text-terracotta">{formatMoney(t.remaining_amount)}</span>
-                </div>
-              ))}
-            {!fTransfers.some((t) => Number(t.remaining_amount ?? 0) > 0) && (
-              <p className="py-4 text-center text-[13px] text-ink/40">لا توجد مبالغ متبقية</p>
-            )}
-          </div>
-        </Panel>
-
+      <div className="mt-3">
         <Panel title="الفترات المنتهية والقريبة من الانتهاء">
           {expired.length + endingSoon.length === 0 ? (
             <p className="py-6 text-center text-[13px] text-ink/40">لا توجد فترات منتهية</p>

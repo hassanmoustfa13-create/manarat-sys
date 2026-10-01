@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/transfers")({
   head: () => ({
     meta: [
       { title: "جدول نقل الكفالة — منارات هجر للاستقدام" },
-      { name: "description", content: "متابعة عمليات نقل الكفالة، المستحقات، العربون، والمتبقي في جدول تفاعلي" },
+      { name: "description", content: "متابعة عمليات نقل الكفالة والمستحقات وحالات الدفع في جدول تفاعلي" },
       { property: "og:title", content: "جدول نقل الكفالة — منارات هجر للاستقدام" },
       { property: "og:description", content: "متابعة عمليات نقل الكفالة والمدفوعات" },
       { property: "og:type", content: "website" },
@@ -290,25 +290,6 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         header: "العربون",
         meta: { editable: true, type: "number", ltr: true, className: "tabular-nums" },
         cell: ({ getValue }) => formatMoney(getValue() as number),
-      },
-      {
-        id: "other_payments",
-        accessorKey: "other_payments",
-        header: "مدفوعات أخرى",
-        meta: { editable: true, type: "number", ltr: true, className: "tabular-nums" },
-        cell: ({ getValue }) => formatMoney(getValue() as number),
-      },
-      {
-        id: "remaining_amount",
-        accessorKey: "remaining_amount",
-        header: "المتبقي",
-        meta: { ltr: true, className: "tabular-nums" },
-        cell: ({ getValue }) => {
-          const v = Number(getValue() ?? 0);
-          return (
-            <span className={`font-semibold ${v > 0 ? "text-terracotta" : "text-success"}`}>{formatMoney(v)}</span>
-          );
-        },
       },
       {
         id: "payment_status",

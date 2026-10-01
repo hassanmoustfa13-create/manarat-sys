@@ -79,7 +79,6 @@ const empty = () => ({
   return_to_office_date: "",
   old_sponsor_dues: "0",
   down_payment: "0",
-  other_payments: "0",
   payment_status: PAYMENT_STATUSES[0] as string,
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
@@ -218,17 +217,6 @@ export function ManualTransfersView({ category }: { category: Category }) {
       badge("worker_location", "موقع العاملة"),
       money("old_sponsor_dues", "مستحقات القديم"),
       money("down_payment", "العربون"),
-      money("other_payments", "مدفوعات أخرى"),
-      {
-        id: "remaining_amount",
-        accessorKey: "remaining_amount",
-        header: "المتبقي",
-        meta: { ltr: true, className: "tabular-nums" },
-        cell: ({ getValue }) => {
-          const v = Number(getValue() ?? 0);
-          return <span className={`font-semibold ${v > 0 ? "text-terracotta" : "text-success"}`}>{formatMoney(v)}</span>;
-        },
-      },
       badge("payment_status", "حالة الدفع"),
       badge("medical_exam", "الفحص الطبي"),
       badge("residency_status", "الإقامة"),
@@ -452,7 +440,6 @@ function ManualTransferDetails({
 }) {
   const { data: profiles } = useQuery(profilesQuery);
   const nameOf = profileNameMap(profiles);
-  const remaining = Number(record?.remaining_amount ?? 0);
   return (
     <Dialog open={Boolean(record)} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -498,17 +485,7 @@ function ManualTransferDetails({
               <Section title="المالية">
                 <DetailRow label="مستحقات الكفيل القديم" value={formatMoney(record.old_sponsor_dues)} ltr />
                 <DetailRow label="العربون" value={formatMoney(record.down_payment)} ltr />
-                <DetailRow label="مدفوعات أخرى" value={formatMoney(record.other_payments)} ltr />
-                <DetailRow
-                  label="المتبقي"
-                  value={
-                    <span className={`font-semibold ${remaining > 0 ? "text-terracotta" : "text-success"}`}>
-                      {formatMoney(remaining)}
-                    </span>
-                  }
-                  ltr
-                />
-                <DetailRow label="حالة الدفع" value={<StatusBadge value={record.payment_status} />} />
+                <EditableSelectRow label="حالة الدفع" field="payment_status" value={record.payment_status} options={PAYMENT_STATUSES} record={record} onSaved={onSaved} />
                 <EditableSelectRow label="مستحقات الرواتب" field="salary_dues_status" value={record.salary_dues_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
                 {record.salary_dues_status === "توجد" && (
                   <DetailRow label="قيمة مستحقات الرواتب" value={formatMoney(record.salary_dues_amount)} ltr />
@@ -529,7 +506,7 @@ function ManualTransferDetails({
 
             <SponsorHistory
               transferId={record.id}
-              current={{ name: record.new_sponsor_name, phone: record.new_sponsor_phone, since: record.transfer_date, salaryStatus: record.salary_dues_status, salaryAmount: Number(record.salary_dues_amount), remaining }}
+              current={{ name: record.new_sponsor_name, phone: record.new_sponsor_phone, since: record.transfer_date, salaryStatus: record.salary_dues_status, salaryAmount: Number(record.salary_dues_amount) }}
             />
 
             <div className="grid gap-4 sm:grid-cols-2">

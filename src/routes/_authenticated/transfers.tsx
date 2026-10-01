@@ -294,8 +294,21 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
       {
         id: "payment_status",
         accessorKey: "payment_status",
-        header: "حالة الدفع",
+        header: "حالة دفع القديم",
         meta: { editable: true, type: "select", options: PAYMENT_STATUSES },
+        cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
+      },
+      {
+        id: "new_sponsor_dues",
+        accessorKey: "new_sponsor_dues",
+        header: "مستحقات المكتب من الجديد",
+        meta: { ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => formatMoney(getValue() as number),
+      },
+      {
+        id: "new_sponsor_payment_status",
+        accessorKey: "new_sponsor_payment_status",
+        header: "حالة دفع الجديد",
         cell: ({ getValue }) => <StatusBadge value={getValue() as string} />,
       },
       {

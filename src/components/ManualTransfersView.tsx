@@ -217,7 +217,9 @@ export function ManualTransfersView({ category }: { category: Category }) {
       badge("worker_location", "موقع العاملة"),
       money("old_sponsor_dues", "مستحقات القديم"),
       money("down_payment", "العربون"),
-      badge("payment_status", "حالة الدفع"),
+      badge("payment_status", "حالة دفع القديم"),
+      money("new_sponsor_dues", "مستحقات المكتب من الجديد"),
+      badge("new_sponsor_payment_status", "حالة دفع الجديد"),
       badge("medical_exam", "الفحص الطبي"),
       badge("residency_status", "الإقامة"),
       txt("residency_number", "رقم الإقامة", true),
@@ -484,8 +486,10 @@ function ManualTransferDetails({
             <div className="grid gap-4 sm:grid-cols-2">
               <Section title="المالية">
                 <DetailRow label="مستحقات الكفيل القديم" value={formatMoney(record.old_sponsor_dues)} ltr />
-                <DetailRow label="العربون" value={formatMoney(record.down_payment)} ltr />
-                <EditableSelectRow label="حالة الدفع" field="payment_status" value={record.payment_status} options={PAYMENT_STATUSES} record={record} onSaved={onSaved} />
+                <EditableSelectRow label="حالة الدفع للكفيل القديم" field="payment_status" value={record.payment_status} options={PAYMENT_STATUSES} record={record} onSaved={onSaved} />
+                <DetailRow label="مستحقات المكتب من الكفيل الجديد" value={formatMoney((record as any).new_sponsor_dues)} ltr />
+                <DetailRow label="العربون (من الكفيل الجديد)" value={formatMoney(record.down_payment)} ltr />
+                <EditableSelectRow label="حالة دفع الكفيل الجديد" field={"new_sponsor_payment_status" as any} value={(record as any).new_sponsor_payment_status} options={PAYMENT_STATUSES} record={record} onSaved={onSaved} />
                 <EditableSelectRow label="مستحقات الرواتب" field="salary_dues_status" value={record.salary_dues_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
                 {record.salary_dues_status === "توجد" && (
                   <DetailRow label="قيمة مستحقات الرواتب" value={formatMoney(record.salary_dues_amount)} ltr />

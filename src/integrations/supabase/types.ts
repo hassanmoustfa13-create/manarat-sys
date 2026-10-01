@@ -303,7 +303,9 @@ export type Database = {
           is_deleted: boolean
           medical_exam: string
           nationality: string
+          new_sponsor_dues: number
           new_sponsor_name: string
+          new_sponsor_payment_status: string
           new_sponsor_phone: string
           notes: string
           old_sponsor_dues: number
@@ -344,7 +346,9 @@ export type Database = {
           is_deleted?: boolean
           medical_exam?: string
           nationality?: string
+          new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
           old_sponsor_dues?: number
@@ -385,7 +389,9 @@ export type Database = {
           is_deleted?: boolean
           medical_exam?: string
           nationality?: string
+          new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
           old_sponsor_dues?: number
@@ -667,7 +673,9 @@ export type Database = {
           id: string
           is_deleted: boolean
           medical_exam: string
+          new_sponsor_dues: number
           new_sponsor_name: string
+          new_sponsor_payment_status: string
           new_sponsor_phone: string
           notes: string
           old_sponsor_dues: number
@@ -702,7 +710,9 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           medical_exam?: string
+          new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
           old_sponsor_dues?: number
@@ -737,7 +747,9 @@ export type Database = {
           id?: string
           is_deleted?: boolean
           medical_exam?: string
+          new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
           old_sponsor_dues?: number

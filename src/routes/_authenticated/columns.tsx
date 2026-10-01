@@ -37,7 +37,7 @@ const sel = "glass h-9 rounded-lg px-2 text-[13px] outline-none";
 function ColumnsPage() {
   const auth = useAuth();
   const qc = useQueryClient();
-  const { data: all } = useQuery({ ...gridSettingsQuery, enabled: auth.isAdmin });
+  const { data: all } = useQuery({ ...gridSettingsQuery, enabled: auth.can("admin_columns", "view") });
   const [key, setKey] = useState<GridKey>("workers");
   const [draft, setDraft] = useState<GridSettings>({});
 
@@ -69,7 +69,7 @@ function ColumnsPage() {
     onError: (e) => toast.error(errorMessage(e)),
   });
 
-  if (!auth.loading && !auth.isAdmin) {
+  if (!auth.loading && !auth.can("admin_columns", "view")) {
     return <div className="p-10 text-center text-muted-foreground">هذه الصفحة متاحة للمدير فقط</div>;
   }
 

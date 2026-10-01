@@ -80,7 +80,7 @@ function FormsList() {
     onError: (e) => toast.error(errorMessage(e)),
   });
 
-  if (!auth.loading && !auth.isAdmin) {
+  if (!auth.loading && !auth.can("admin_forms", "view")) {
     return <div className="p-10 text-center text-muted-foreground">هذه الصفحة للمدير فقط.</div>;
   }
 

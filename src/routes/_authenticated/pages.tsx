@@ -25,7 +25,7 @@ function PagesSettings() {
   const auth = useAuth();
   const qc = useQueryClient();
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
-  if (!auth.isAdmin) return <main className="p-6 text-ink/60">هذه الصفحة للمدير فقط.</main>;
+  if (!auth.can("admin_pages", "view")) return <main className="p-6 text-ink/60">هذه الصفحة للمدير فقط.</main>;
 
   const toggle = async (to: string) => {
     const next = hidden.includes(to) ? hidden.filter((h) => h !== to) : [...hidden, to];

@@ -246,6 +246,13 @@
       "when": 1790877860468,
       "tag": "0034_hide_admins_from_non_admins",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1790881756282,
+      "tag": "0035_new_sponsor_payments",
+      "breakpoints": true
     }
   ]
 }

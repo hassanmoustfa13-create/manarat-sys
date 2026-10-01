@@ -57,6 +57,7 @@ export const createUser = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertUsersPerm(context.supabase, context.userId, "add");
+    if (data.role === "admin") await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     {
       const { data: dup } = await supabaseAdmin.from("profiles").select("id").ilike("username", data.username).maybeSingle();
@@ -118,6 +119,7 @@ export const updateUser = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertUsersPerm(context.supabase, context.userId, "edit");
+    if (data.role === "admin") await assertAdmin(context.supabase, context.userId);
     if (data.password && data.password.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
     if (data.id === context.userId && data.role !== "admin") throw new Error("لا يمكنك إزالة صلاحية المدير عن حسابك");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

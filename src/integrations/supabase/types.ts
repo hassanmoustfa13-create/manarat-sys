@@ -292,6 +292,8 @@ export type Database = {
       }
       manual_transfers: {
         Row: {
+          archived_at: string | null
+          archived_by: string | null
           category: string
           created_at: string
           created_by: string | null
@@ -331,6 +333,8 @@ export type Database = {
           worker_name: string
         }
         Insert: {
+          archived_at?: string | null
+          archived_by?: string | null
           category?: string
           created_at?: string
           created_by?: string | null
@@ -370,6 +374,8 @@ export type Database = {
           worker_name?: string
         }
         Update: {
+          archived_at?: string | null
+          archived_by?: string | null
           category?: string
           created_at?: string
           created_by?: string | null
@@ -605,8 +611,55 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsor_history: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          ended_on: string | null
+          id: string
+          remaining_amount: number
+          salary_dues_amount: number
+          salary_dues_status: string
+          source: string
+          sponsor_name: string
+          sponsor_phone: string
+          started_on: string | null
+          transfer_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          ended_on?: string | null
+          id?: string
+          remaining_amount?: number
+          salary_dues_amount?: number
+          salary_dues_status?: string
+          source: string
+          sponsor_name?: string
+          sponsor_phone?: string
+          started_on?: string | null
+          transfer_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          ended_on?: string | null
+          id?: string
+          remaining_amount?: number
+          salary_dues_amount?: number
+          salary_dues_status?: string
+          source?: string
+          sponsor_name?: string
+          sponsor_phone?: string
+          started_on?: string | null
+          transfer_id?: string
+        }
+        Relationships: []
+      }
       transfers: {
         Row: {
+          archived_at: string | null
+          archived_by: string | null
           category: string
           created_at: string
           created_by: string | null
@@ -640,6 +693,8 @@ export type Database = {
           worker_location: string
         }
         Insert: {
+          archived_at?: string | null
+          archived_by?: string | null
           category?: string
           created_at?: string
           created_by?: string | null
@@ -673,6 +728,8 @@ export type Database = {
           worker_location?: string
         }
         Update: {
+          archived_at?: string | null
+          archived_by?: string | null
           category?: string
           created_at?: string
           created_by?: string | null

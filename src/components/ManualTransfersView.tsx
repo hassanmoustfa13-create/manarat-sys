@@ -1,3 +1,5 @@
+import { SponsorHistory, setArchived } from "@/components/SponsorHistory";
+import { Archive } from "lucide-react";
 import { useMutation, useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash2 } from "lucide-react";
@@ -46,6 +48,7 @@ const manualTransfersQuery = queryOptions({
       .from("manual_transfers")
       .select("*")
       .eq("is_deleted", false)
+      .is("archived_at", null)
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data;
@@ -108,6 +111,17 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const [editing, setEditing] = useState<MT | null>(null);
   const [deleting, setDeleting] = useState<MT | null>(null);
   const [viewing, setViewing] = useState<MT | null>(null);
+  const [archiving, setArchiving] = useState<MT | null>(null);
+  const archive = useMutation({
+    mutationFn: (id: string) => setArchived("manual_transfers", id, true),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["manual_transfers"] });
+      qc.invalidateQueries({ queryKey: ["archive"] });
+      toast.success("تمت أرشفة العملية");
+      setArchiving(null);
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
 
   const mine = useMemo(() => all.filter((t) => t.category === category), [all, category]);
   const nationalityOptions = useMemo(
@@ -286,6 +300,11 @@ export function ManualTransfersView({ category }: { category: Category }) {
               {canEdit && (<IconBtn title="تعديل" onClick={() => { setEditing(t); setFormOpen(true); }}>
                 <Pencil className="size-3.5" />
               </IconBtn>)}
+              {canEdit && t.transfer_stage === "تم النقل" && (
+                <IconBtn title="أرشفة العملية" onClick={() => setArchiving(t)}>
+                  <Archive className="size-3.5" />
+                </IconBtn>
+              )}
               {canDel && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(t)}>
                   <Trash2 className="size-3.5" />
@@ -311,6 +330,15 @@ export function ManualTransfersView({ category }: { category: Category }) {
         description={`سيتم حذف عملية نقل كفالة "${deleting?.worker_name ?? ""}".`}
         pending={remove.isPending}
         onConfirm={() => deleting && remove.mutate(deleting.id)}
+      />
+      <ConfirmDelete
+        open={Boolean(archiving)}
+        onOpenChange={(o) => !o && setArchiving(null)}
+        title="أرشفة عملية النقل؟"
+        description={`ستنتقل عملية "${archiving?.worker_name ?? ""}" إلى صفحة الأرشيف ويمكن استرجاعها لاحقًا.`}
+        confirmLabel="نعم، أرشف"
+        pending={archive.isPending}
+        onConfirm={() => archiving && archive.mutate(archiving.id)}
       />
       <ManualTransferDetails
         record={viewing}
@@ -498,6 +526,11 @@ function ManualTransferDetails({
                 {record.notes && <DetailRow label="ملاحظات" value={record.notes} />}
               </Section>
             </div>
+
+            <SponsorHistory
+              transferId={record.id}
+              current={{ name: record.new_sponsor_name, phone: record.new_sponsor_phone, since: record.transfer_date, salaryStatus: record.salary_dues_status, salaryAmount: Number(record.salary_dues_amount), remaining }}
+            />
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Section title="سجل التدقيق">

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { CheckCircle2, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
+import { Archive, CheckCircle2, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { TransferFormDialog } from "@/components/TransferFormDialog";
 import { SponsorLink, SponsorProfileDialog, WorkerProfileDialog } from "@/components/ProfileDialogs";
+import { setArchived } from "@/components/SponsorHistory";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import {
@@ -76,6 +77,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
   const [sponsor, setSponsor] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Row | null>(null);
   const [completing, setCompleting] = useState<Row | null>(null);
+  const [archiving, setArchiving] = useState<Row | null>(null);
 
   const nationalities = useMemo(() => {
     const byId = new Map(workers.map((w) => [w.id, w]));
@@ -130,6 +132,17 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
       invalidate();
       toast.success("تم إتمام النقل وتحديث الكفيل الحالي");
       setCompleting(null);
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+
+  const archive = useMutation({
+    mutationFn: (id: string) => setArchived("transfers", id, true),
+    onSuccess: () => {
+      invalidate();
+      qc.invalidateQueries({ queryKey: ["archive"] });
+      toast.success("تمت أرشفة العملية");
+      setArchiving(null);
     },
     onError: (e) => toast.error(errorMessage(e)),
   });
@@ -419,6 +432,11 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
               >
                 <Pencil className="size-3.5" />
               </IconBtn>)}
+              {canEdit && t.transfer_stage === "تم النقل" && (
+                <IconBtn title="أرشفة العملية" onClick={() => setArchiving(t)}>
+                  <Archive className="size-3.5" />
+                </IconBtn>
+              )}
               {canDel && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(t)}>
                   <Trash2 className="size-3.5" />
@@ -429,6 +447,15 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         />
       )}
 
+      <ConfirmDelete
+        open={Boolean(archiving)}
+        onOpenChange={(o) => !o && setArchiving(null)}
+        title="أرشفة عملية النقل؟"
+        description={`ستنتقل عملية "${archiving?.worker_name ?? ""}" إلى صفحة الأرشيف ويمكن استرجاعها لاحقًا.`}
+        confirmLabel="نعم، أرشف"
+        pending={archive.isPending}
+        onConfirm={() => archiving && archive.mutate(archiving.id)}
+      />
       <TransferFormDialog open={formOpen} onOpenChange={setFormOpen} transfer={editing} isAdmin={admin} category={category} />
       <ExcelImportDialog targetKey="transfers" tableLabel={category === "مهنية" ? "نقل الكفالة المهنية" : "نقل كفالة العمالة المنزلية"} open={importOpen} onOpenChange={setImportOpen} onImported={() => qc.invalidateQueries()} />
       <WorkerProfileDialog

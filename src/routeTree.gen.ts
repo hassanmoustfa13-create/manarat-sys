@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedArchiveRouteImport } from './routes/_authenticated/archive'
 import { Route as AuthenticatedColumnsRouteImport } from './routes/_authenticated/columns'
 import { Route as AuthenticatedFlightsRouteImport } from './routes/_authenticated/flights'
 import { Route as AuthenticatedFormsRouteImport } from './routes/_authenticated/forms'
@@ -43,6 +44,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedArchiveRoute = AuthenticatedArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedColumnsRoute = AuthenticatedColumnsRouteImport.update({
   id: '/columns',
@@ -138,6 +144,7 @@ const AuthenticatedFormsFormIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/archive': typeof AuthenticatedArchiveRoute
   '/columns': typeof AuthenticatedColumnsRoute
   '/flights': typeof AuthenticatedFlightsRoute
   '/forms': typeof AuthenticatedFormsRouteWithChildren
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/archive': typeof AuthenticatedArchiveRoute
   '/columns': typeof AuthenticatedColumnsRoute
   '/flights': typeof AuthenticatedFlightsRoute
   '/forms': typeof AuthenticatedFormsRouteWithChildren
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/archive': typeof AuthenticatedArchiveRoute
   '/_authenticated/columns': typeof AuthenticatedColumnsRoute
   '/_authenticated/flights': typeof AuthenticatedFlightsRoute
   '/_authenticated/forms': typeof AuthenticatedFormsRouteWithChildren
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/archive'
     | '/columns'
     | '/flights'
     | '/forms'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/archive'
     | '/columns'
     | '/flights'
     | '/forms'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/archive'
     | '/_authenticated/columns'
     | '/_authenticated/flights'
     | '/_authenticated/forms'
@@ -295,6 +307,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/archive': {
+      id: '/_authenticated/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof AuthenticatedArchiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/columns': {
       id: '/_authenticated/columns'
@@ -430,6 +449,7 @@ const AuthenticatedFormsRouteWithChildren =
   AuthenticatedFormsRoute._addFileChildren(AuthenticatedFormsRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedArchiveRoute: typeof AuthenticatedArchiveRoute
   AuthenticatedColumnsRoute: typeof AuthenticatedColumnsRoute
   AuthenticatedFlightsRoute: typeof AuthenticatedFlightsRoute
   AuthenticatedFormsRoute: typeof AuthenticatedFormsRouteWithChildren
@@ -449,6 +469,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedArchiveRoute: AuthenticatedArchiveRoute,
   AuthenticatedColumnsRoute: AuthenticatedColumnsRoute,
   AuthenticatedFlightsRoute: AuthenticatedFlightsRoute,
   AuthenticatedFormsRoute: AuthenticatedFormsRouteWithChildren,

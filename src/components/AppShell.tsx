@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
+  Archive,
   ArrowLeftRight, Briefcase,
   BarChart3,
   ClipboardList,
@@ -30,7 +31,7 @@ import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/archive" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
 export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -41,6 +42,7 @@ export const NAV: NavItem[] = [
   { to: "/manual-transfers-pro", label: "نقل الكفالة المهنية", icon: Briefcase },
   { to: "/visas", label: "تأشيرات المكتب", icon: Stamp, section: "" },
   { to: "/flights", label: "الرحلات", icon: Plane, section: "" },
+  { to: "/archive", label: "الأرشيف", icon: Archive },
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
   { to: "/permissions", label: "الصلاحيات", icon: KeyRound, admin: true },

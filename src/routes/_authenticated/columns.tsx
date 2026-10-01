@@ -148,7 +148,7 @@ function ColumnsPage() {
       <div className="overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/8">
         <div className="grid grid-cols-[60px_1fr_90px_130px_130px_90px] gap-2 border-b border-black/10 px-4 py-3 text-[13px] font-bold text-ink/70">
           <span>الترتيب</span>
-          <span>العمود</span>
+          <span>اسم العمود (اكتب اسمًا جديدًا)</span>
           <span>الظهور</span>
           <span>العرض (بكسل)</span>
           <span>المحاذاة</span>
@@ -185,7 +185,16 @@ function ColumnsPage() {
               <GripVertical className="size-4" />
               {i + 1}
             </span>
-            <span className="font-medium">{labels[c.id]}</span>
+            <input
+              aria-label="اسم العمود"
+              value={c.label ?? ""}
+              placeholder={labels[c.id]}
+              title={`الاسم الأصلي: ${labels[c.id]}`}
+              draggable={false}
+              onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onChange={(e) => update(i, { label: e.target.value || undefined })}
+              className="h-8 min-w-0 rounded-md bg-white/70 px-2 font-medium ring-1 ring-black/10 placeholder:text-ink/70 focus:ring-brand"
+            />
             <button
               onClick={() => update(i, { visible: !c.visible })}
               className="inline-flex items-center gap-1 text-[13px]"

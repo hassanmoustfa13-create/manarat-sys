@@ -9,6 +9,8 @@ export interface ColumnSetting {
   visible: boolean;
   width?: number | null | undefined;
   align?: ColAlign | undefined;
+  /** اسم مخصص للعمود يظهر بدل الاسم الافتراضي */
+  label?: string | undefined;
 }
 
 export interface GridSettings {

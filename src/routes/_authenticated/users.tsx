@@ -50,7 +50,11 @@ function UsersPage() {
   const qc = useQueryClient();
   const list = useServerFn(listUsers);
   const create = useServerFn(createUser);
-  const { data: users = [] } = useQuery({ queryKey: ["users"], queryFn: () => list(), enabled: auth.isAdmin });
+  const canView = auth.isAdmin || auth.can("admin_users", "view");
+  const canAdd = auth.isAdmin || auth.can("admin_users", "add");
+  const canEdit = auth.isAdmin || auth.can("admin_users", "edit");
+  const canDelete = auth.isAdmin || auth.can("admin_users", "delete");
+  const { data: users = [] } = useQuery({ queryKey: ["users"], queryFn: () => list(), enabled: canView });
   const [form, setForm] = useState({ fullName: "", username: "", email: "", password: "", role: "employee" as Role });
 
   const m = useMutation({
@@ -94,8 +98,8 @@ function UsersPage() {
   });
 
   if (auth.loading) return null;
-  if (!auth.isAdmin)
-    return <main className="p-10 text-center text-ink/50">هذه الصفحة متاحة للمدير فقط</main>;
+  if (!canView)
+    return <main className="p-10 text-center text-ink/50">هذه الصفحة غير متاحة لك</main>;
 
   return (
     <main className="mx-auto grid max-w-[1100px] gap-4 px-4 py-5 lg:grid-cols-[360px_1fr]">

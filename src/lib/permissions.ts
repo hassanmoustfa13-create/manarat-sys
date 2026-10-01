@@ -1,12 +1,12 @@
 export const ACTIONS = [
-  { key: "view", label: "عرض" },
-  { key: "add", label: "إضافة" },
-  { key: "edit", label: "تعديل" },
-  { key: "delete", label: "حذف" },
-  { key: "import", label: "استيراد Excel" },
-  { key: "export", label: "تصدير" },
-  { key: "complete", label: "إتمام النقل" },
-  { key: "quick_edit", label: "تعديل سريع بالتفاصيل" },
+  { key: "view", label: "عرض", short: "عرض" },
+  { key: "add", label: "إضافة", short: "إضافة" },
+  { key: "edit", label: "تعديل", short: "تعديل" },
+  { key: "delete", label: "حذف", short: "حذف" },
+  { key: "import", label: "استيراد Excel", short: "استيراد" },
+  { key: "export", label: "تصدير", short: "تصدير" },
+  { key: "complete", label: "إتمام النقل", short: "إتمام" },
+  { key: "quick_edit", label: "تعديل سريع بالتفاصيل", short: "تعديل سريع" },
 ] as const;
 export type Action = (typeof ACTIONS)[number]["key"];
 

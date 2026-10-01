@@ -22,75 +22,89 @@ export function PermissionMatrix({
   const resources = allResources(forms);
   let lastGroup = "";
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[820px] text-[13px]">
-        <thead>
-          <tr className="text-ink/50">
-            <th className="p-2 text-right font-medium">القسم</th>
-            {ACTIONS.map((a) => (
-              <th key={a.key} className="p-2 text-center font-medium">{a.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {resources.flatMap((r) => {
-            const rows = [];
-            if (r.group !== lastGroup) {
-              lastGroup = r.group;
+    <div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px] text-[13px]">
+          <thead>
+            <tr className="text-ink/50">
+              <th className="w-[130px] p-1.5 text-right text-[12px] font-medium">القسم</th>
+              {ACTIONS.map((a) => (
+                <th
+                  key={a.key}
+                  title={a.label}
+                  className="p-1.5 text-center text-[12px] font-medium leading-tight"
+                >
+                  {a.short}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {resources.flatMap((r) => {
+              const rows = [];
+              if (r.group !== lastGroup) {
+                lastGroup = r.group;
+                rows.push(
+                  <tr key={`g-${r.group}`}>
+                    <td colSpan={ACTIONS.length + 1} className="bg-black/[0.03] p-1.5 text-[12px] font-semibold text-ink/50">
+                      {r.group}
+                      {r.group === "صفحات الإدارة" && " — «عرض» يعني فتح الصفحة واستخدامها بالكامل"}
+                    </td>
+                  </tr>,
+                );
+              }
               rows.push(
-                <tr key={`g-${r.group}`}>
-                  <td colSpan={ACTIONS.length + 1} className="bg-black/[0.03] p-2 text-[12px] font-semibold text-ink/50">
-                    {r.group}
-                    {r.group === "صفحات الإدارة" && " — «عرض» يعني فتح الصفحة واستخدامها بالكامل"}
-                  </td>
-                </tr>,
-              );
-            }
-            rows.push(
-              <tr key={r.key} className="border-t border-black/5">
-                <td className="p-2 font-medium">{r.label}</td>
-                {ACTIONS.map((a) => {
-                  if (!r.actions.includes(a.key))
-                    return <td key={a.key} className="p-2 text-center text-ink/20">—</td>;
-                  const k = permKey(r.key, a.key);
-                  const v = values[k] ?? null;
-                  if (!tri)
+                <tr key={r.key} className="border-t border-black/5">
+                  <td className="p-1.5 font-medium leading-snug">{r.label}</td>
+                  {ACTIONS.map((a) => {
+                    if (!r.actions.includes(a.key))
+                      return <td key={a.key} className="p-1.5 text-center text-ink/20">—</td>;
+                    const k = permKey(r.key, a.key);
+                    const v = values[k] ?? null;
+                    if (!tri)
+                      return (
+                        <td key={a.key} className="p-1.5 text-center">
+                          <input
+                            type="checkbox"
+                            aria-label={`${r.label} - ${a.label}`}
+                            disabled={disabled}
+                            checked={Boolean(v)}
+                            onChange={(e) => onChange(k, e.target.checked)}
+                            className="size-4 accent-[var(--color-brand)]"
+                          />
+                        </td>
+                      );
+                    const inh = inherited?.[k] ?? false;
                     return (
-                      <td key={a.key} className="p-2 text-center">
-                        <input
-                          type="checkbox"
+                      <td key={a.key} className="p-1 text-center">
+                        <select
                           aria-label={`${r.label} - ${a.label}`}
-                          disabled={disabled}
-                          checked={Boolean(v)}
-                          onChange={(e) => onChange(k, e.target.checked)}
-                          className="size-4 accent-[var(--color-brand)]"
-                        />
+                          title={v === null ? (inh ? "حسب الدور — مسموح للدور" : "حسب الدور — ممنوع للدور") : undefined}
+                          value={v === null ? "" : v ? "1" : "0"}
+                          onChange={(e) => onChange(k, e.target.value === "" ? null : e.target.value === "1")}
+                          className={`w-[74px] rounded-md px-0.5 py-1 text-[11.5px] ring-1 ring-black/10 ${
+                            v === true ? "bg-brand/10 text-brand" : v === false ? "bg-terracotta/10 text-terracotta" : "bg-white/70 text-ink/60"
+                          }`}
+                        >
+                          <option value="">حسب الدور</option>
+                          <option value="1">سماح</option>
+                          <option value="0">منع</option>
+                        </select>
                       </td>
                     );
-                  const inh = inherited?.[k] ?? false;
-                  return (
-                    <td key={a.key} className="p-1.5 text-center">
-                      <select
-                        aria-label={`${r.label} - ${a.label}`}
-                        value={v === null ? "" : v ? "1" : "0"}
-                        onChange={(e) => onChange(k, e.target.value === "" ? null : e.target.value === "1")}
-                        className={`rounded-md px-1 py-1 text-[12px] ring-1 ring-black/10 ${
-                          v === true ? "bg-brand/10 text-brand" : v === false ? "bg-terracotta/10 text-terracotta" : "bg-white/70 text-ink/60"
-                        }`}
-                      >
-                        <option value="">حسب الدور ({inh ? "✓" : "✗"})</option>
-                        <option value="1">سماح</option>
-                        <option value="0">منع</option>
-                      </select>
-                    </td>
-                  );
-                })}
-              </tr>,
-            );
-            return rows;
-          })}
-        </tbody>
-      </table>
+                  })}
+                </tr>,
+              );
+              return rows;
+            })}
+          </tbody>
+        </table>
+      </div>
+      {tri && (
+        <p className="mt-2 text-[11px] leading-relaxed text-ink/45">
+          «حسب الدور» تعني أن الصلاحية تتبع إعدادات الدور (المشرف أو الموظف) المحددة في هذه الصفحة — ضع المؤشر على القائمة لترى ما يسمح به الدور.
+        </p>
+      )}
     </div>
   );
 }

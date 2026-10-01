@@ -224,12 +224,51 @@ export function DataGrid<T extends { id: string }>({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
-      <div className="flex items-center justify-between border-t border-black/5 px-4 py-2.5 text-[13px] text-ink/50">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-black/5 px-4 py-2.5 text-[13px] text-ink/50">
         <span>
-          عرض {rows.length} من {data.length} سجل
+          عرض {rows.length} من {table.getFilteredRowModel().rows.length} سجل
         </span>
-        <span className="hidden sm:inline">لتعديل بيانات أي صف اضغط زر التعديل بجانبه</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="hidden sm:inline">لتعديل بيانات أي صف اضغط زر التعديل بجانبه</span>
+          {table.getPageCount() > 1 && (
+            <div className="flex items-center gap-1.5" dir="ltr">
+              <button
+                type="button"
+                aria-label="الصفحة السابقة"
+                disabled={!table.getCanPreviousPage()}
+                onClick={() => table.previousPage()}
+                className="grid size-7 place-items-center rounded-full bg-white/90 text-ink/60 ring-1 ring-black/10 transition-colors hover:text-brand disabled:opacity-40"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+              <span className="text-[12.5px]">
+                صفحة {pagination.pageIndex + 1} من {table.getPageCount()}
+              </span>
+              <button
+                type="button"
+                aria-label="الصفحة التالية"
+                disabled={!table.getCanNextPage()}
+                onClick={() => table.nextPage()}
+                className="grid size-7 place-items-center rounded-full bg-white/90 text-ink/60 ring-1 ring-black/10 transition-colors hover:text-brand disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+            </div>
+          )}
+          <select
+            value={pagination.pageSize}
+            onChange={(e) => setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })}
+            aria-label="عدد الأسطر في الصفحة"
+            className="rounded-lg border border-black/10 bg-white/80 px-2 py-1 text-[12.5px] text-ink/70 focus:outline-none"
+          >
+            <option value={10}>10 أسطر</option>
+            <option value={25}>25 سطرًا</option>
+            <option value={50}>50 سطرًا</option>
+            <option value={1000000}>كل الأسطر</option>
+          </select>
+        </div>
       </div>
     </div>
   );

@@ -5,11 +5,12 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
 
@@ -49,6 +50,22 @@ export function DataGrid<T extends { id: string }>({
   onRowClick,
 }: DataGridProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState(false);
+  const move = (left: number) => scrollRef.current?.scrollBy({ left, behavior: "smooth" });
+  useEffect(() => {
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+  }, [search, data.length]);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const check = () => setCanScroll(el.scrollWidth > el.clientWidth + 4);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [data, pagination.pageSize]);
   const { data: allSettings } = useQuery(gridSettingsQuery);
   const saved = gridKey ? allSettings?.[gridKey] : undefined;
   const colSettings = useMemo(() => (gridKey ? resolveColumns(gridKey, saved) : []), [gridKey, saved]);
@@ -69,12 +86,14 @@ export function DataGrid<T extends { id: string }>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter: search, ...(gridKey ? { columnOrder, columnVisibility } : {}) },
+    state: { sorting, globalFilter: search, pagination, ...(gridKey ? { columnOrder, columnVisibility } : {}) },
     onSortingChange: setSorting,
+    onPaginationChange: setPagination,
     getRowId: (r) => r.id,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     globalFilterFn: (row, _colId, filter: string) => {
       const q = filter.trim().toLowerCase();
       if (!q) return true;
@@ -90,7 +109,31 @@ export function DataGrid<T extends { id: string }>({
 
   return (
     <div className="overflow-hidden rounded-[min(1vw,14px)] bg-white/60 ring-1 ring-black/8 backdrop-blur-xl">
-      <div className="grid-scroll max-h-[calc(100vh-15rem)] overflow-auto">
+      <div className="relative">
+        {canScroll && (
+          <div
+            dir="ltr"
+            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 flex items-center justify-between px-0.5"
+          >
+            <button
+              type="button"
+              aria-label="تمرير لعرض أعمدة إضافية"
+              onClick={() => move(-420)}
+              className="pointer-events-auto grid size-8 place-items-center rounded-full bg-white/95 text-ink/60 shadow-lg ring-1 ring-black/10 transition-colors hover:text-brand"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+            <button
+              type="button"
+              aria-label="العودة للأعمدة الأولى"
+              onClick={() => move(420)}
+              className="pointer-events-auto grid size-8 place-items-center rounded-full bg-white/95 text-ink/60 shadow-lg ring-1 ring-black/10 transition-colors hover:text-brand"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </div>
+        )}
+        <div ref={scrollRef} className="grid-scroll max-h-[calc(100vh-15rem)] overflow-auto">
         <table className={`w-full border-collapse ${fontCls}`} style={{ minWidth }}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (
@@ -181,12 +224,51 @@ export function DataGrid<T extends { id: string }>({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
-      <div className="flex items-center justify-between border-t border-black/5 px-4 py-2.5 text-[13px] text-ink/50">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-black/5 px-4 py-2.5 text-[13px] text-ink/50">
         <span>
-          عرض {rows.length} من {data.length} سجل
+          عرض {rows.length} من {table.getFilteredRowModel().rows.length} سجل
         </span>
-        <span className="hidden sm:inline">لتعديل بيانات أي صف اضغط زر التعديل بجانبه</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="hidden sm:inline">لتعديل بيانات أي صف اضغط زر التعديل بجانبه</span>
+          {table.getPageCount() > 1 && (
+            <div className="flex items-center gap-1.5" dir="ltr">
+              <button
+                type="button"
+                aria-label="الصفحة السابقة"
+                disabled={!table.getCanPreviousPage()}
+                onClick={() => table.previousPage()}
+                className="grid size-7 place-items-center rounded-full bg-white/90 text-ink/60 ring-1 ring-black/10 transition-colors hover:text-brand disabled:opacity-40"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+              <span className="text-[12.5px]">
+                صفحة {pagination.pageIndex + 1} من {table.getPageCount()}
+              </span>
+              <button
+                type="button"
+                aria-label="الصفحة التالية"
+                disabled={!table.getCanNextPage()}
+                onClick={() => table.nextPage()}
+                className="grid size-7 place-items-center rounded-full bg-white/90 text-ink/60 ring-1 ring-black/10 transition-colors hover:text-brand disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+            </div>
+          )}
+          <select
+            value={pagination.pageSize}
+            onChange={(e) => setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })}
+            aria-label="عدد الأسطر في الصفحة"
+            className="rounded-lg border border-black/10 bg-white/80 px-2 py-1 text-[12.5px] text-ink/70 focus:outline-none"
+          >
+            <option value={10}>10 أسطر</option>
+            <option value={25}>25 سطرًا</option>
+            <option value={50}>50 سطرًا</option>
+            <option value={1000000}>كل الأسطر</option>
+          </select>
+        </div>
       </div>
     </div>
   );

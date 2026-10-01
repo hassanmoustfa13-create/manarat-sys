@@ -11,6 +11,7 @@ import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";
+import { formsQuery } from "@/lib/forms";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -350,8 +351,16 @@ function EditableSelectRow({
   const auth = useAuth();
   const qc = useQueryClient();
   const [saving, setSaving] = useState(false);
+  const { data: forms } = useQuery(formsQuery);
+  // نفس خيارات نموذج الإضافة في «إدارة النماذج»، وإلا القائمة الافتراضية
+  const formKey = record.category === "مهنية" ? "manual_pro" : "manual_domestic";
+  const formField = forms
+    ?.find((f) => f.form_key === formKey)
+    ?.form_fields.find((x) => x.column_name === field || x.field_key === field);
+  const dbOptions = formField?.form_field_options.filter((o) => o.is_active).map((o) => o.value) ?? [];
+  const base: readonly string[] = dbOptions.length ? dbOptions : options;
   if (!auth.isAdmin) return <DetailRow label={label} value={<StatusBadge value={value} />} />;
-  const list = value && !options.includes(value) ? [value, ...options] : options;
+  const list = value && !base.includes(value) ? [value, ...base] : base;
   const save = async (v: string) => {
     if (v === value) return;
     setSaving(true);

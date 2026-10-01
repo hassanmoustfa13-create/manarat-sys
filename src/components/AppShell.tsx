@@ -1,6 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import {
-  Archive, Link } from "@tanstack/react-router";
-import {
+  Archive,
   ArrowLeftRight, Briefcase,
   BarChart3,
   ClipboardList,

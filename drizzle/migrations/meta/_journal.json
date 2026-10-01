@@ -232,6 +232,13 @@
       "when": 1790876959629,
       "tag": "0032_admin_users_permission",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1790877781336,
+      "tag": "0033_users_view_permission_read",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,2 @@
+CREATE POLICY "profiles read with users view" ON public.profiles FOR SELECT TO authenticated USING (public.can(auth.uid(), 'admin_users', 'view'));
+CREATE POLICY "roles read with users view" ON public.user_roles FOR SELECT TO authenticated USING (public.can(auth.uid(), 'admin_users', 'view'));

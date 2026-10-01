@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { ACTIONS, allResources, permKey } from "@/lib/permissions";
 import { formsQuery } from "@/lib/forms";
 import { Button } from "@/components/ui/button";

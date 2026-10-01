@@ -14,11 +14,12 @@ import { ROLE_LABELS, type StaffRole } from "@/lib/permissions";
 import { KeyRound } from "lucide-react";
 
 function RoleSelect({ value, onChange, disabled }: { value: StaffRole; onChange: (r: StaffRole) => void; disabled?: boolean }) {
+  const { isAdmin } = useAuth();
   return (
     <label className="flex items-center gap-2 text-[13px]">
       <span className="text-ink/60">الدور</span>
       <select disabled={disabled} value={value} onChange={(e) => onChange(e.target.value as StaffRole)} className="glass h-9 flex-1 rounded-lg px-2 text-[13px]">
-        {(Object.keys(ROLE_LABELS) as StaffRole[]).map((r) => (
+        {(Object.keys(ROLE_LABELS) as StaffRole[]).filter((r) => isAdmin || r !== "admin" || value === "admin").map((r) => (
           <option key={r} value={r}>{ROLE_LABELS[r]}</option>
         ))}
       </select>

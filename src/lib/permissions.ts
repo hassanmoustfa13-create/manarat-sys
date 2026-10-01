@@ -31,6 +31,7 @@ export const RESOURCES: ResourceDef[] = [
   { key: "admin_forms", label: "إدارة النماذج", actions: ["view"], group: "صفحات الإدارة" },
   { key: "admin_pages", label: "إظهار وإخفاء الصفحات", actions: ["view"], group: "صفحات الإدارة" },
   { key: "admin_security", label: "سجل الأمان", actions: ["view"], group: "صفحات الإدارة" },
+  { key: "admin_users", label: "المستخدمون", actions: ["view", "add", "edit", "delete"], group: "صفحات الإدارة" },
 ];
 export type Resource = string;
 
@@ -64,6 +65,7 @@ export const ROUTE_RESOURCE: Record<string, Resource> = {
   "/forms": "admin_forms",
   "/pages": "admin_pages",
   "/security": "admin_security",
+  "/users": "admin_users",
 };
 
 export const permKey = (r: string, a: string) => `${r}:${a}`;

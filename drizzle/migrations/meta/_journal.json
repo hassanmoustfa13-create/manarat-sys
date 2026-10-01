@@ -239,6 +239,13 @@
       "when": 1790877781336,
       "tag": "0033_users_view_permission_read",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790877860468,
+      "tag": "0034_hide_admins_from_non_admins",
+      "breakpoints": true
     }
   ]
 }

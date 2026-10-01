@@ -25,11 +25,12 @@ export function PermissionMatrix({
   const resources = allResources(forms);
   const scrollRef = useRef<HTMLDivElement>(null);
   const move = (left: number) => scrollRef.current?.scrollBy({ left, behavior: "smooth" });
+  const moveY = (top: number) => scrollRef.current?.scrollBy({ top, behavior: "smooth" });
   let lastGroup = "";
   return (
     <div>
       <div className="mb-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <p className="min-w-0 text-[12px] text-ink/55">حرّك الجدول لعرض باقي الصلاحيات</p>
+        <p className="min-w-0 text-[12px] text-ink/55">حرّك الجدول بالأسهم أو بالسحب لعرض باقي الصلاحيات</p>
         <div className="flex shrink-0 items-center gap-1" dir="ltr">
           <Button type="button" variant="outline" size="icon" aria-label="عرض الأعمدة السابقة" title="عرض الأعمدة السابقة" onClick={() => move(420)}>
             <ChevronRight />
@@ -37,11 +38,17 @@ export function PermissionMatrix({
           <Button type="button" variant="outline" size="icon" aria-label="عرض الأعمدة التالية" title="عرض الأعمدة التالية" onClick={() => move(-420)}>
             <ChevronLeft />
           </Button>
+          <Button type="button" variant="outline" size="icon" aria-label="عرض الصفوف السابقة" title="عرض الصفوف السابقة" onClick={() => moveY(-320)}>
+            <ChevronUp />
+          </Button>
+          <Button type="button" variant="outline" size="icon" aria-label="عرض الصفوف التالية" title="عرض الصفوف التالية" onClick={() => moveY(320)}>
+            <ChevronDown />
+          </Button>
         </div>
       </div>
-      <div ref={scrollRef} className="grid-scroll overflow-x-scroll overscroll-x-contain pb-3">
+      <div ref={scrollRef} className="grid-scroll max-h-[55vh] overflow-auto overscroll-contain rounded-xl ring-1 ring-black/10">
         <table className="w-full min-w-[920px] text-[13px]">
-          <thead>
+          <thead className="sticky top-0 z-10 bg-card shadow-[0_1px_0_0_rgba(0,0,0,0.08)]">
             <tr className="text-ink/50">
               <th className="w-[130px] p-1.5 text-right text-[12px] font-medium">القسم</th>
               {ACTIONS.map((a) => (

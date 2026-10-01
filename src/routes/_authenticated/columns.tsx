@@ -185,7 +185,16 @@ function ColumnsPage() {
               <GripVertical className="size-4" />
               {i + 1}
             </span>
-            <span className="font-medium">{labels[c.id]}</span>
+            <input
+              aria-label="اسم العمود"
+              value={c.label ?? ""}
+              placeholder={labels[c.id]}
+              title={`الاسم الأصلي: ${labels[c.id]}`}
+              draggable={false}
+              onDragStart={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              onChange={(e) => update(i, { label: e.target.value || undefined })}
+              className="h-8 min-w-0 rounded-md bg-white/70 px-2 font-medium ring-1 ring-black/10 placeholder:text-ink/70 focus:ring-brand"
+            />
             <button
               onClick={() => update(i, { visible: !c.visible })}
               className="inline-flex items-center gap-1 text-[13px]"

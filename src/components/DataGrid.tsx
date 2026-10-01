@@ -114,7 +114,7 @@ export function DataGrid<T extends { id: string }>({
                           onClick={header.column.getToggleSortingHandler()}
                           className="inline-flex items-center gap-1.5 leading-snug disabled:cursor-default"
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
                           {canSort &&
                             (sorted === "asc" ? (
                               <ArrowUp className="size-3.5 text-brand" />

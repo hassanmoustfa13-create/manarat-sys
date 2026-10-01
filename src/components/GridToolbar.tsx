@@ -18,7 +18,7 @@ export function GridToolbar({
   onSearch: (v: string) => void;
   filters?: ReactNode;
   addLabel: string;
-  onAdd?: () => void;
+  onAdd?: (() => void) | undefined;
   extra?: ReactNode;
 }) {
   return (

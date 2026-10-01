@@ -56,7 +56,7 @@ type Row = Transfer & { worker_name: string; worker: Worker | null };
 export function TransfersView({ category }: { category: "منزلية" | "مهنية" }) {
   const auth = useAuth();
   const admin = auth.isAdmin;
-  const permRes = (category === "مهنية" ? "transfers_pro" : "transfers") as const;
+  const permRes: "transfers" | "transfers_pro" = category === "مهنية" ? "transfers_pro" : "transfers";
   const canAdd = auth.can(permRes, "add");
   const canEdit = auth.can(permRes, "edit");
   const canDel = auth.can(permRes, "delete");

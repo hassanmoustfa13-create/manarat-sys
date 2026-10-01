@@ -44,7 +44,7 @@ export function UserOverridesDialog({
             .from("user_permission_overrides")
             .upsert({ user_id: user.id, resource, action, allowed: v }, { onConflict: "user_id,resource,action" });
     const { error } = await q;
-    if (error) return toast.error(errorMessage(error));
+    if (error) { toast.error(errorMessage(error)); return; }
     toast.success("تم الحفظ");
     qc.invalidateQueries({ queryKey: ["overrides", user.id] });
   };

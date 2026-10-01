@@ -48,7 +48,7 @@ function PermissionsPage() {
     const { error } = await supabase
       .from("role_permissions")
       .upsert({ role, resource: resource!, action: action!, allowed: Boolean(v) }, { onConflict: "role,resource,action" });
-    if (error) return toast.error(errorMessage(error));
+    if (error) { toast.error(errorMessage(error)); return; }
     toast.success("تم الحفظ");
     qc.invalidateQueries({ queryKey: ["role_permissions"] });
     qc.invalidateQueries({ queryKey: ["auth"] });

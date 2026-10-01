@@ -331,7 +331,7 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
         default_value: def,
         helper_text: helper,
         min_value: min === "" ? null : Number(min),
-        max_value: max === "" ? null : Number(max),
+        max_value: max === "" || Number(max) < 0 ? null : Number(max),
         validation: (pattern ? { ...field?.validation, pattern } : {}) as never,
         settings: { ...field?.settings, full } as never,
         ...(locked ? {} : { field_key: k, field_type: type }),
@@ -426,8 +426,8 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
           <Field label="الحد الأدنى" hint="للأرقام: أقل قيمة — للنص: أقل عدد أحرف">
             <Input type="number" dir="ltr" value={min} onChange={(e) => setMin(e.target.value)} />
           </Field>
-          <Field label="الحد الأقصى">
-            <Input type="number" dir="ltr" value={max} onChange={(e) => setMax(e.target.value)} />
+          <Field label="الحد الأقصى" hint="اتركه فارغًا إذا لم ترد تحديد حد أقصى">
+            <Input type="number" min="0" dir="ltr" value={max} onChange={(e) => setMax(e.target.value)} />
           </Field>
           <Field label="قاعدة تحقق (اختياري، نمط Regex)" className="sm:col-span-2">
             <Input dir="ltr" className="text-left" value={pattern} placeholder="^05\d{8}$" onChange={(e) => setPattern(e.target.value)} />

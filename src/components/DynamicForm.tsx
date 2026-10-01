@@ -274,7 +274,7 @@ export function DynamicFields({
                   value={v}
                   placeholder={f.placeholder}
                   min={f.min_value ?? undefined}
-                  max={f.max_value ?? undefined}
+                  max={f.max_value != null && f.max_value >= 0 ? f.max_value : undefined}
                   step={f.field_type === "currency" ? "0.01" : undefined}
                   onChange={(e) => set(f.field_key)(e.target.value)}
                 />

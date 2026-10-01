@@ -150,10 +150,10 @@ export function validate(form: FormDef, values: Values): string | null {
       const n = Number(v);
       if (Number.isNaN(n)) return `«${f.label}» يجب أن يكون رقمًا`;
       if (f.min_value != null && n < f.min_value) return `«${f.label}» يجب ألا يقل عن ${f.min_value}`;
-      if (f.max_value != null && n > f.max_value) return `«${f.label}» يجب ألا يزيد عن ${f.max_value}`;
+      if (f.max_value != null && f.max_value >= 0 && n > f.max_value) return `«${f.label}» يجب ألا يزيد عن ${f.max_value}`;
     } else if (f.field_type !== "date" && f.field_type !== "time" && f.field_type !== "file") {
       if (f.min_value != null && v.length < f.min_value) return `«${f.label}» قصير جدًا (الحد الأدنى ${f.min_value})`;
-      if (f.max_value != null && v.length > f.max_value) return `«${f.label}» طويل جدًا (الحد الأقصى ${f.max_value})`;
+      if (f.max_value != null && f.max_value >= 0 && v.length > f.max_value) return `«${f.label}» طويل جدًا (الحد الأقصى ${f.max_value})`;
     }
     if (f.field_type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return `«${f.label}» بريد غير صحيح`;
     if (f.field_type === "phone" && !/^[+\d\s-]{5,20}$/.test(v)) return `«${f.label}» رقم هاتف غير صحيح`;

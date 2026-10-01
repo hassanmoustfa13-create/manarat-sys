@@ -12,6 +12,11 @@ async function assertAdmin(supabase: any, userId: string) {
   if (!data) throw new Error("غير مسموح: هذه العملية للمدير فقط");
 }
 
+async function setRole(admin: any, userId: string, role: "admin" | "supervisor" | "employee") {
+  await admin.from("user_roles").delete().eq("user_id", userId).neq("role", role);
+  await admin.from("user_roles").upsert({ user_id: userId, role }, { onConflict: "user_id,role" });
+}
+
 export const listUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -23,6 +28,11 @@ export const listUsers = createServerFn({ method: "GET" })
     return (profiles ?? []).map((p) => ({
       ...p,
       isAdmin: (roles ?? []).some((r) => r.user_id === p.id && r.role === "admin"),
+      role: ((roles ?? []).some((r) => r.user_id === p.id && r.role === "admin")
+        ? "admin"
+        : (roles ?? []).some((r) => r.user_id === p.id && r.role === "supervisor")
+          ? "supervisor"
+          : "employee") as "admin" | "supervisor" | "employee",
     }));
   });
 
@@ -35,7 +45,7 @@ export const createUser = createServerFn({ method: "POST" })
         password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل").max(72),
         fullName: z.string().trim().min(1).max(100),
         username: z.string().trim().toLowerCase().regex(/^[a-z0-9._-]{3,30}$/, "اسم المستخدم: 3-30 حرفاً إنجليزياً أو أرقام أو . _ -"),
-        isAdmin: z.boolean(),
+        role: z.enum(["admin", "supervisor", "employee"]),
       })
       .parse(d),
   )
@@ -56,11 +66,9 @@ export const createUser = createServerFn({ method: "POST" })
       await log({ event_type: "user_created", success: false, identifier: data.email, actor_user_id: context.userId, details: error.message });
       throw new Error(error.message);
     }
-    await log({ event_type: "user_created", identifier: data.email, target_user_id: created.user?.id, actor_user_id: context.userId, details: data.isAdmin ? "بصلاحية مدير" : "موظف" });
+    await log({ event_type: "user_created", identifier: data.email, target_user_id: created.user?.id, actor_user_id: context.userId, details: `دور: ${data.role}` });
     if (created.user) await supabaseAdmin.from("profiles").update({ username: data.username }).eq("id", created.user.id);
-    if (data.isAdmin && created.user) {
-      await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: "admin" });
-    }
+    if (created.user) await setRole(supabaseAdmin, created.user.id, data.role);
     return { ok: true };
   });
 
@@ -98,14 +106,14 @@ export const updateUser = createServerFn({ method: "POST" })
         fullName: z.string().trim().min(1).max(100),
         username: z.string().trim().toLowerCase().regex(/^[a-z0-9._-]{3,30}$/, "اسم المستخدم: 3-30 حرفاً إنجليزياً أو أرقام أو . _ -"),
         password: z.string().max(72).optional(),
-        isAdmin: z.boolean(),
+        role: z.enum(["admin", "supervisor", "employee"]),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     if (data.password && data.password.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
-    if (data.id === context.userId && !data.isAdmin) throw new Error("لا يمكنك إزالة صلاحية المدير عن حسابك");
+    if (data.id === context.userId && data.role !== "admin") throw new Error("لا يمكنك إزالة صلاحية المدير عن حسابك");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     {
       const { data: dup } = await supabaseAdmin.from("profiles").select("id").ilike("username", data.username).maybeSingle();
@@ -117,15 +125,10 @@ export const updateUser = createServerFn({ method: "POST" })
       user_metadata: { full_name: data.fullName },
       ...(data.password ? { password: data.password } : {}),
     });
-    await log({ event_type: data.password ? "password_reset_by_admin" : "user_updated", success: !error, identifier: data.email, target_user_id: data.id, actor_user_id: context.userId, details: error?.message ?? (data.isAdmin ? "صلاحية مدير" : "صلاحية موظف") });
+    await log({ event_type: data.password ? "password_reset_by_admin" : "user_updated", success: !error, identifier: data.email, target_user_id: data.id, actor_user_id: context.userId, details: error?.message ?? `دور: ${data.role}` });
     if (error) throw new Error(error.message);
     await supabaseAdmin.from("profiles").update({ full_name: data.fullName, email: data.email, username: data.username }).eq("id", data.id);
-    if (data.isAdmin) {
-      await supabaseAdmin.from("user_roles").upsert({ user_id: data.id, role: "admin" }, { onConflict: "user_id,role" });
-    } else {
-      await supabaseAdmin.from("user_roles").delete().eq("user_id", data.id).eq("role", "admin");
-      await supabaseAdmin.from("user_roles").upsert({ user_id: data.id, role: "user" }, { onConflict: "user_id,role" });
-    }
+    await setRole(supabaseAdmin, data.id, data.role);
     return { ok: true };
   });
 

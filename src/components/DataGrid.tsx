@@ -86,12 +86,14 @@ export function DataGrid<T extends { id: string }>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter: search, ...(gridKey ? { columnOrder, columnVisibility } : {}) },
+    state: { sorting, globalFilter: search, pagination, ...(gridKey ? { columnOrder, columnVisibility } : {}) },
     onSortingChange: setSorting,
+    onPaginationChange: setPagination,
     getRowId: (r) => r.id,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     globalFilterFn: (row, _colId, filter: string) => {
       const q = filter.trim().toLowerCase();
       if (!q) return true;
@@ -107,7 +109,31 @@ export function DataGrid<T extends { id: string }>({
 
   return (
     <div className="overflow-hidden rounded-[min(1vw,14px)] bg-white/60 ring-1 ring-black/8 backdrop-blur-xl">
-      <div className="grid-scroll max-h-[calc(100vh-15rem)] overflow-auto">
+      <div className="relative">
+        {canScroll && (
+          <div
+            dir="ltr"
+            className="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 flex items-center justify-between px-0.5"
+          >
+            <button
+              type="button"
+              aria-label="تمرير لعرض أعمدة إضافية"
+              onClick={() => move(-420)}
+              className="pointer-events-auto grid size-8 place-items-center rounded-full bg-white/95 text-ink/60 shadow-lg ring-1 ring-black/10 transition-colors hover:text-brand"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+            <button
+              type="button"
+              aria-label="العودة للأعمدة الأولى"
+              onClick={() => move(420)}
+              className="pointer-events-auto grid size-8 place-items-center rounded-full bg-white/95 text-ink/60 shadow-lg ring-1 ring-black/10 transition-colors hover:text-brand"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </div>
+        )}
+        <div ref={scrollRef} className="grid-scroll max-h-[calc(100vh-15rem)] overflow-auto">
         <table className={`w-full border-collapse ${fontCls}`} style={{ minWidth }}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (

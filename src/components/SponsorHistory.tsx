@@ -22,7 +22,7 @@ export function SponsorHistory({
       return data;
     },
   });
-  const lastEnd = data.length ? data[data.length - 1].ended_on : current.since;
+  const lastEnd = data.at(-1)?.ended_on ?? current.since;
   const rows = [
     ...data.map((h) => ({
       key: h.id,

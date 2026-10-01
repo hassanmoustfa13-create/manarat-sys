@@ -34,7 +34,8 @@ type Item = {
   worker_name: string;
   passport_number: string;
   nationality: string;
-  r: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  r: any;
 };
 
 function ArchivePage() {
@@ -159,7 +160,7 @@ function Sec({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function Details({ item, nameOf, onRestore, pending }: { item: Item; nameOf: (id: string | null) => string; onRestore?: () => void; pending: boolean }) {
+function Details({ item, nameOf, onRestore, pending }: { item: Item; nameOf: (id: string | null | undefined) => string; onRestore?: (() => void) | undefined; pending: boolean }) {
   const r = item.r;
   const remaining = Number(r.remaining_amount ?? 0);
   return (

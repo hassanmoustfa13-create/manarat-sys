@@ -169,7 +169,10 @@ export function validate(form: FormDef, values: Values): string | null {
 }
 
 function coerce(f: FormField, v: string): unknown {
-  if (NUMERIC_TYPES.includes(f.field_type)) return Number(v || 0);
+  if (NUMERIC_TYPES.includes(f.field_type)) {
+    const n = Number(v);
+    return v.trim() === "" || Number.isNaN(n) ? 0 : n;
+  }
   if (f.field_type === "date") return v || null;
   if (f.field_type === "checkbox") return v === "true";
   return v.trim();

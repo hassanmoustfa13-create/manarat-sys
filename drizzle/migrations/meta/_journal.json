@@ -218,6 +218,13 @@
       "when": 1790872616205,
       "tag": "0030_sponsor_history_and_archive",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1790876551464,
+      "tag": "0031_fix_guard_soft_delete",
+      "breakpoints": true
     }
   ]
 }

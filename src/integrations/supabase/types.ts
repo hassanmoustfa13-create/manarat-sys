@@ -551,6 +551,27 @@ export type Database = {
         }
         Relationships: []
       }
+      role_permissions: {
+        Row: {
+          action: string
+          allowed: boolean
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          action: string
+          allowed?: boolean
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          action?: string
+          allowed?: boolean
+          resource?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       security_events: {
         Row: {
           actor_user_id: string | null
@@ -694,6 +715,27 @@ export type Database = {
           },
         ]
       }
+      user_permission_overrides: {
+        Row: {
+          action: string
+          allowed: boolean
+          resource: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          allowed: boolean
+          resource: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          allowed?: boolean
+          resource?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -804,6 +846,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can: {
+        Args: { _action: string; _resource: string; _uid: string }
+        Returns: boolean
+      }
       complete_transfer: { Args: { _transfer_id: string }; Returns: undefined }
       has_role: {
         Args: {
@@ -820,6 +866,7 @@ export type Database = {
           id: string
         }[]
       }
+      transfer_resource: { Args: { _category: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user" | "supervisor" | "employee"

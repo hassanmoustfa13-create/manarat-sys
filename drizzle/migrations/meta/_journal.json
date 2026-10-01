@@ -197,6 +197,13 @@
       "when": 1790870183495,
       "tag": "0027_roles_add_supervisor_employee",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1790870216177,
+      "tag": "0028_permissions_system",
+      "breakpoints": true
     }
   ]
 }

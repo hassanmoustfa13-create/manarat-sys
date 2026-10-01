@@ -225,6 +225,13 @@
       "when": 1790876551464,
       "tag": "0031_fix_guard_soft_delete",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1790876959629,
+      "tag": "0032_admin_users_permission",
+      "breakpoints": true
     }
   ]
 }

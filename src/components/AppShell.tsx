@@ -8,6 +8,7 @@ import {
   Settings2,
   ShieldCheck,
   UserCog,
+  KeyRound,
   Users,
   X,
   type LucideIcon,
@@ -21,6 +22,7 @@ import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { hiddenPagesQuery } from "@/lib/pageVisibility";
+import { ROLE_LABELS, ROUTE_RESOURCE } from "@/lib/permissions";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
 import { useAuth, useSignOut } from "@/hooks/useAuth";
@@ -28,7 +30,7 @@ import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages" | "/forms"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
+type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/reports" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; section?: string };
 
 export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -41,6 +43,7 @@ export const NAV: NavItem[] = [
   { to: "/flights", label: "الرحلات", icon: Plane, section: "" },
   { to: "/reports", label: "التقارير", icon: BarChart3 },
   { to: "/users", label: "المستخدمون", icon: UserCog, admin: true },
+  { to: "/permissions", label: "الصلاحيات", icon: KeyRound, admin: true },
   { to: "/columns", label: "إعدادات الجداول", icon: Settings2, admin: true },
   { to: "/security", label: "سجل الأمان", icon: ShieldCheck, admin: true },
   { to: "/pages", label: "إظهار وإخفاء الصفحات", icon: EyeOff, admin: true },
@@ -53,12 +56,17 @@ const activeCls =
   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20";
 
 function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
+  const { can } = useAuth();
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const { data: forms = [] } = useQuery(formsQuery);
-  const custom = forms.filter((f) => !f.is_system && f.is_active);
+  const custom = isAdmin || can("custom_forms", "view") ? forms.filter((f) => !f.is_system && f.is_active) : [];
+  const visible = (to: string) => {
+    const r = ROUTE_RESOURCE[to];
+    return !r || can(r, "view");
+  };
   return (
     <>
-      {NAV.filter((n) => (!n.admin || isAdmin) && (isAdmin || !hidden.includes(n.to))).map(({ to, label, icon: Icon, section }) => (
+      {NAV.filter((n) => (!n.admin || isAdmin) && (isAdmin || (!hidden.includes(n.to) && visible(n.to)))).map(({ to, label, icon: Icon, section }) => (
         <div key={to}>
           {section !== undefined && (
             <div className="mt-2 border-t border-black/5 px-3 pb-1 pt-3 text-[11px] font-semibold text-ink/40">
@@ -101,7 +109,7 @@ function UserBlock() {
           {auth.loading ? "…" : auth.fullName}
         </span>
         <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
-          {auth.isAdmin ? "مدير" : "موظف"}
+          {ROLE_LABELS[auth.role]}
         </span>
       </div>
       <div className="flex items-center justify-between">
@@ -125,7 +133,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const blocked = !auth.loading && !auth.isAdmin && hidden.includes(pathname);
+  const routeRes = ROUTE_RESOURCE[pathname] ?? (pathname.startsWith("/f/") ? "custom_forms" : undefined);
+  const noAccess = !auth.loading && !auth.isAdmin && routeRes !== undefined && !auth.can(routeRes, "view");
+  const blocked = noAccess || (!auth.loading && !auth.isAdmin && hidden.includes(pathname));
 
   return (
     <div className="flex min-h-screen">

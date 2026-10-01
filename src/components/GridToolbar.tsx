@@ -18,7 +18,7 @@ export function GridToolbar({
   onSearch: (v: string) => void;
   filters?: ReactNode;
   addLabel: string;
-  onAdd: () => void;
+  onAdd?: (() => void) | undefined;
   extra?: ReactNode;
 }) {
   return (
@@ -39,10 +39,12 @@ export function GridToolbar({
       {filters && <div className="flex flex-wrap items-center gap-1.5">{filters}</div>}
       <div className="flex items-center gap-2 lg:ms-auto">
         {extra}
-        <Button onClick={onAdd} className="gap-1.5">
-          <Plus className="size-4" />
-          {addLabel}
-        </Button>
+        {onAdd && (
+          <Button onClick={onAdd} className="gap-1.5">
+            <Plus className="size-4" />
+            {addLabel}
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ type Entry = { id: string; data: Record<string, unknown>; created_by: string | n
 
 function DynamicFormPage() {
   const { formKey } = Route.useParams();
-  const { isAdmin } = useAuth();
+  const { isAdmin, can } = useAuth();
   const qc = useQueryClient();
   const { data: forms, isLoading: fl } = useQuery(formsQuery);
   const form = forms?.find((f) => f.form_key === formKey);
@@ -112,10 +112,10 @@ function DynamicFormPage() {
         search={search}
         onSearch={setSearch}
         addLabel="إضافة"
-        onAdd={() => {
+        onAdd={can("custom_forms", "add") ? () => {
           setEditing(null);
           setOpen(true);
-        }}
+        } : undefined}
       />
       {activeFields(form).length === 0 && (
         <p className="mb-3 text-[13px] text-ink/55">لا توجد حقول مفعّلة في هذا النموذج بعد ({Object.keys(FIELD_TYPES).length} نوع متاح في «إدارة النماذج»).</p>
@@ -129,16 +129,18 @@ function DynamicFormPage() {
           search={search}
           rowActions={(r) => (
             <>
-              <IconBtn
-                title="تعديل"
-                onClick={() => {
-                  setEditing(r);
-                  setOpen(true);
-                }}
-              >
-                <Pencil className="size-3.5" />
-              </IconBtn>
-              {isAdmin && (
+              {can("custom_forms", "edit") && (
+                <IconBtn
+                  title="تعديل"
+                  onClick={() => {
+                    setEditing(r);
+                    setOpen(true);
+                  }}
+                >
+                  <Pencil className="size-3.5" />
+                </IconBtn>
+              )}
+              {can("custom_forms", "delete") && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(r)}>
                   <Trash2 className="size-3.5" />
                 </IconBtn>

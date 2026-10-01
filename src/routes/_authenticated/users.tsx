@@ -9,8 +9,25 @@ import { formatDate } from "@/lib/data";
 import { Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
+import { UserOverridesDialog } from "@/components/UserOverridesDialog";
+import { ROLE_LABELS, type StaffRole } from "@/lib/permissions";
+import { KeyRound } from "lucide-react";
 
-type Editing = { id: string; fullName: string; username: string; email: string; password: string; isAdmin: boolean };
+function RoleSelect({ value, onChange, disabled }: { value: StaffRole; onChange: (r: StaffRole) => void; disabled?: boolean }) {
+  return (
+    <label className="flex items-center gap-2 text-[13px]">
+      <span className="text-ink/60">الدور</span>
+      <select disabled={disabled} value={value} onChange={(e) => onChange(e.target.value as StaffRole)} className="glass h-9 flex-1 rounded-lg px-2 text-[13px]">
+        {(Object.keys(ROLE_LABELS) as StaffRole[]).map((r) => (
+          <option key={r} value={r}>{ROLE_LABELS[r]}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+type Role = StaffRole;
+type Editing = { id: string; fullName: string; username: string; email: string; password: string; role: Role };
 
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
@@ -34,13 +51,13 @@ function UsersPage() {
   const list = useServerFn(listUsers);
   const create = useServerFn(createUser);
   const { data: users = [] } = useQuery({ queryKey: ["users"], queryFn: () => list(), enabled: auth.isAdmin });
-  const [form, setForm] = useState({ fullName: "", username: "", email: "", password: "", isAdmin: false });
+  const [form, setForm] = useState({ fullName: "", username: "", email: "", password: "", role: "employee" as Role });
 
   const m = useMutation({
     mutationFn: () => create({ data: form }),
     onSuccess: () => {
       toast.success("تمت إضافة المستخدم");
-      setForm({ fullName: "", username: "", email: "", password: "", isAdmin: false });
+      setForm({ fullName: "", username: "", email: "", password: "", role: "employee" as Role });
       qc.invalidateQueries({ queryKey: ["users"] });
       qc.invalidateQueries({ queryKey: ["profiles"] });
     },
@@ -51,6 +68,7 @@ function UsersPage() {
   const remove = useServerFn(deleteUser);
   const [editing, setEditing] = useState<Editing | null>(null);
   const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null);
+  const [overrideFor, setOverrideFor] = useState<{ id: string; name: string; role: StaffRole } | null>(null);
   const refresh = () => {
     qc.invalidateQueries({ queryKey: ["users"] });
     qc.invalidateQueries({ queryKey: ["profiles"] });
@@ -93,10 +111,7 @@ function UsersPage() {
         <input required dir="ltr" placeholder="اسم المستخدم (يوزر)" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} className={input} />
         <input required type="email" dir="ltr" placeholder="البريد الإلكتروني" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={input} />
         <input required dir="ltr" placeholder="كلمة المرور (6 أحرف على الأقل)" minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className={input} />
-        <label className="flex items-center gap-2 text-[13px]">
-          <input type="checkbox" checked={form.isAdmin} onChange={(e) => setForm({ ...form, isAdmin: e.target.checked })} />
-          صلاحية مدير
-        </label>
+        <RoleSelect value={form.role} onChange={(role) => setForm({ ...form, role })} />
         <button disabled={m.isPending} className="h-10 w-full rounded-lg bg-brand text-[13px] font-medium text-primary-foreground disabled:opacity-60">
           {m.isPending ? "جارٍ الإضافة…" : "إضافة"}
         </button>
@@ -110,8 +125,13 @@ function UsersPage() {
               <span dir="ltr" className="truncate text-[12px] font-semibold text-brand">@{u.username}</span>
               <span dir="ltr" className="truncate text-ink/50">{u.email}</span>
               <span className="text-[11px] text-ink/40">{formatDate(u.created_at)}</span>
-              <span className={u.isAdmin ? "pill pill-teal" : "pill pill-brand"}>{u.isAdmin ? "مدير" : "موظف"}</span>
-              <button type="button" title="تعديل" onClick={() => setEditing({ id: u.id, fullName: u.full_name, username: u.username ?? "", email: u.email, password: "", isAdmin: u.isAdmin })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
+              <span className={u.isAdmin ? "pill pill-teal" : "pill pill-brand"}>{ROLE_LABELS[u.role]}</span>
+              {!u.isAdmin && (
+                <button type="button" title="صلاحيات خاصة" onClick={() => setOverrideFor({ id: u.id, name: u.full_name, role: u.role })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
+                  <KeyRound className="size-3.5" />
+                </button>
+              )}
+              <button type="button" title="تعديل" onClick={() => setEditing({ id: u.id, fullName: u.full_name, username: u.username ?? "", email: u.email, password: "", role: u.role })} className="grid size-7 place-items-center rounded-lg text-ink/50 hover:bg-black/5 hover:text-ink">
                 <Pencil className="size-3.5" />
               </button>
               {u.id !== auth.userId && (
@@ -141,10 +161,7 @@ function UsersPage() {
               <input required dir="ltr" placeholder="اسم المستخدم (يوزر)" value={editing.username} onChange={(e) => setEditing({ ...editing, username: e.target.value })} className={input} />
               <input required type="email" dir="ltr" placeholder="البريد الإلكتروني" value={editing.email} onChange={(e) => setEditing({ ...editing, email: e.target.value })} className={input} />
               <input dir="ltr" minLength={6} placeholder="كلمة مرور جديدة (اتركها فارغة لعدم التغيير)" value={editing.password} onChange={(e) => setEditing({ ...editing, password: e.target.value })} className={input} />
-              <label className="flex items-center gap-2 text-[13px]">
-                <input type="checkbox" disabled={editing.id === auth.userId} checked={editing.isAdmin} onChange={(e) => setEditing({ ...editing, isAdmin: e.target.checked })} />
-                صلاحية مدير
-              </label>
+              <RoleSelect disabled={editing.id === auth.userId} value={editing.role} onChange={(role) => setEditing({ ...editing, role })} />
               <button disabled={editM.isPending} className="h-10 w-full rounded-lg bg-brand text-[13px] font-medium text-primary-foreground disabled:opacity-60">
                 {editM.isPending ? "جارٍ الحفظ…" : "حفظ التعديلات"}
               </button>
@@ -152,6 +169,8 @@ function UsersPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <UserOverridesDialog user={overrideFor} onClose={() => setOverrideFor(null)} />
 
       <ConfirmDelete
         open={!!deleting}

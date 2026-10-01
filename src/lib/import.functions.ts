@@ -20,11 +20,14 @@ export const logImport = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("الاستيراد متاح للمدير فقط");
+    const resources =
+      data.table === "transfers" ? ["transfers", "transfers_pro"] : [data.table === "office_visas" ? "visas" : data.table];
+    let allowed = false;
+    for (const r of resources) {
+      const { data: ok } = await context.supabase.rpc("can", { _uid: context.userId, _resource: r, _action: "import" });
+      if (ok) allowed = true;
+    }
+    if (!allowed) throw new Error("ليس لديك صلاحية الاستيراد");
     await logSecurityEvent({
       event_type: "excel_import",
       success: data.failed === 0,

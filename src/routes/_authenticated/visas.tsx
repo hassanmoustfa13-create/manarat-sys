@@ -43,7 +43,13 @@ function Pill({ ok, children }: { ok: boolean; children: React.ReactNode }) {
 }
 
 function VisasPage() {
-  const { isAdmin: admin } = useAuth();
+  const auth = useAuth();
+  const admin = auth.isAdmin;
+  const permRes = "visas" as const;
+  const canAdd = auth.can(permRes, "add");
+  const canEdit = auth.can(permRes, "edit");
+  const canDel = auth.can(permRes, "delete");
+  const canImport = auth.can(permRes, "import");
   const qc = useQueryClient();
   const { data: visas = [], isLoading } = useQuery({
     queryKey: ["office_visas"],
@@ -135,12 +141,12 @@ function VisasPage() {
         search={search}
         onSearch={setSearch}
         addLabel="إضافة تأشيرة جديدة"
-        onAdd={() => {
+        onAdd={canAdd ? () => {
           setEditing(null);
           setFormOpen(true);
-        }}
+        } : undefined}
         extra={
-          admin ? (
+          canImport ? (
             <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setImportOpen(true)}>
               <FileSpreadsheet className="size-4" /> استيراد من Excel
             </Button>
@@ -170,7 +176,7 @@ function VisasPage() {
           emptyMessage="لا توجد تأشيرات بعد"
           rowActions={(r) => (
             <>
-              <IconBtn
+              {canEdit && (<IconBtn
                 title="تعديل"
                 onClick={() => {
                   setEditing(r);
@@ -178,8 +184,8 @@ function VisasPage() {
                 }}
               >
                 <Pencil className="size-3.5" />
-              </IconBtn>
-              {admin && (
+              </IconBtn>)}
+              {canDel && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(r)}>
                   <Trash2 className="size-3.5" />
                 </IconBtn>

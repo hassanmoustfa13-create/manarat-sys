@@ -128,6 +128,11 @@ function WorkersPage() {
   });
 
   const admin = auth.isAdmin;
+  const permRes = "workers" as const;
+  const canAdd = auth.can(permRes, "add");
+  const canEdit = auth.can(permRes, "edit");
+  const canDel = auth.can(permRes, "delete");
+  const canImport = auth.can(permRes, "import");
 
   const columns = useMemo<ColumnDef<Worker, unknown>[]>(
     () => [
@@ -303,12 +308,12 @@ function WorkersPage() {
         search={search}
         onSearch={setSearch}
         addLabel="إضافة عامل/ـة"
-        onAdd={() => {
+        onAdd={canAdd ? () => {
           setEditing(null);
           setFormOpen(true);
-        }}
+        } : undefined}
         extra={
-          admin ? (
+          canImport ? (
             <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setImportOpen(true)}>
               <FileSpreadsheet className="size-4" /> استيراد من Excel
             </Button>
@@ -355,7 +360,7 @@ function WorkersPage() {
               <IconBtn title="نقل الكفالة" onClick={() => setTransferFor(w)}>
                 <ArrowLeftRight className="size-3.5" />
               </IconBtn>
-              <IconBtn
+              {canEdit && (<IconBtn
                 title="تعديل"
                 onClick={() => {
                   setEditing(w);
@@ -363,8 +368,8 @@ function WorkersPage() {
                 }}
               >
                 <Pencil className="size-3.5" />
-              </IconBtn>
-              {admin && (
+              </IconBtn>)}
+              {canDel && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(w)}>
                   <Trash2 className="size-3.5" />
                 </IconBtn>

@@ -53,7 +53,13 @@ export const Route = createFileRoute("/_authenticated/flights")({
 });
 
 function FlightsPage() {
-  const { isAdmin: admin } = useAuth();
+  const auth = useAuth();
+  const admin = auth.isAdmin;
+  const permRes = "flights" as const;
+  const canAdd = auth.can(permRes, "add");
+  const canEdit = auth.can(permRes, "edit");
+  const canDel = auth.can(permRes, "delete");
+  const canImport = auth.can(permRes, "import");
   const qc = useQueryClient();
   const { data: profiles } = useQuery(profilesQuery);
   const nameOf = profileNameMap(profiles);
@@ -180,10 +186,10 @@ function FlightsPage() {
         search={search}
         onSearch={setSearch}
         addLabel="إضافة رحلة"
-        onAdd={() => {
+        onAdd={canAdd ? () => {
           setEditing(null);
           setFormOpen(true);
-        }}
+        } : undefined}
         filters={
           <>
             <FilterChip active={filter === null} onClick={() => setFilter(null)}>
@@ -208,7 +214,7 @@ function FlightsPage() {
           emptyMessage="لا توجد رحلات بعد"
           rowActions={(r) => (
             <>
-              <IconBtn
+              {canEdit && (<IconBtn
                 title="تعديل"
                 onClick={() => {
                   setEditing(r);
@@ -216,8 +222,8 @@ function FlightsPage() {
                 }}
               >
                 <Pencil className="size-3.5" />
-              </IconBtn>
-              {admin && (
+              </IconBtn>)}
+              {canDel && (
                 <IconBtn title="حذف" danger onClick={() => setDeleting(r)}>
                   <Trash2 className="size-3.5" />
                 </IconBtn>

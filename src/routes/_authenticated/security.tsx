@@ -38,7 +38,7 @@ function SecurityPage() {
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["security_events"],
     queryFn: () => fetchEvents(),
-    enabled: auth.isAdmin,
+    enabled: auth.can("admin_security", "view"),
   });
 
   const rows = useMemo(() => {
@@ -52,7 +52,7 @@ function SecurityPage() {
   }, [data, type, result, q]);
 
   if (auth.loading) return null;
-  if (!auth.isAdmin) return <div className="p-8 text-center text-ink/60">هذه الصفحة متاحة للمدير فقط</div>;
+  if (!auth.can("admin_security", "view")) return <div className="p-8 text-center text-ink/60">هذه الصفحة متاحة للمدير فقط</div>;
 
   const sel = "h-10 rounded-lg border border-black/10 bg-white px-3 text-sm";
   return (

@@ -92,7 +92,7 @@ type Form = ReturnType<typeof empty>;
 export function ManualTransfersView({ category }: { category: Category }) {
   const auth = useAuth();
   const admin = auth.isAdmin;
-  const permRes = "manual_transfers" as const;
+  const permRes = category === "مهنية" ? "manual_transfers_pro" : "manual_transfers";
   const canAdd = auth.can(permRes, "add");
   const canEdit = auth.can(permRes, "edit");
   const canDel = auth.can(permRes, "delete");
@@ -364,7 +364,8 @@ function EditableSelectRow({
     ?.form_fields.find((x) => x.column_name === field || x.field_key === field);
   const dbOptions = formField?.form_field_options.filter((o) => o.is_active).map((o) => o.value) ?? [];
   const base: readonly string[] = dbOptions.length ? dbOptions : options;
-  if (!auth.isAdmin) return <DetailRow label={label} value={<StatusBadge value={value} />} />;
+  const res = record.category === "مهنية" ? "manual_transfers_pro" : "manual_transfers";
+  if (!(auth.can(res, "quick_edit") && auth.can(res, "edit"))) return <DetailRow label={label} value={<StatusBadge value={value} />} />;
   const list = value && !base.includes(value) ? [value, ...base] : base;
   const save = async (v: string) => {
     if (v === value) return;

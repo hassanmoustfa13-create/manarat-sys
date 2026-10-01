@@ -59,7 +59,7 @@ function FormEditor() {
     onError: (e) => toast.error(errorMessage(e)),
   });
 
-  if (!auth.loading && !auth.isAdmin) return <div className="p-10 text-center text-muted-foreground">هذه الصفحة للمدير فقط.</div>;
+  if (!auth.loading && !auth.can("admin_forms", "view")) return <div className="p-10 text-center text-muted-foreground">هذه الصفحة للمدير فقط.</div>;
   if (isLoading || !form) return <div className="p-10 text-center text-ink/50">{isLoading ? "جارٍ التحميل…" : "النموذج غير موجود"}</div>;
 
   const fields = form.form_fields;

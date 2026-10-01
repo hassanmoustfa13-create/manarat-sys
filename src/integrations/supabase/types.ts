@@ -851,6 +851,7 @@ export type Database = {
         Returns: boolean
       }
       complete_transfer: { Args: { _transfer_id: string }; Returns: undefined }
+      form_resource: { Args: { _form_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -859,6 +860,7 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      manual_resource: { Args: { _category: string }; Returns: string }
       staff_names: {
         Args: never
         Returns: {

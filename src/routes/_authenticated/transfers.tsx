@@ -405,7 +405,7 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
 
           rowActions={(t) => (
             <>
-              {t.worker?.transfer_status !== "تم النقل" && (
+              {auth.can(permRes, "complete") && t.worker?.transfer_status !== "تم النقل" && (
                 <IconBtn title="إتمام النقل" onClick={() => setCompleting(t)}>
                   <CheckCircle2 className="size-3.5" />
                 </IconBtn>

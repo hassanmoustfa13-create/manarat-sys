@@ -1,4 +1,6 @@
-import { ACTIONS, RESOURCES, permKey } from "@/lib/permissions";
+import { useQuery } from "@tanstack/react-query";
+import { ACTIONS, allResources, permKey } from "@/lib/permissions";
+import { formsQuery } from "@/lib/forms";
 
 type Cell = boolean | null; // null = حسب الدور
 
@@ -16,9 +18,12 @@ export function PermissionMatrix({
   inherited?: Record<string, boolean>;
   disabled?: boolean;
 }) {
+  const { data: forms = [] } = useQuery(formsQuery);
+  const resources = allResources(forms);
+  let lastGroup = "";
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px] text-[13px]">
+      <table className="w-full min-w-[820px] text-[13px]">
         <thead>
           <tr className="text-ink/50">
             <th className="p-2 text-right font-medium">القسم</th>
@@ -28,45 +33,62 @@ export function PermissionMatrix({
           </tr>
         </thead>
         <tbody>
-          {RESOURCES.map((r) => (
-            <tr key={r.key} className="border-t border-black/5">
-              <td className="p-2 font-medium">{r.label}</td>
-              {ACTIONS.map((a) => {
-                const k = permKey(r.key, a.key);
-                const v = values[k] ?? null;
-                if (!tri)
+          {resources.flatMap((r) => {
+            const rows = [];
+            if (r.group !== lastGroup) {
+              lastGroup = r.group;
+              rows.push(
+                <tr key={`g-${r.group}`}>
+                  <td colSpan={ACTIONS.length + 1} className="bg-black/[0.03] p-2 text-[12px] font-semibold text-ink/50">
+                    {r.group}
+                    {r.group === "صفحات الإدارة" && " — «عرض» يعني فتح الصفحة واستخدامها بالكامل"}
+                  </td>
+                </tr>,
+              );
+            }
+            rows.push(
+              <tr key={r.key} className="border-t border-black/5">
+                <td className="p-2 font-medium">{r.label}</td>
+                {ACTIONS.map((a) => {
+                  if (!r.actions.includes(a.key))
+                    return <td key={a.key} className="p-2 text-center text-ink/20">—</td>;
+                  const k = permKey(r.key, a.key);
+                  const v = values[k] ?? null;
+                  if (!tri)
+                    return (
+                      <td key={a.key} className="p-2 text-center">
+                        <input
+                          type="checkbox"
+                          aria-label={`${r.label} - ${a.label}`}
+                          disabled={disabled}
+                          checked={Boolean(v)}
+                          onChange={(e) => onChange(k, e.target.checked)}
+                          className="size-4 accent-[var(--color-brand)]"
+                        />
+                      </td>
+                    );
+                  const inh = inherited?.[k] ?? false;
                   return (
-                    <td key={a.key} className="p-2 text-center">
-                      <input
-                        type="checkbox"
+                    <td key={a.key} className="p-1.5 text-center">
+                      <select
                         aria-label={`${r.label} - ${a.label}`}
-                        disabled={disabled}
-                        checked={Boolean(v)}
-                        onChange={(e) => onChange(k, e.target.checked)}
-                        className="size-4 accent-[var(--color-brand)]"
-                      />
+                        value={v === null ? "" : v ? "1" : "0"}
+                        onChange={(e) => onChange(k, e.target.value === "" ? null : e.target.value === "1")}
+                        className={`rounded-md px-1 py-1 text-[12px] ring-1 ring-black/10 ${
+                          v === true ? "bg-brand/10 text-brand" : v === false ? "bg-terracotta/10 text-terracotta" : "bg-white/70 text-ink/60"
+                        }`}
+                      >
+                        <option value="">حسب الدور ({inh ? "✓" : "✗"})</option>
+                        <option value="1">سماح</option>
+                        <option value="0">منع</option>
+                      </select>
                     </td>
                   );
-                const inh = inherited?.[k] ?? false;
-                return (
-                  <td key={a.key} className="p-1.5 text-center">
-                    <select
-                      aria-label={`${r.label} - ${a.label}`}
-                      value={v === null ? "" : v ? "1" : "0"}
-                      onChange={(e) => onChange(k, e.target.value === "" ? null : e.target.value === "1")}
-                      className={`rounded-md px-1 py-1 text-[12px] ring-1 ring-black/10 ${
-                        v === true ? "bg-brand/10 text-brand" : v === false ? "bg-terracotta/10 text-terracotta" : "bg-white/70 text-ink/60"
-                      }`}
-                    >
-                      <option value="">حسب الدور ({inh ? "✓" : "✗"})</option>
-                      <option value="1">سماح</option>
-                      <option value="0">منع</option>
-                    </select>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+                })}
+              </tr>,
+            );
+            return rows;
+          })}
         </tbody>
       </table>
     </div>

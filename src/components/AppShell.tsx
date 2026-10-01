@@ -53,12 +53,17 @@ const activeCls =
   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20";
 
 function NavLinks({ isAdmin, onNavigate }: { isAdmin: boolean; onNavigate?: () => void }) {
+  const { can } = useAuth();
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const { data: forms = [] } = useQuery(formsQuery);
-  const custom = forms.filter((f) => !f.is_system && f.is_active);
+  const custom = isAdmin || can("custom_forms", "view") ? forms.filter((f) => !f.is_system && f.is_active) : [];
+  const visible = (to: string) => {
+    const r = ROUTE_RESOURCE[to];
+    return !r || can(r, "view");
+  };
   return (
     <>
-      {NAV.filter((n) => (!n.admin || isAdmin) && (isAdmin || !hidden.includes(n.to))).map(({ to, label, icon: Icon, section }) => (
+      {NAV.filter((n) => (!n.admin || isAdmin) && (isAdmin || (!hidden.includes(n.to) && visible(n.to)))).map(({ to, label, icon: Icon, section }) => (
         <div key={to}>
           {section !== undefined && (
             <div className="mt-2 border-t border-black/5 px-3 pb-1 pt-3 text-[11px] font-semibold text-ink/40">
@@ -125,7 +130,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const blocked = !auth.loading && !auth.isAdmin && hidden.includes(pathname);
+  const routeRes = ROUTE_RESOURCE[pathname] ?? (pathname.startsWith("/f/") ? "custom_forms" : undefined);
+  const noAccess = !auth.loading && !auth.isAdmin && routeRes !== undefined && !auth.can(routeRes, "view");
+  const blocked = noAccess || (!auth.loading && !auth.isAdmin && hidden.includes(pathname));
 
   return (
     <div className="flex min-h-screen">

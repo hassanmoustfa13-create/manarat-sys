@@ -317,10 +317,28 @@ export function DynamicFormDialog({
   const form = formDef ?? forms?.find((f) => f.form_key === formKey);
   const [values, setValues] = useState<Values>({});
 
+  const draftKey = form ? `draft:form:${form.form_key}` : null;
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
-    if (open && form) setValues(initialValues(form, record));
+    if (open && form) {
+      let init = initialValues(form, record);
+      if (!record && draftKey) {
+        try {
+          const raw = localStorage.getItem(draftKey);
+          if (raw) init = { ...init, ...JSON.parse(raw) };
+        } catch { /* ignore */ }
+      }
+      setValues(init);
+      setLoaded(true);
+    } else if (!open) setLoaded(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, record, form?.id]);
+
+  useEffect(() => {
+    if (!open || !loaded || record || !draftKey) return;
+    try { localStorage.setItem(draftKey, JSON.stringify(values)); } catch { /* ignore */ }
+  }, [values, open, loaded, record, draftKey]);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -335,6 +353,7 @@ export function DynamicFormDialog({
     },
     onSuccess: () => {
       toast.success(record ? "تم حفظ التعديلات" : (successText ?? "تمت الإضافة"));
+      if (!record && draftKey) localStorage.removeItem(draftKey);
       qc.invalidateQueries({ queryKey });
       onOpenChange(false);
     },

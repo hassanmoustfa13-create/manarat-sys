@@ -87,7 +87,7 @@ export function WorkerProfileDialog({
 
   return (
     <Dialog open={Boolean(worker)} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl">
+      <DialogContent className="glass-strong max-h-[90vh] max-w-3xl overflow-y-auto" dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
         {worker && (
           <>
             <DialogHeader className="text-right sm:text-right">
@@ -340,7 +340,7 @@ export function SponsorProfileDialog({
 
   return (
     <Dialog open={Boolean(sponsor)} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl">
+      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
         {sponsor && info && (
           <>
             <DialogHeader className="text-right sm:text-right">

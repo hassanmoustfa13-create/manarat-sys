@@ -26,7 +26,7 @@ async function setRole(admin: any, userId: string, role: "admin" | "supervisor" 
 export const listUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    await assertUsersPerm(context.supabase, context.userId, "view");
     const [{ data: profiles }, { data: roles }] = await Promise.all([
       context.supabase.from("profiles").select("id, full_name, email, username, created_at").order("created_at"),
       context.supabase.from("user_roles").select("user_id, role"),
@@ -56,7 +56,7 @@ export const createUser = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    await assertUsersPerm(context.supabase, context.userId, "add");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     {
       const { data: dup } = await supabaseAdmin.from("profiles").select("id").ilike("username", data.username).maybeSingle();
@@ -117,7 +117,7 @@ export const updateUser = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    await assertUsersPerm(context.supabase, context.userId, "edit");
     if (data.password && data.password.length < 6) throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
     if (data.id === context.userId && data.role !== "admin") throw new Error("لا يمكنك إزالة صلاحية المدير عن حسابك");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -142,7 +142,7 @@ export const deleteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await assertAdmin(context.supabase, context.userId);
+    await assertUsersPerm(context.supabase, context.userId, "delete");
     if (data.id === context.userId) throw new Error("لا يمكنك حذف حسابك");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: prof } = await supabaseAdmin.from("profiles").select("email").eq("id", data.id).maybeSingle();

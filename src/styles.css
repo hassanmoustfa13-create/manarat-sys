@@ -202,11 +202,13 @@
 
 /* Scrollbar for grid */
 @utility ledger-rows {
-  & tbody > tr:nth-child(4n + 1) { background-color: color-mix(in oklab, var(--teal) 13%, white); }
-  & tbody > tr:nth-child(4n + 2) { background-color: color-mix(in oklab, var(--brand) 10%, white); }
-  & tbody > tr:nth-child(4n + 3) { background-color: color-mix(in oklab, var(--success) 10%, white); }
-  & tbody > tr:nth-child(4n) { background-color: color-mix(in oklab, var(--terracotta) 9%, white); }
-  & tbody > tr:hover { background-color: color-mix(in oklab, var(--brand) 17%, white); }
+  & tbody > tr:nth-child(6n + 1) { background-color: oklch(0.94 0.05 230); }
+  & tbody > tr:nth-child(6n + 2) { background-color: oklch(0.95 0.06 85); }
+  & tbody > tr:nth-child(6n + 3) { background-color: oklch(0.94 0.05 300); }
+  & tbody > tr:nth-child(6n + 4) { background-color: oklch(0.95 0.06 145); }
+  & tbody > tr:nth-child(6n + 5) { background-color: oklch(0.94 0.05 20); }
+  & tbody > tr:nth-child(6n) { background-color: oklch(0.95 0.05 190); }
+  & tbody > tr:hover { background-color: oklch(0.88 0.08 262); }
 }
 
 @utility grid-scroll {

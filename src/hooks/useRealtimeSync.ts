@@ -9,6 +9,7 @@ const TABLES: Record<string, string[][]> = {
   manual_transfers: [["manual_transfers"]],
   requests: [["requests"]],
   flights: [["flights"]],
+  departures: [["departures"]],
   office_visas: [["office_visas"]],
   grid_settings: [["grid_settings"], ["hidden_pages"]],
   forms: [["forms"]],

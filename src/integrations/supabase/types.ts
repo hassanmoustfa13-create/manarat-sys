@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      departures: {
+        Row: {
+          clients: string[]
+          created_at: string
+          created_by: string | null
+          extra: Json
+          flight_date: string | null
+          flight_time: string
+          id: string
+          office_name: string
+          status: string
+          updated_at: string
+          updated_by: string | null
+          visa_clients: string[]
+          workers_count: number
+        }
+        Insert: {
+          clients?: string[]
+          created_at?: string
+          created_by?: string | null
+          extra?: Json
+          flight_date?: string | null
+          flight_time?: string
+          id?: string
+          office_name?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          visa_clients?: string[]
+          workers_count?: number
+        }
+        Update: {
+          clients?: string[]
+          created_at?: string
+          created_by?: string | null
+          extra?: Json
+          flight_date?: string | null
+          flight_time?: string
+          id?: string
+          office_name?: string
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+          visa_clients?: string[]
+          workers_count?: number
+        }
+        Relationships: []
+      }
       flights: {
         Row: {
           clients: string[]

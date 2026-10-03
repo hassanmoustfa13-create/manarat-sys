@@ -47,7 +47,6 @@ export function DataGrid<T extends { id: string }>({
   gridKey,
   onRowClick,
 }: DataGridProps<T>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScroll, setCanScroll] = useState(false);

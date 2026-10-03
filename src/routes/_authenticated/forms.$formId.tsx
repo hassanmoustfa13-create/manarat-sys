@@ -125,7 +125,7 @@ function FormEditor() {
       </div>
 
       <div className="overflow-hidden rounded-2xl bg-white/60 ring-1 ring-black/8">
-        <table className="w-full text-[14px]">
+        <table className="ledger-rows w-full text-[14px]">
           <thead>
             <tr className="border-b border-black/10 bg-white/90 text-[12px] text-ink/65">
               <th className="w-10 px-3 py-2.5">#</th>

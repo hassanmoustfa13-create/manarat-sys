@@ -94,7 +94,7 @@ function SecurityPage() {
         </select>
       </div>
       <div className="overflow-x-auto rounded-xl bg-white/80 ring-1 ring-black/8">
-        <table className="w-full min-w-[800px] text-[15px]">
+        <table className="ledger-rows w-full min-w-[800px] text-[15px]">
           <thead className="border-b-2 border-black/10 text-[13px] font-bold text-ink/70">
             <tr>
               {["التاريخ", "الحدث", "المستخدم", "بواسطة", "النتيجة", "تفاصيل", ...(canDel ? [""] : [])].map((h) => (

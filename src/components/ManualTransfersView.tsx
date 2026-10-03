@@ -510,7 +510,8 @@ function ManualTransferDetails({
 
             <SponsorHistory
               transferId={record.id}
-              current={{ name: record.new_sponsor_name, phone: record.new_sponsor_phone, since: record.transfer_date, salaryStatus: record.salary_dues_status, salaryAmount: Number(record.salary_dues_amount) }}
+              source="manual_transfers"
+              current={{ name: record.new_sponsor_name, phone: record.new_sponsor_phone, since: record.transfer_date, createdAt: record.created_at, salaryStatus: record.salary_dues_status, salaryAmount: Number(record.salary_dues_amount) }}
             />
 
             <div className="grid gap-4 sm:grid-cols-2">

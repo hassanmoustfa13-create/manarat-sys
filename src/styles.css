@@ -201,6 +201,14 @@
 }
 
 /* Scrollbar for grid */
+@utility ledger-rows {
+  & tbody > tr:nth-child(4n + 1) { background-color: color-mix(in oklab, var(--teal) 13%, white); }
+  & tbody > tr:nth-child(4n + 2) { background-color: color-mix(in oklab, var(--brand) 10%, white); }
+  & tbody > tr:nth-child(4n + 3) { background-color: color-mix(in oklab, var(--success) 10%, white); }
+  & tbody > tr:nth-child(4n) { background-color: color-mix(in oklab, var(--terracotta) 9%, white); }
+  & tbody > tr:hover { background-color: color-mix(in oklab, var(--brand) 17%, white); }
+}
+
 @utility grid-scroll {
   scrollbar-width: thin;
   scrollbar-color: oklch(0 0 0 / 0.18) transparent;

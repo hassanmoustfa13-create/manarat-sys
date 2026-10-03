@@ -134,7 +134,7 @@ export function DataGrid<T extends { id: string }>({
           </div>
         )}
         <div ref={scrollRef} className="grid-scroll max-h-[calc(100vh-15rem)] overflow-auto">
-        <table className={`w-full border-collapse ${fontCls}`} style={{ minWidth }}>
+        <table className={`ledger-rows w-full border-collapse ${fontCls}`} style={{ minWidth }}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="text-[12px] font-bold text-ink/70">
@@ -194,7 +194,7 @@ export function DataGrid<T extends { id: string }>({
               <tr
                 key={row.id}
                 onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                className={`border-b border-black/5 transition-colors hover:bg-white/55 ${onRowClick ? "cursor-pointer" : ""} ${i % 2 === 0 ? "bg-white/25" : ""}`}
+                className={`border-b border-black/5 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
               >
                 <td className={`px-2 ${padCls} text-center text-[12px] font-semibold text-ink/40`}>{i + 1}</td>
                 {row.getVisibleCells().map((cell) => {

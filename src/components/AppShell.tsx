@@ -1,4 +1,4 @@
-import { Link, useMatchRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   Archive,
   ArrowLeftRight, Briefcase,
@@ -89,18 +89,16 @@ function HiddenLabel({ to, label }: { to: string; label: string }) {
   );
 }
 
-function NavItemLink({ item, isAdmin, onNavigate, className, activeClassName }: { item: NavItem; isAdmin: boolean; onNavigate?: () => void; className: string; activeClassName: string }) {
+function NavItemLink({ item, onNavigate, className, activeClassName }: { item: NavItem; onNavigate?: () => void; className: string; activeClassName: string }) {
   return (
     <Link
       to={item.to}
       onClick={onNavigate}
       className={className}
       activeProps={{ className: activeClassName }}
-      end={false}
     >
       <item.icon className="size-4 shrink-0" />
       <HiddenLabel to={item.to} label={item.altLabel ?? item.label} />
-      {isAdmin ? null : null}
     </Link>
   );
 }
@@ -114,52 +112,36 @@ function NavDropdown({
   label,
   icon: Icon,
   items,
-  isAdmin,
   activePaths,
 }: {
   label: string;
   icon: LucideIcon;
   items: NavItem[];
-  isAdmin: boolean;
   activePaths: (path: string) => boolean;
 }) {
-  const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const anyActive = items.some((i) => activePaths(pathname));
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className={
-            anyActive
-              ? `${linkActiveCls} gap-1`
-              : `${linkCls} gap-1`
-          }
-        >
+        <button type="button" className={anyActive ? linkActiveCls : linkCls}>
           <Icon className="size-4 shrink-0" />
-          <span className={hidden.length && false ? "" : ""}>{label}</span>
+          {label}
           <ChevronDown className="size-3.5 opacity-50" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent dir="rtl" align="start" sideOffset={8} className="w-56">
-        {items.map((item, idx) => (
-          <div key={item.to}>
-            {idx === 0 && null}
-            <DropdownMenuItem asChild className="p-0">
-              <Link
-                to={item.to}
-                className={
-                  activePaths(pathname) && pathname === item.to ? menuLinkActiveCls : menuLinkCls
-                }
-              >
-                <item.icon className="size-4 shrink-0" />
-                <HiddenLabel to={item.to} label={item.altLabel ?? item.label} />
-              </Link>
-            </DropdownMenuItem>
-          </div>
+        {items.map((item) => (
+          <DropdownMenuItem asChild key={item.to} className="p-0">
+            <Link
+              to={item.to}
+              className={pathname === item.to ? menuLinkActiveCls : menuLinkCls}
+            >
+              <item.icon className="size-4 shrink-0" />
+              <HiddenLabel to={item.to} label={item.altLabel ?? item.label} />
+            </Link>
+          </DropdownMenuItem>
         ))}
-        {isAdmin ? null : null}
       </DropdownMenuContent>
     </DropdownMenu>
   );

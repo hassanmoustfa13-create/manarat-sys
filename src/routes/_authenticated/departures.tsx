@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { DataGrid } from "@/components/DataGrid";
-import { Dialog } from "@/components/ui/dialog";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";

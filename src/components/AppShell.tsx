@@ -24,7 +24,7 @@ import {
 import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
-import { hiddenPagesQuery } from "@/lib/pageVisibility";
+import { applyNavOrder, hiddenPagesQuery, navOrderQuery } from "@/lib/pageVisibility";
 import { ROLE_LABELS, ROUTE_RESOURCE, formResource } from "@/lib/permissions";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
@@ -71,6 +71,7 @@ const linkActiveCls =
 function useNavFiltering() {
   const { can } = useAuth();
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
+  const { data: order = [] } = useQuery(navOrderQuery);
   const { data: forms = [] } = useQuery(formsQuery);
   const visible = (to: string) => {
     const r = ROUTE_RESOURCE[to];
@@ -79,7 +80,8 @@ function useNavFiltering() {
   const shown = (n: NavItem, isAdmin: boolean) =>
     isAdmin || (!hidden.includes(n.to) && (n.admin ? Boolean(ROUTE_RESOURCE[n.to]) && visible(n.to) : visible(n.to)));
   const custom = forms.filter((f) => !f.is_system && f.is_active);
-  return { hidden, visible, shown, custom };
+  const ordered = applyNavOrder(NAV, order);
+  return { hidden, visible, shown, custom, ordered };
 }
 
 function HiddenLabel({ to, label }: { to: string; label: string }) {
@@ -191,10 +193,10 @@ function UserMenu() {
 }
 
 function TopNav({ isAdmin }: { isAdmin: boolean }) {
-  const { shown, custom } = useNavFiltering();
-  const direct = NAV.filter((n) => !n.admin && !n.to.startsWith("/transfers") && !n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
-  const transfers = NAV.filter((n) => n.to.startsWith("/transfers") || n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
-  const adminItems = NAV.filter((n) => n.admin).filter((n) => shown(n, isAdmin));
+  const { shown, custom, ordered } = useNavFiltering();
+  const direct = ordered.filter((n) => !n.admin && !n.to.startsWith("/transfers") && !n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
+  const transfers = ordered.filter((n) => n.to.startsWith("/transfers") || n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
+  const adminItems = ordered.filter((n) => n.admin).filter((n) => shown(n, isAdmin));
   const activePaths = (path: string) =>
     path.startsWith("/transfers") || path.startsWith("/manual-transfers");
 
@@ -253,7 +255,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
   useRealtimeSync();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { shown, custom } = useNavFiltering();
+  const { shown, custom, ordered } = useNavFiltering();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const routeRes = ROUTE_RESOURCE[pathname] ?? (pathname.startsWith("/f/") ? formResource(decodeURIComponent(pathname.slice(3))) : undefined);
   const noAccess = !auth.loading && !auth.isAdmin && routeRes !== undefined && !auth.can(routeRes, "view");
@@ -316,7 +318,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </button>
             </div>
             <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-              {NAV.filter((n) => shown(n, auth.isAdmin)).map((item) => (
+              {ordered.filter((n) => shown(n, auth.isAdmin)).map((item) => (
                 <NavItemLink
                   key={item.to}
                   item={item}

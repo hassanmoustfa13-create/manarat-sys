@@ -150,47 +150,43 @@ function NavDropdown({
 function UserMenu() {
   const auth = useAuth();
   const signOut = useSignOut();
+  const [pwOpen, setPwOpen] = useState(false);
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="flex shrink-0 items-center gap-2 rounded-lg bg-white/70 py-1.5 pe-3 ps-2 ring-1 ring-black/8 transition-colors hover:bg-white"
-        >
-          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand/15 text-[12px] font-bold text-brand">
-            {(auth.fullName || "؟").trim().charAt(0)}
-          </span>
-          <span className="hidden max-w-28 truncate text-[13px] font-medium sm:block">
-            {auth.loading ? "…" : auth.fullName}
-          </span>
-          <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
-            {ROLE_LABELS[auth.role]}
-          </span>
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent dir="rtl" align="end" sideOffset={8} className="w-56">
-        <DropdownMenuLabel className="truncate text-[13px]">
-          {auth.loading ? "…" : auth.fullName}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild className="p-0">
-          <div className="flex w-full items-center justify-between px-3 py-2">
-            <ChangePasswordDialog />
-            <span className="text-[13px] text-ink/60">تغيير كلمة المرور</span>
-          </div>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild className="p-0">
+    <div className="flex items-center">
+      <ChangePasswordDialog open={pwOpen} onOpenChange={setPwOpen} hideTrigger />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <button
             type="button"
-            onClick={signOut}
-            className="flex w-full items-center justify-end gap-2 px-3 py-2 text-[13px] text-ink/60 transition-colors hover:bg-black/5 hover:text-ink"
+            className="flex shrink-0 items-center gap-2 rounded-lg bg-white/70 py-1.5 pe-3 ps-2 ring-1 ring-black/8 transition-colors hover:bg-white"
           >
+            <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand/15 text-[12px] font-bold text-brand">
+              {(auth.fullName || "؟").trim().charAt(0)}
+            </span>
+            <span className="hidden max-w-28 truncate text-[13px] font-medium sm:block">
+              {auth.loading ? "…" : auth.fullName}
+            </span>
+            <span className={auth.isAdmin ? "pill pill-teal" : "pill pill-brand"}>
+              {ROLE_LABELS[auth.role]}
+            </span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent dir="rtl" align="end" sideOffset={8} className="w-56">
+          <DropdownMenuLabel className="truncate text-[13px]">
+            {auth.loading ? "…" : auth.fullName}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => setPwOpen(true)}>
+            <KeyRound className="size-4" />
+            تغيير كلمة المرور
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={signOut}>
             <LogOut className="size-4" />
             تسجيل الخروج
-          </button>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }
 

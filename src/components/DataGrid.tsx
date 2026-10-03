@@ -83,7 +83,7 @@ export function DataGrid<T extends { id: string }>({
   const table = useReactTable({
     data,
     columns,
-    state: { globalFilter: search, pagination },
+    state: { globalFilter: search, pagination, columnVisibility, columnOrder },
     onPaginationChange: setPagination,
     getRowId: (r) => r.id,
     getCoreRowModel: getCoreRowModel(),

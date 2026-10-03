@@ -209,6 +209,26 @@
   & tbody > tr:nth-child(6n + 5) { background-color: oklch(0.94 0.05 20); }
   & tbody > tr:nth-child(6n) { background-color: oklch(0.95 0.05 190); }
   & tbody > tr:hover { background-color: oklch(0.88 0.08 262); }
+  & tbody > tr[data-state="selected"], & tbody > tr[aria-selected="true"] { background-color: oklch(0.85 0.1 262); }
+  :root[data-row-palette="contrast"] & tbody > tr { color: oklch(0.18 0.02 250); }
+  :root[data-row-palette="contrast"] & tbody > tr:nth-child(odd) { background-color: oklch(1 0 0); }
+  :root[data-row-palette="contrast"] & tbody > tr:nth-child(even) { background-color: oklch(0.86 0.06 240); }
+  :root[data-row-palette="contrast"] & tbody > tr:hover,
+  :root[data-row-palette="contrast"] & tbody > tr[data-state="selected"],
+  :root[data-row-palette="contrast"] & tbody > tr[aria-selected="true"] {
+    background-color: oklch(0.3 0.08 255);
+    color: oklch(1 0 0);
+    outline: 2px solid oklch(0.75 0.16 85);
+    outline-offset: -2px;
+  }
+  :root[data-row-palette="contrast"] & tbody > tr:hover *,
+  :root[data-row-palette="contrast"] & tbody > tr[data-state="selected"] * { color: inherit; }
+  :root[data-row-palette="contrast"] & tbody > tr:hover [class*="pill-"],
+  :root[data-row-palette="contrast"] & tbody > tr[data-state="selected"] [class*="pill-"] {
+    background-color: oklch(1 0 0);
+    color: oklch(0.2 0.03 250);
+    border-color: oklch(1 0 0);
+  }
 }
 
 @utility grid-scroll {

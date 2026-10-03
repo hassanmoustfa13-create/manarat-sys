@@ -86,8 +86,9 @@ function useNavFiltering() {
 
 function HiddenLabel({ to, label }: { to: string; label: string }) {
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
+  const { data: texts } = useQuery(pageTextsQuery);
   return (
-    <span className={hidden.includes(to) ? "opacity-40 line-through" : ""}>{label}</span>
+    <span className={hidden.includes(to) ? "opacity-40 line-through" : ""}>{texts?.labels[to]?.trim() || label}</span>
   );
 }
 
@@ -202,6 +203,7 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
 
   // Slots rendered in the saved order: each direct page, the transfers dropdown,
   // then admin/custom dropdowns (not user-orderable, always last).
+  const transferGroupLabel = texts?.labels["/transfers-group"]?.trim() || "نقل الكفالة";
   const slots: { key: string; node: ReactNode }[] = direct.map((item) => ({
     key: item.to,
     node: <NavItemLink item={item} className={linkCls} activeClassName={linkActiveCls} />,
@@ -209,7 +211,7 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
   if (transfers.length > 0) {
     slots.push({
       key: "/transfers",
-      node: <NavDropdown label="نقل الكفالة" icon={ArrowLeftRight} items={transfers} activePaths={activePaths} />,
+      node: <NavDropdown label={transferGroupLabel} icon={ArrowLeftRight} items={transfers} activePaths={activePaths} />,
     });
   }
   const pos = (key: string) => {

@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 const KEY = "page_visibility";
 
-type PageSettings = { hidden?: string[]; order?: string[] };
+type PageSettings = { hidden?: string[]; order?: string[]; labels?: Record<string, string>; titles?: Record<string, string> };
+export type PageTexts = { labels: Record<string, string>; titles: Record<string, string> };
 
 async function readSettings(): Promise<PageSettings> {
   const { data, error } = await supabase.from("grid_settings").select("settings").eq("grid_key", KEY).maybeSingle();
@@ -30,6 +31,20 @@ export const navOrderQuery = queryOptions({
   },
   staleTime: 30_000,
 });
+
+/** Custom nav names (labels) and in-page headings (titles), keyed by path. */
+export const pageTextsQuery = queryOptions({
+  queryKey: ["page_texts"],
+  queryFn: async (): Promise<PageTexts> => {
+    const s = await readSettings();
+    return { labels: s.labels ?? {}, titles: s.titles ?? {} };
+  },
+  staleTime: 30_000,
+});
+
+export async function savePageTexts(t: PageTexts) {
+  await writeSettings(t);
+}
 
 async function writeSettings(patch: Partial<PageSettings>) {
   const current = await readSettings();

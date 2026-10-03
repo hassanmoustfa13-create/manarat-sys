@@ -24,7 +24,7 @@ import {
 import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
-import { applyNavOrder, hiddenPagesQuery, navOrderQuery } from "@/lib/pageVisibility";
+import { applyNavOrder, hiddenPagesQuery, navOrderQuery, pageTextsQuery } from "@/lib/pageVisibility";
 import { ROLE_LABELS, ROUTE_RESOURCE, formResource } from "@/lib/permissions";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
@@ -86,8 +86,9 @@ function useNavFiltering() {
 
 function HiddenLabel({ to, label }: { to: string; label: string }) {
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
+  const { data: texts } = useQuery(pageTextsQuery);
   return (
-    <span className={hidden.includes(to) ? "opacity-40 line-through" : ""}>{label}</span>
+    <span className={hidden.includes(to) ? "opacity-40 line-through" : ""}>{texts?.labels[to]?.trim() || label}</span>
   );
 }
 
@@ -194,6 +195,7 @@ function UserMenu() {
 
 function TopNav({ isAdmin }: { isAdmin: boolean }) {
   const { shown, custom, ordered, order } = useNavFiltering();
+  const { data: texts } = useQuery(pageTextsQuery);
   const direct = ordered.filter((n) => !n.admin && !n.to.startsWith("/transfers") && !n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
   const transfers = ordered.filter((n) => n.to.startsWith("/transfers") || n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
   const adminItems = ordered.filter((n) => n.admin).filter((n) => shown(n, isAdmin));
@@ -202,6 +204,7 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
 
   // Slots rendered in the saved order: each direct page, the transfers dropdown,
   // then admin/custom dropdowns (not user-orderable, always last).
+  const transferGroupLabel = texts?.labels["/transfers-group"]?.trim() || "نقل الكفالة";
   const slots: { key: string; node: ReactNode }[] = direct.map((item) => ({
     key: item.to,
     node: <NavItemLink item={item} className={linkCls} activeClassName={linkActiveCls} />,
@@ -209,7 +212,7 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
   if (transfers.length > 0) {
     slots.push({
       key: "/transfers",
-      node: <NavDropdown label="نقل الكفالة" icon={ArrowLeftRight} items={transfers} activePaths={activePaths} />,
+      node: <NavDropdown label={transferGroupLabel} icon={ArrowLeftRight} items={transfers} activePaths={activePaths} />,
     });
   }
   const pos = (key: string) => {

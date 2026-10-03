@@ -1,3 +1,6 @@
+import { useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { pageTextsQuery } from "@/lib/pageVisibility";
 import { Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -21,10 +24,13 @@ export function GridToolbar({
   onAdd?: (() => void) | undefined;
   extra?: ReactNode;
 }) {
+  const path = useRouterState({ select: (st) => st.location.pathname });
+  const { data: texts } = useQuery(pageTextsQuery);
+  const shownTitle = texts?.titles[path]?.trim() || title;
   return (
     <div className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-center">
       <div className="flex items-baseline gap-2">
-        <h1 className="text-lg font-semibold">{title}</h1>
+        <h1 className="text-lg font-semibold">{shownTitle}</h1>
         <span className="text-[12px] text-ink/45">{count} سجل</span>
       </div>
       <div className="relative w-full lg:ms-4 lg:w-80">

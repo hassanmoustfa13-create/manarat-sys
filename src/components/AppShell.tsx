@@ -24,7 +24,7 @@ import {
 import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
-import { hiddenPagesQuery } from "@/lib/pageVisibility";
+import { applyNavOrder, hiddenPagesQuery, navOrderQuery } from "@/lib/pageVisibility";
 import { ROLE_LABELS, ROUTE_RESOURCE, formResource } from "@/lib/permissions";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
@@ -71,6 +71,7 @@ const linkActiveCls =
 function useNavFiltering() {
   const { can } = useAuth();
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
+  const { data: order = [] } = useQuery(navOrderQuery);
   const { data: forms = [] } = useQuery(formsQuery);
   const visible = (to: string) => {
     const r = ROUTE_RESOURCE[to];
@@ -79,7 +80,8 @@ function useNavFiltering() {
   const shown = (n: NavItem, isAdmin: boolean) =>
     isAdmin || (!hidden.includes(n.to) && (n.admin ? Boolean(ROUTE_RESOURCE[n.to]) && visible(n.to) : visible(n.to)));
   const custom = forms.filter((f) => !f.is_system && f.is_active);
-  return { hidden, visible, shown, custom };
+  const ordered = applyNavOrder(NAV, order);
+  return { hidden, visible, shown, custom, ordered };
 }
 
 function HiddenLabel({ to, label }: { to: string; label: string }) {

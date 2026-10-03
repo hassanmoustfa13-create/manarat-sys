@@ -1,15 +1,13 @@
 import {
   type ColumnDef,
   type RowData,
-  type SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
@@ -49,7 +47,6 @@ export function DataGrid<T extends { id: string }>({
   gridKey,
   onRowClick,
 }: DataGridProps<T>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScroll, setCanScroll] = useState(false);
@@ -86,13 +83,11 @@ export function DataGrid<T extends { id: string }>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter: search, pagination, ...(gridKey ? { columnOrder, columnVisibility } : {}) },
-    onSortingChange: setSorting,
+    state: { globalFilter: search, pagination },
     onPaginationChange: setPagination,
     getRowId: (r) => r.id,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     globalFilterFn: (row, _colId, filter: string) => {
       const q = filter.trim().toLowerCase();
@@ -141,36 +136,17 @@ export function DataGrid<T extends { id: string }>({
                 <th className="w-10 border-b-2 border-black/10 bg-white/90 px-2 py-2.5 text-center font-bold backdrop-blur-xl">
                   م
                 </th>
-                {hg.headers.map((header) => {
-                  const canSort = header.column.getCanSort();
-                  const sorted = header.column.getIsSorted();
-                  return (
-                    <th
-                      key={header.id}
-                      style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
-                      className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
-                    >
-                      {header.isPlaceholder ? null : (
-                        <button
-                          type="button"
-                          disabled={!canSort}
-                          onClick={header.column.getToggleSortingHandler()}
-                          className="inline-flex items-center gap-1.5 leading-snug disabled:cursor-default"
-                        >
-                          {setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
-                          {canSort &&
-                            (sorted === "asc" ? (
-                              <ArrowUp className="size-3.5 text-brand" />
-                            ) : sorted === "desc" ? (
-                              <ArrowDown className="size-3.5 text-brand" />
-                            ) : (
-                              <ArrowUpDown className="size-3.5 opacity-30" />
-                            ))}
-                        </button>
-                      )}
-                    </th>
-                  );
-                })}
+                {hg.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
+                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
                 {rowActions && (
                   <th className="border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 text-center font-bold backdrop-blur-xl">
                     إجراءات

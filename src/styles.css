@@ -257,15 +257,15 @@
 }
 
 @utility grid-scroll {
-.no-scrollbar {
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
   scrollbar-width: thin;
   scrollbar-color: oklch(0 0 0 / 0.18) transparent;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Hide the "Made with Lovable" badge without affecting layout */

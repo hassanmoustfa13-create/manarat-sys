@@ -193,10 +193,10 @@ function UserMenu() {
 }
 
 function TopNav({ isAdmin }: { isAdmin: boolean }) {
-  const { shown, custom } = useNavFiltering();
-  const direct = NAV.filter((n) => !n.admin && !n.to.startsWith("/transfers") && !n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
-  const transfers = NAV.filter((n) => n.to.startsWith("/transfers") || n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
-  const adminItems = NAV.filter((n) => n.admin).filter((n) => shown(n, isAdmin));
+  const { shown, custom, ordered } = useNavFiltering();
+  const direct = ordered.filter((n) => !n.admin && !n.to.startsWith("/transfers") && !n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
+  const transfers = ordered.filter((n) => n.to.startsWith("/transfers") || n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
+  const adminItems = ordered.filter((n) => n.admin).filter((n) => shown(n, isAdmin));
   const activePaths = (path: string) =>
     path.startsWith("/transfers") || path.startsWith("/manual-transfers");
 
@@ -255,7 +255,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
   useRealtimeSync();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { shown, custom } = useNavFiltering();
+  const { shown, custom, ordered } = useNavFiltering();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const routeRes = ROUTE_RESOURCE[pathname] ?? (pathname.startsWith("/f/") ? formResource(decodeURIComponent(pathname.slice(3))) : undefined);
   const noAccess = !auth.loading && !auth.isAdmin && routeRes !== undefined && !auth.can(routeRes, "view");

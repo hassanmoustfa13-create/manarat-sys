@@ -331,7 +331,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
         onConfirm={() => archiving && archive.mutate(archiving.id)}
       />
       <ManualTransferDetails
-        record={viewing}
+        record={all.find((t) => t.id === viewing?.id) ?? viewing}
         onClose={() => setViewing(null)}
         onSaved={(f, v) => setViewing((cur) => (cur ? { ...cur, [f]: v } : cur))}
         onEdit={(t) => {

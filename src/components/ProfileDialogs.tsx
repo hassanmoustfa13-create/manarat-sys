@@ -233,6 +233,12 @@ export function WorkerProfileDialog({
                         <p className="mt-2 text-[12px] text-ink/60">{t.worker_condition}</p>
                       )}
 
+                      <SponsorHistory
+                        transferId={t.id}
+                        source="transfers"
+                        current={{ name: t.new_sponsor_name, phone: t.new_sponsor_phone, since: t.transfer_date, createdAt: t.created_at, salaryStatus: t.salary_dues_status, salaryAmount: Number(t.salary_dues_amount ?? 0) }}
+                      />
+
                       <p className="mt-2 text-[11px] text-ink/45">
                         أضافها {nameOf(t.created_by)} · آخر تعديل {nameOf(t.updated_by)}
                       </p>

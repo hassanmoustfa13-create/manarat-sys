@@ -41,7 +41,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/departures" | "/reports" | "/archive" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; altLabel?: string };
+export type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/departures" | "/reports" | "/archive" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; altLabel?: string };
 
 export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -81,7 +81,7 @@ function useNavFiltering() {
     isAdmin || (!hidden.includes(n.to) && (n.admin ? Boolean(ROUTE_RESOURCE[n.to]) && visible(n.to) : visible(n.to)));
   const custom = forms.filter((f) => !f.is_system && f.is_active);
   const ordered = applyNavOrder(NAV, order);
-  return { hidden, visible, shown, custom, ordered };
+  return { hidden, visible, shown, custom, ordered, order };
 }
 
 function HiddenLabel({ to, label }: { to: string; label: string }) {

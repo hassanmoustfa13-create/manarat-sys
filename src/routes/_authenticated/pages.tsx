@@ -4,7 +4,8 @@ import { ArrowDown, ArrowUp, ArrowLeftRight, Eye, EyeOff, type LucideIcon } from
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { errorMessage } from "@/lib/data";
-import { applyNavOrder, hiddenPagesQuery, navOrderQuery, saveHiddenPages, saveNavOrder } from "@/lib/pageVisibility";
+import { useEffect, useState } from "react";
+import { applyNavOrder, pageTextsQuery, savePageTexts, type PageTexts, hiddenPagesQuery, navOrderQuery, saveHiddenPages, saveNavOrder } from "@/lib/pageVisibility";
 import { NAV, type NavItem } from "@/components/AppShell";
 
 export const Route = createFileRoute("/_authenticated/pages")({
@@ -30,6 +31,9 @@ function PagesSettings() {
   const qc = useQueryClient();
   const { data: hidden = [] } = useQuery(hiddenPagesQuery);
   const { data: order = [] } = useQuery(navOrderQuery);
+  const { data: texts } = useQuery(pageTextsQuery);
+  const [draft, setDraft] = useState<PageTexts>({ labels: {}, titles: {} });
+  useEffect(() => { if (texts) setDraft(texts); }, [texts]);
   if (!auth.can("admin_pages", "view")) return <main className="p-6 text-ink/60">هذه الصفحة للمدير فقط.</main>;
 
   const toggle = async (to: string) => {
@@ -73,6 +77,29 @@ function PagesSettings() {
     }
   };
 
+  const setText = (kind: keyof PageTexts, to: string, v: string) =>
+    setDraft((d) => ({ ...d, [kind]: { ...d[kind], [to]: v } }));
+  const saveTexts = async () => {
+    const clean = (m: Record<string, string>) => Object.fromEntries(Object.entries(m).filter(([, v]) => v.trim()).map(([k, v]) => [k, v.trim()]));
+    const next = { labels: clean(draft.labels), titles: clean(draft.titles) };
+    try {
+      await savePageTexts(next);
+      qc.setQueryData(pageTextsQuery.queryKey, next);
+      toast.success("تم حفظ الأسماء");
+    } catch (e) {
+      toast.error(errorMessage(e));
+    }
+  };
+  const inputCls = "h-8 w-full rounded-md border border-black/10 bg-white px-2 text-[13px] outline-none focus:border-brand";
+  const textInputs = (to: string, defLabel: string, withTitle = true) => (
+    <div className="grid grid-cols-1 gap-2 pb-3 pe-4 ps-12 sm:grid-cols-2">
+      <input className={inputCls} placeholder={`اسم القائمة: ${defLabel}`} value={draft.labels[to] ?? ""} onChange={(e) => setText("labels", to, e.target.value)} />
+      {withTitle && (
+        <input className={inputCls} placeholder="عنوان الصفحة (اتركه فارغًا للافتراضي)" value={draft.titles[to] ?? ""} onChange={(e) => setText("titles", to, e.target.value)} />
+      )}
+    </div>
+  );
+
   const arrows = (key: string, i: number) => (
     <div className="flex flex-col gap-0.5">
       <button
@@ -115,7 +142,7 @@ function PagesSettings() {
       <h1 className="mb-1 text-xl font-semibold">إظهار وإخفاء الصفحات</h1>
       <p className="mb-5 text-sm text-ink/55">
         الصفحة المخفية تختفي من القائمة للموظفين ولا يمكنهم فتحها. المدير يراها باهتة ويستطيع فتحها. البيانات لا تُحذف.
-        استخدم الأسهم لتغيير ترتيب الصفحات في القائمة العلوية — يُطبَّق الترتيب على الجميع.
+        استخدم الأسهم لتغيير ترتيب الصفحات في القائمة العلوية، واكتب اسمًا جديدًا للصفحة في القائمة أو عنوانًا جديدًا يظهر داخلها — اترك الخانة فارغة للاسم الافتراضي.
       </p>
       <div className="glass divide-y divide-black/5 rounded-2xl">
         {rows.map((row, i) => (
@@ -126,19 +153,26 @@ function PagesSettings() {
               <span className="flex-1 text-sm font-medium">{row.label}</span>
               {row.items.length === 1 ? hideBtn(row.items[0]!.to) : null}
             </div>
+            {row.items.length === 1 ? textInputs(row.items[0]!.to, row.label) : textInputs("/transfers-group", row.label, false)}
             {row.items.length > 1 && (
               <div className="divide-y divide-black/5 border-t border-black/5 bg-black/[0.02]">
                 {row.items.map((n) => (
-                  <div key={n.to} className="flex items-center gap-2 py-2 pe-4 ps-12">
+                  <div key={n.to}>
+                  <div className="flex items-center gap-2 py-2 pe-4 ps-12">
                     <n.icon className="size-3.5 text-ink/40" />
                     <span className="flex-1 text-[13px] text-ink/70">{n.altLabel ?? n.label}</span>
                     {hideBtn(n.to)}
+                  </div>
+                  {textInputs(n.to, n.altLabel ?? n.label)}
                   </div>
                 ))}
               </div>
             )}
           </div>
         ))}
+      </div>
+      <div className="sticky bottom-4 mt-4 flex justify-end">
+        <button type="button" onClick={saveTexts} className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-primary-foreground shadow">حفظ الأسماء والعناوين</button>
       </div>
     </main>
   );

@@ -24,7 +24,7 @@ import {
 import { formsQuery } from "@/lib/forms";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
-import { applyNavOrder, hiddenPagesQuery, navOrderQuery } from "@/lib/pageVisibility";
+import { applyNavOrder, hiddenPagesQuery, navOrderQuery, pageTextsQuery } from "@/lib/pageVisibility";
 import { ROLE_LABELS, ROUTE_RESOURCE, formResource } from "@/lib/permissions";
 import { useState, type ReactNode } from "react";
 import logoAsset from "@/assets/manarat-logo.png.asset.json";
@@ -195,6 +195,7 @@ function UserMenu() {
 
 function TopNav({ isAdmin }: { isAdmin: boolean }) {
   const { shown, custom, ordered, order } = useNavFiltering();
+  const { data: texts } = useQuery(pageTextsQuery);
   const direct = ordered.filter((n) => !n.admin && !n.to.startsWith("/transfers") && !n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
   const transfers = ordered.filter((n) => n.to.startsWith("/transfers") || n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
   const adminItems = ordered.filter((n) => n.admin).filter((n) => shown(n, isAdmin));

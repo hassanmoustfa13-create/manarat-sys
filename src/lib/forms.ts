@@ -64,7 +64,7 @@ export type FormDef = {
   form_key: string;
   name: string;
   route: string;
-  target_table: "manual_transfers" | "office_visas" | "flights" | "form_entries";
+  target_table: "manual_transfers" | "office_visas" | "flights" | "departures" | "form_entries";
   is_active: boolean;
   is_system: boolean;
   sort_order: number;

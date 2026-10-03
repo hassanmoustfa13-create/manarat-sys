@@ -130,7 +130,7 @@ function NavDropdown({
           <ChevronDown className="size-3.5 opacity-50" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent dir="rtl" align="start" sideOffset={8} className="w-56">
+      <DropdownMenuContent align="start" sideOffset={8} className="w-56">
         {items.map((item) => (
           <DropdownMenuItem asChild key={item.to} className="p-0">
             <Link
@@ -171,7 +171,7 @@ function UserMenu() {
             </span>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent dir="rtl" align="end" sideOffset={8} className="w-56">
+        <DropdownMenuContent align="end" sideOffset={8} className="w-56">
           <DropdownMenuLabel className="truncate text-[13px]">
             {auth.loading ? "…" : auth.fullName}
           </DropdownMenuLabel>
@@ -228,7 +228,7 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
               <ChevronDown className="size-3.5 opacity-50" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent dir="rtl" align="start" sideOffset={8} className="w-56">
+          <DropdownMenuContent align="start" sideOffset={8} className="w-56">
             {custom.map((f) => (
               <DropdownMenuItem asChild key={f.id} className="p-0">
                 <Link

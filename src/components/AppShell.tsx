@@ -318,7 +318,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </button>
             </div>
             <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-              {NAV.filter((n) => shown(n, auth.isAdmin)).map((item) => (
+              {ordered.filter((n) => shown(n, auth.isAdmin)).map((item) => (
                 <NavItemLink
                   key={item.to}
                   item={item}

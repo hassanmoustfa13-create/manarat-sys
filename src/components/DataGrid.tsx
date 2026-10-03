@@ -72,8 +72,8 @@ export function DataGrid<T extends { id: string }>({
   const setById = useMemo(() => new Map(colSettings.map((c) => [c.id, c])), [colSettings]);
   const columnOrder = colSettings.map((c) => c.id);
   const columnVisibility = Object.fromEntries(colSettings.map((c) => [c.id, c.visible]));
-  const fontCls = saved?.fontSize === "sm" ? "text-[13px]" : saved?.fontSize === "lg" ? "text-[17px]" : "text-[15px]";
-  const padCls = saved?.density === "compact" ? "py-1.5" : saved?.density === "comfortable" ? "py-5" : "py-3";
+  const fontCls = saved?.fontSize === "sm" ? "text-[12.5px]" : saved?.fontSize === "lg" ? "text-[16px]" : "text-[13.5px]";
+  const padCls = saved?.density === "compact" ? "py-1" : saved?.density === "comfortable" ? "py-4" : "py-2";
   const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;
   const alignOf = (id: string, ltr?: boolean) => {
     const a = setById.get(id)?.align;
@@ -108,7 +108,7 @@ export function DataGrid<T extends { id: string }>({
   const rows = table.getRowModel().rows;
 
   return (
-    <div className="overflow-hidden rounded-[min(1vw,14px)] bg-white/60 ring-1 ring-black/8 backdrop-blur-xl">
+    <div className="overflow-hidden rounded-xl border border-white/50 bg-white/60 shadow-xl backdrop-blur-xl">
       <div className="relative">
         {canScroll && (
           <div
@@ -137,8 +137,8 @@ export function DataGrid<T extends { id: string }>({
         <table className={`w-full border-collapse ${fontCls}`} style={{ minWidth }}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (
-              <tr key={hg.id} className="text-[13px] font-bold text-ink/70">
-                <th className="w-12 border-b-2 border-black/10 bg-white/95 px-3 py-3.5 text-center font-bold backdrop-blur-xl">
+              <tr key={hg.id} className="text-[12px] font-bold text-ink/70">
+                <th className="w-10 border-b-2 border-black/10 bg-white/90 px-2 py-2.5 text-center font-bold backdrop-blur-xl">
                   م
                 </th>
                 {hg.headers.map((header) => {
@@ -148,7 +148,7 @@ export function DataGrid<T extends { id: string }>({
                     <th
                       key={header.id}
                       style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
-                      className={`border-b-2 border-l border-black/10 bg-white/95 px-4 py-3.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
+                      className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
                     >
                       {header.isPlaceholder ? null : (
                         <button
@@ -172,7 +172,7 @@ export function DataGrid<T extends { id: string }>({
                   );
                 })}
                 {rowActions && (
-                  <th className="border-b-2 border-l border-black/10 bg-white/95 px-4 py-3.5 text-center font-bold backdrop-blur-xl">
+                  <th className="border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 text-center font-bold backdrop-blur-xl">
                     إجراءات
                   </th>
                 )}
@@ -194,9 +194,9 @@ export function DataGrid<T extends { id: string }>({
               <tr
                 key={row.id}
                 onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                className={`border-b border-black/5 transition-colors hover:bg-brand/[0.06] ${onRowClick ? "cursor-pointer" : ""} ${i % 2 === 0 ? "bg-black/[0.015]" : ""}`}
+                className={`border-b border-black/5 transition-colors hover:bg-white/55 ${onRowClick ? "cursor-pointer" : ""} ${i % 2 === 0 ? "bg-white/25" : ""}`}
               >
-                <td className={`px-3 ${padCls} text-center text-[13px] font-semibold text-ink/40`}>{i + 1}</td>
+                <td className={`px-2 ${padCls} text-center text-[12px] font-semibold text-ink/40`}>{i + 1}</td>
                 {row.getVisibleCells().map((cell) => {
                   const meta = cell.column.columnDef.meta ?? {};
                   return (
@@ -226,7 +226,7 @@ export function DataGrid<T extends { id: string }>({
         </table>
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-black/5 px-4 py-2.5 text-[13px] text-ink/50">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/60 bg-white/40 px-4 py-2 text-xs text-ink/60">
         <span>
           عرض {rows.length} من {table.getFilteredRowModel().rows.length} سجل
         </span>
@@ -243,7 +243,7 @@ export function DataGrid<T extends { id: string }>({
               >
                 <ChevronRight className="size-4" />
               </button>
-              <span className="text-[12.5px]">
+              <span className="text-[11.5px]">
                 صفحة {pagination.pageIndex + 1} من {table.getPageCount()}
               </span>
               <button
@@ -261,7 +261,7 @@ export function DataGrid<T extends { id: string }>({
             value={pagination.pageSize}
             onChange={(e) => setPagination({ pageIndex: 0, pageSize: Number(e.target.value) })}
             aria-label="عدد الأسطر في الصفحة"
-            className="rounded-lg border border-black/10 bg-white/80 px-2 py-1 text-[12.5px] text-ink/70 focus:outline-none"
+            className="rounded-lg border border-white/60 bg-white/50 px-2 py-1 text-[11.5px] text-ink/70 focus:outline-none"
           >
             <option value={10}>10 أسطر</option>
             <option value={25}>25 سطرًا</option>

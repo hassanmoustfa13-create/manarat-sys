@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
-export type RowPalette = "soft" | "contrast";
+export type RowPalette = "soft" | "contrast" | "dark" | "light";
 const KEY = "row-palette";
+const VALID: RowPalette[] = ["soft", "contrast", "dark", "light"];
 
 export function readRowPalette(): RowPalette {
   if (typeof window === "undefined") return "soft";
-  return localStorage.getItem(KEY) === "contrast" ? "contrast" : "soft";
+  const v = localStorage.getItem(KEY) as RowPalette | null;
+  return v && VALID.includes(v) ? v : "soft";
 }
 
 export function applyRowPalette(p: RowPalette) {

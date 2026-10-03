@@ -101,6 +101,8 @@ function ColumnsPage() {
           <select className={sel} value={palette} onChange={(e) => setPalette(e.target.value as RowPalette)}>
             <option value="soft">ألوان متنوعة هادئة</option>
             <option value="contrast">تباين عالٍ (أبيض / أزرق، وتحديد داكن)</option>
+            <option value="light">فاتح (أبيض / رمادي فاتح)</option>
+            <option value="dark">غامق (كحلي / رمادي داكن، نص أبيض)</option>
           </select>
         </label>
       </div>

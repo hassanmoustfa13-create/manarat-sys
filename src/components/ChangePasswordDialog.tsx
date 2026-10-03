@@ -5,8 +5,13 @@ import { KeyRound } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { setUserPassword } from "@/lib/users.functions";
 
-export function ChangePasswordDialog() {
-  const [open, setOpen] = useState(false);
+export function ChangePasswordDialog({ open: openProp, onOpenChange, hideTrigger }: { open?: boolean; onOpenChange?: (o: boolean) => void; hideTrigger?: boolean }) {
+  const [uncontrolled, setUncontrolled] = useState(false);
+  const open = openProp ?? uncontrolled;
+  const setOpen = (o: boolean) => {
+    setUncontrolled(o);
+    onOpenChange?.(o);
+  };
   const [current, setCurrent] = useState("");
   const [pw, setPw] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -37,11 +42,15 @@ export function ChangePasswordDialog() {
   const cls = "glass h-10 w-full rounded-lg px-3 text-[13px] outline-none";
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button type="button" title="تغيير كلمة المرور" className="grid size-8 place-items-center rounded-full text-ink/50 transition-colors hover:bg-black/5 hover:text-ink">
-          <KeyRound className="size-4" />
-        </button>
-      </DialogTrigger>
+      {hideTrigger ? (
+        <span className="hidden" aria-hidden="true" />
+      ) : (
+        <DialogTrigger asChild>
+          <button type="button" title="تغيير كلمة المرور" className="grid size-8 place-items-center rounded-full text-ink/50 transition-colors hover:bg-black/5 hover:text-ink">
+            <KeyRound className="size-4" />
+          </button>
+        </DialogTrigger>
+      )}
       <DialogContent dir="rtl" className="max-w-sm">
         <DialogHeader>
           <DialogTitle>تغيير كلمة المرور</DialogTitle>

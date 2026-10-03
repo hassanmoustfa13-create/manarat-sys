@@ -261,6 +261,13 @@
   scrollbar-color: oklch(0 0 0 / 0.18) transparent;
 }
 
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Hide the "Made with Lovable" badge without affecting layout */
 #lovable-badge,
 a[href*="lovable.dev"][target="_blank"],

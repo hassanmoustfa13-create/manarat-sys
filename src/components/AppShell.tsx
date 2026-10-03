@@ -41,7 +41,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/departures" | "/reports" | "/archive" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; altLabel?: string };
+export type NavItem = { to: "/requests" | "/workers" | "/transfers" | "/transfers-pro" | "/manual-transfers" | "/manual-transfers-pro" | "/visas" | "/flights" | "/departures" | "/reports" | "/archive" | "/users" | "/columns" | "/security" | "/pages" | "/forms" | "/permissions"; label: string; icon: LucideIcon; admin?: boolean; altLabel?: string };
 
 export const NAV: NavItem[] = [
   { to: "/requests", label: "طلبات الاستقدام", icon: ClipboardList },
@@ -81,7 +81,7 @@ function useNavFiltering() {
     isAdmin || (!hidden.includes(n.to) && (n.admin ? Boolean(ROUTE_RESOURCE[n.to]) && visible(n.to) : visible(n.to)));
   const custom = forms.filter((f) => !f.is_system && f.is_active);
   const ordered = applyNavOrder(NAV, order);
-  return { hidden, visible, shown, custom, ordered };
+  return { hidden, visible, shown, custom, ordered, order };
 }
 
 function HiddenLabel({ to, label }: { to: string; label: string }) {
@@ -193,35 +193,47 @@ function UserMenu() {
 }
 
 function TopNav({ isAdmin }: { isAdmin: boolean }) {
-  const { shown, custom, ordered } = useNavFiltering();
+  const { shown, custom, ordered, order } = useNavFiltering();
   const direct = ordered.filter((n) => !n.admin && !n.to.startsWith("/transfers") && !n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
   const transfers = ordered.filter((n) => n.to.startsWith("/transfers") || n.to.startsWith("/manual")).filter((n) => shown(n, isAdmin));
   const adminItems = ordered.filter((n) => n.admin).filter((n) => shown(n, isAdmin));
   const activePaths = (path: string) =>
     path.startsWith("/transfers") || path.startsWith("/manual-transfers");
 
-  return (
-    <nav className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
-      {direct.map((item) => (
-        <NavItemLink
-          key={item.to}
-          item={item}
-          className={linkCls}
-          activeClassName={linkActiveCls}
-        />
-      ))}
-      {transfers.length > 0 && (
-        <NavDropdown label="نقل الكفالة" icon={ArrowLeftRight} items={transfers} activePaths={activePaths} />
-      )}
-      {adminItems.length > 0 && (
+  // Slots rendered in the saved order: each direct page, the transfers dropdown,
+  // then admin/custom dropdowns (not user-orderable, always last).
+  const slots: { key: string; node: ReactNode }[] = direct.map((item) => ({
+    key: item.to,
+    node: <NavItemLink item={item} className={linkCls} activeClassName={linkActiveCls} />,
+  }));
+  if (transfers.length > 0) {
+    slots.push({
+      key: "/transfers",
+      node: <NavDropdown label="نقل الكفالة" icon={ArrowLeftRight} items={transfers} activePaths={activePaths} />,
+    });
+  }
+  const pos = (key: string) => {
+    const i = order.indexOf(key);
+    return i >= 0 ? i : 1000;
+  };
+  slots.sort((a, b) => pos(a.key) - pos(b.key));
+  if (adminItems.length > 0) {
+    slots.push({
+      key: "/__admin",
+      node: (
         <NavDropdown
           label="الإدارة"
           icon={Settings2}
           items={adminItems}
           activePaths={(path) => NAV.some((n) => n.admin && n.to === path)}
         />
-      )}
-      {custom.length > 0 && (
+      ),
+    });
+  }
+  if (custom.length > 0) {
+    slots.push({
+      key: "/__custom",
+      node: (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button type="button" className={linkCls}>
@@ -246,7 +258,15 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-      )}
+      ),
+    });
+  }
+
+  return (
+    <nav className="no-scrollbar flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+      {slots.map((s) => (
+        <span key={s.key} className="contents">{s.node}</span>
+      ))}
     </nav>
   );
 }

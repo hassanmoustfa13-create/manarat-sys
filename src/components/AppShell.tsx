@@ -208,20 +208,18 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
         <NavItemLink
           key={item.to}
           item={item}
-          isAdmin={isAdmin}
           className={linkCls}
           activeClassName={linkActiveCls}
         />
       ))}
       {transfers.length > 0 && (
-        <NavDropdown label="نقل الكفالة" icon={ArrowLeftRight} items={transfers} isAdmin={isAdmin} activePaths={activePaths} />
+        <NavDropdown label="نقل الكفالة" icon={ArrowLeftRight} items={transfers} activePaths={activePaths} />
       )}
       {adminItems.length > 0 && (
         <NavDropdown
           label="الإدارة"
           icon={Settings2}
           items={adminItems}
-          isAdmin={isAdmin}
           activePaths={(path) => NAV.some((n) => n.admin && n.to === path)}
         />
       )}
@@ -326,7 +324,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <NavItemLink
                   key={item.to}
                   item={item}
-                  isAdmin={auth.isAdmin}
                   onNavigate={() => setMenuOpen(false)}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-ink/60 transition-colors hover:bg-black/5"
                   activeClassName="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-brand/12 text-brand ring-1 ring-brand/20"

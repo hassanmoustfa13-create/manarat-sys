@@ -136,36 +136,17 @@ export function DataGrid<T extends { id: string }>({
                 <th className="w-10 border-b-2 border-black/10 bg-white/90 px-2 py-2.5 text-center font-bold backdrop-blur-xl">
                   م
                 </th>
-                {hg.headers.map((header) => {
-                  const canSort = header.column.getCanSort();
-                  const sorted = header.column.getIsSorted();
-                  return (
-                    <th
-                      key={header.id}
-                      style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
-                      className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
-                    >
-                      {header.isPlaceholder ? null : (
-                        <button
-                          type="button"
-                          disabled={!canSort}
-                          onClick={header.column.getToggleSortingHandler()}
-                          className="inline-flex items-center gap-1.5 leading-snug disabled:cursor-default"
-                        >
-                          {setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
-                          {canSort &&
-                            (sorted === "asc" ? (
-                              <ArrowUp className="size-3.5 text-brand" />
-                            ) : sorted === "desc" ? (
-                              <ArrowDown className="size-3.5 text-brand" />
-                            ) : (
-                              <ArrowUpDown className="size-3.5 opacity-30" />
-                            ))}
-                        </button>
-                      )}
-                    </th>
-                  );
-                })}
+                {hg.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
+                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
                 {rowActions && (
                   <th className="border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 text-center font-bold backdrop-blur-xl">
                     إجراءات

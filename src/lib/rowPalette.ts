@@ -10,7 +10,7 @@ export function readRowPalette(): RowPalette {
 
 export function applyRowPalette(p: RowPalette) {
   if (typeof document === "undefined") return;
-  document.documentElement.dataset.rowPalette = p;
+  document.documentElement.setAttribute("data-row-palette", p);
 }
 
 export function useRowPalette() {

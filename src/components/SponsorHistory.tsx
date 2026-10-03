@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate, formatMoney } from "@/lib/data";
 
@@ -48,7 +49,7 @@ export function SponsorHistory({
       {isLoading ? (
         <div className="h-10 animate-pulse rounded bg-black/5" />
       ) : isError ? (
-        <p className="text-[13px] text-destructive">تعذر تحميل سجل الكفلاء. <button type="button" className="underline" onClick={() => void refetch()}>إعادة المحاولة</button></p>
+        <div className="flex items-center gap-2 text-[13px] text-destructive">تعذر تحميل سجل الكفلاء. <Button type="button" variant="link" size="sm" onClick={() => void refetch()}>إعادة المحاولة</Button></div>
       ) : rows.length === 0 ? (
         <p className="text-[13px] text-ink/50">لا يوجد كفيل جديد بعد</p>
       ) : (

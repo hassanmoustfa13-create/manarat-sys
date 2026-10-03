@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { SponsorHistory } from "@/components/SponsorHistory";
 import { useMemo } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/StatusBadge";

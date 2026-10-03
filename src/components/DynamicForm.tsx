@@ -343,7 +343,7 @@ export function DynamicFormDialog({
       toast.success(record ? "تم حفظ التعديلات" : (successText ?? "تمت الإضافة"));
       if (!record && draftKey) localStorage.removeItem(draftKey);
       qc.invalidateQueries({ queryKey });
-      if (form?.target_table === "manual_transfers" || form?.target_table === "transfers") {
+      if (form?.target_table === "manual_transfers") {
         qc.invalidateQueries({ queryKey: ["sponsor_history"] });
       }
       onOpenChange(false);

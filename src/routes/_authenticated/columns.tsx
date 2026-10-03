@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, RotateCcw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { errorMessage } from "@/lib/data";
+import { useRowPalette, type RowPalette } from "@/lib/rowPalette";
 import {
   GRID_COLUMNS,
   GRID_LABELS,
@@ -36,6 +37,7 @@ const sel = "glass h-9 rounded-lg px-2 text-[13px] outline-none";
 
 function ColumnsPage() {
   const auth = useAuth();
+  const [palette, setPalette] = useRowPalette();
   const qc = useQueryClient();
   const { data: all } = useQuery({ ...gridSettingsQuery, enabled: auth.can("admin_columns", "view") });
   const [key, setKey] = useState<GridKey>("workers");
@@ -94,6 +96,13 @@ function ColumnsPage() {
         <p className="text-sm text-muted-foreground">
           تحكم في ترتيب الأعمدة وعرضها ومحاذاتها والأعمدة الظاهرة — تُطبّق على جميع المستخدمين.
         </p>
+        <label className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+          <span className="font-semibold">ألوان صفوف الجداول (على هذا الجهاز):</span>
+          <select className={sel} value={palette} onChange={(e) => setPalette(e.target.value as RowPalette)}>
+            <option value="soft">ألوان متنوعة هادئة</option>
+            <option value="contrast">تباين عالٍ (أبيض / أزرق، وتحديد داكن)</option>
+          </select>
+        </label>
       </div>
 
       <div className="flex flex-wrap gap-2">

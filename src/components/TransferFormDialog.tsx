@@ -216,6 +216,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
       toast.success(editing ? "تم حفظ التعديلات" : "تم تسجيل طلب نقل الكفالة");
       if (!editing) localStorage.removeItem(draftKey);
       qc.invalidateQueries({ queryKey: ["transfers"] });
+      qc.invalidateQueries({ queryKey: ["sponsor_history"] });
       qc.invalidateQueries({ queryKey: ["workers"] });
       onOpenChange(false);
     },

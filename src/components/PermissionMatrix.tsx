@@ -47,7 +47,7 @@ export function PermissionMatrix({
         </div>
       </div>
       <div ref={scrollRef} className="grid-scroll max-h-[55vh] overflow-auto overscroll-contain rounded-xl ring-1 ring-black/10">
-        <table className="w-full min-w-[920px] text-[13px]">
+        <table className="ledger-rows w-full min-w-[920px] text-[13px]">
           <thead className="sticky top-0 z-10 bg-white/95 shadow-[0_1px_0_0_rgba(0,0,0,0.08)] backdrop-blur-sm">
             <tr className="text-ink/50">
               <th className="w-[130px] p-1.5 text-right text-[12px] font-medium">القسم</th>

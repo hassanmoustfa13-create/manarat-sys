@@ -94,7 +94,7 @@ function SecurityPage() {
         </select>
       </div>
       <div className="overflow-x-auto rounded-xl bg-white/80 ring-1 ring-black/8">
-        <table className="w-full min-w-[800px] text-[15px]">
+        <table className="ledger-rows w-full min-w-[800px] text-[15px]">
           <thead className="border-b-2 border-black/10 text-[13px] font-bold text-ink/70">
             <tr>
               {["التاريخ", "الحدث", "المستخدم", "بواسطة", "النتيجة", "تفاصيل", ...(canDel ? [""] : [])].map((h) => (
@@ -107,7 +107,7 @@ function SecurityPage() {
             {error && <tr><td colSpan={7} className="py-12 text-center text-destructive">{(error as Error).message}</td></tr>}
             {!isLoading && !rows.length && <tr><td colSpan={7} className="py-12 text-center text-ink/50">لا توجد أحداث</td></tr>}
             {rows.map((e) => (
-              <tr key={e.id} className="border-b border-black/5 hover:bg-brand/[0.06]">
+              <tr key={e.id} className="border-b border-black/5">
                 <td className="px-4 py-3 whitespace-nowrap" dir="ltr">{formatDateTime(e.created_at)}</td>
                 <td className="px-4 py-3">{EVENT_LABELS[e.event_type] ?? e.event_type}</td>
                 <td className="px-4 py-3">

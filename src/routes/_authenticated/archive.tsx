@@ -100,7 +100,7 @@ function ArchivePage() {
         <div className="glass rounded-2xl p-10 text-center text-ink/50">لا توجد عمليات مؤرشفة</div>
       ) : (
         <div className="glass overflow-x-auto rounded-2xl">
-          <table className="w-full text-[13px]">
+          <table className="ledger-rows w-full text-[13px]">
             <thead className="text-ink/55">
               <tr className="text-right">
                 {["العاملة", "الجواز", "النوع", "الفئة", "الكفيل القديم", "الكفيل الجديد", "حالة الدفع", "تاريخ الأرشفة", "أرشفها", ""].map((h) => (
@@ -110,7 +110,7 @@ function ArchivePage() {
             </thead>
             <tbody>
               {rows.map((i) => (
-                <tr key={i.id} className="cursor-pointer border-t border-black/5 hover:bg-black/[0.03]" onClick={() => setViewing(i)}>
+                <tr key={i.id} className="cursor-pointer border-t border-black/5" onClick={() => setViewing(i)}>
                   <td className="p-2.5 font-medium">{i.worker_name}</td>
                   <td className="p-2.5" dir="ltr">{i.passport_number || "—"}</td>
                   <td className="p-2.5">{i.kind}</td>
@@ -214,7 +214,8 @@ function Details({ item, nameOf, onRestore, pending }: { item: Item; nameOf: (id
       </div>
       <SponsorHistory
         transferId={item.id}
-        current={{ name: r.new_sponsor_name, phone: r.new_sponsor_phone, since: r.transfer_date, salaryStatus: r.salary_dues_status, salaryAmount: Number(r.salary_dues_amount ?? 0) }}
+        source={item.table}
+        current={{ name: r.new_sponsor_name, phone: r.new_sponsor_phone, since: r.transfer_date, createdAt: r.created_at, salaryStatus: r.salary_dues_status, salaryAmount: Number(r.salary_dues_amount ?? 0) }}
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <Sec title="سجل التدقيق">

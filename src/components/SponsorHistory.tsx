@@ -1,28 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate, formatMoney } from "@/lib/data";
 
 /** سجل الكفلاء الجدد السابقين لعملية نقل (الكفيل القديم ثابت، الجديد يتغير). */
 export function SponsorHistory({
   transferId,
+  source,
   current,
 }: {
   transferId: string;
-  current: { name: string; phone: string; since: string | null; salaryStatus: string; salaryAmount: number };
+  source: "transfers" | "manual_transfers";
+  current: { name: string; phone: string; since: string | null; createdAt: string; salaryStatus: string; salaryAmount: number };
 }) {
-  const { data = [], isLoading } = useQuery({
-    queryKey: ["sponsor_history", transferId],
+  const { data = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ["sponsor_history", source, transferId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sponsor_history")
         .select("*")
+        .eq("source", source)
         .eq("transfer_id", transferId)
         .order("created_at", { ascending: true });
       if (error) throw error;
       return data;
     },
   });
-  const lastEnd = data.at(-1)?.ended_on ?? current.since;
+  const lastEnd = data.at(-1)?.ended_on ?? current.since ?? current.createdAt.slice(0, 10);
   const rows = [
     ...data.map((h) => ({
       key: h.id,
@@ -44,11 +48,13 @@ export function SponsorHistory({
       <h4 className="mb-2 text-[11px] font-semibold text-ink/50">سجل الكفلاء الجدد</h4>
       {isLoading ? (
         <div className="h-10 animate-pulse rounded bg-black/5" />
+      ) : isError ? (
+        <div className="flex items-center gap-2 text-[13px] text-destructive">تعذر تحميل سجل الكفلاء. <Button type="button" variant="link" size="sm" onClick={() => void refetch()}>إعادة المحاولة</Button></div>
       ) : rows.length === 0 ? (
         <p className="text-[13px] text-ink/50">لا يوجد كفيل جديد بعد</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-[12.5px]">
+          <table className="ledger-rows w-full text-[12.5px]">
             <thead className="text-ink/50">
               <tr className="text-right">
                 <th className="p-1.5 font-medium">#</th>

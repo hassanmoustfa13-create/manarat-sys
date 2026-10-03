@@ -359,7 +359,7 @@ export function ExcelImportDialog({
             </div>
             <p className="text-[12px] text-ink/50">الأخضر = مطابق، الأصفر = عمود في الملف غير مطابق، الرمادي = عمود في الجدول لم يُربط بأي عمود من الملف.</p>
             <div className="overflow-x-auto rounded-lg ring-1 ring-black/8">
-              <table className="w-full text-sm">
+              <table className="ledger-rows w-full text-sm">
                 <thead>
                   <tr className="bg-black/4 text-[12px]">
                     <th className="px-3 py-2 text-right">عمود الملف</th>
@@ -417,7 +417,7 @@ export function ExcelImportDialog({
               <Stat label="مكررة (سيتم تخطيها)" value={stats.dupes} tone="warn" />
             </div>
             <div className="max-h-80 overflow-auto rounded-lg ring-1 ring-black/8">
-              <table className="w-full text-[12px]">
+              <table className="ledger-rows w-full text-[12px]">
                 <thead className="sticky top-0 bg-white">
                   <tr className="bg-black/4">
                     <th className="px-2 py-1.5 text-right">الصف</th>

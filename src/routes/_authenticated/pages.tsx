@@ -40,14 +40,16 @@ function PagesSettings() {
   };
 
   const items = applyNavOrder(NAV.filter((n) => !n.admin), order);
-  const currentOrder = items.map((n) => n.to);
+  const currentOrder: string[] = items.map((n) => n.to);
 
   const move = async (to: string, dir: -1 | 1) => {
     const i = currentOrder.indexOf(to);
     const j = i + dir;
     if (i < 0 || j < 0 || j >= currentOrder.length) return;
     const next = [...currentOrder];
-    [next[i], next[j]] = [next[j], next[i]];
+    const a = next[i]!;
+    next[i] = next[j]!;
+    next[j] = a;
     try {
       await saveNavOrder(next);
       qc.setQueryData(navOrderQuery.queryKey, next);

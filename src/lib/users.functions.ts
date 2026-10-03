@@ -178,7 +178,11 @@ export const listSecurityEvents = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: profiles } = await supabaseAdmin.from("profiles").select("id, full_name, email");
     const names = new Map((profiles ?? []).map((p) => [p.id, p.full_name || p.email]));
-    return (data ?? []).map((e) => ({
+    // إخفاء أحداث تسجيل دخول المديرين من السجل
+    const { data: adminRoles } = await supabaseAdmin.from("user_roles").select("user_id").eq("role", "admin");
+    const adminIds = new Set((adminRoles ?? []).map((r) => r.user_id));
+    const visible = (data ?? []).filter((e) => !(e.event_type === "login" && e.target_user_id && adminIds.has(e.target_user_id)));
+    return visible.map((e) => ({
       ...e,
       target_name: e.target_user_id ? names.get(e.target_user_id) ?? "" : "",
       actor_name: e.actor_user_id ? names.get(e.actor_user_id) ?? "" : "",

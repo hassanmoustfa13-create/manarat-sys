@@ -253,6 +253,13 @@
       "when": 1790881756282,
       "tag": "0035_new_sponsor_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1791056950958,
+      "tag": "0036_create_departures",
+      "breakpoints": true
     }
   ]
 }

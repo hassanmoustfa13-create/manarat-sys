@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers" | "flights" | "office_visas";
+export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers" | "flights" | "departures" | "office_visas";
 export type ColAlign = "right" | "center" | "left";
 
 export interface ColumnSetting {
@@ -27,6 +27,7 @@ export const GRID_LABELS: Record<GridKey, string> = {
   transfers: "جدول نقل الكفالة",
   manual_transfers: "جدول نقل الكفالة (يدوي)",
   flights: "جدول الرحلات",
+  departures: "جدول المغادرة",
   office_visas: "جدول تأشيرات المكتب",
 };
 
@@ -115,6 +116,12 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
     ["clients_text", "اسم العميل"], ["status", "الحالة"],
     ...AUDIT,
   ],
+  departures: [
+    ["day", "اليوم"], ["flight_date", "التاريخ"], ["flight_time", "الوقت"],
+    ["office_name", "اسم المكتب الخارجي"], ["workers_count", "عدد العاملات"],
+    ["clients_text", "اسم العميل"], ["status", "الحالة"],
+    ...AUDIT,
+  ],
   office_visas: [
     ["holder_name", "اسم صاحب التأشيرة"], ["new_sponsor_name", "اسم الكفيل الجديد"],
     ["visa_status", "حالة التأشيرة"], ["visa_number", "رقم التأشيرة"], ["payment_status", "حالة الدفع"],
@@ -125,6 +132,7 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
 const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
   manual_transfers: {},
   flights: { day: 100, flight_date: 110, flight_time: 90, office_name: 170, workers_count: 100, clients_text: 220, status: 110, created_by: 120, updated_by: 120 },
+  departures: { day: 100, flight_date: 110, flight_time: 90, office_name: 170, workers_count: 100, clients_text: 220, status: 110, created_by: 120, updated_by: 120 },
   office_visas: { holder_name: 170, new_sponsor_name: 170, visa_status: 140, visa_number: 130, payment_status: 120 },
   workers: {
     name: 130,

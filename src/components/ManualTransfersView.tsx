@@ -502,6 +502,7 @@ function ManualTransferDetails({
                 <DetailRow label="مدفوعات أخرى للكفيل الجديد" value={formatMoney((record as any).new_sponsor_other_payments)} ltr />
                 <DetailRow label="حالة دفع الكفيل الجديد (تلقائي)" value={(record as any).new_sponsor_payment_status} />
                 <DetailRow label="تاريخ دخول العاملة السعودية" value={(record as any).saudi_entry_date || "—"} ltr />
+                <DetailRow label="عدد الأيام في السعودية" value={formatDaysInSaudi(daysInSaudi((record as any).saudi_entry_date ?? null))} ltr />
                 <EditableSelectRow label="مستحقات الرواتب" field="salary_dues_status" value={record.salary_dues_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
                 {record.salary_dues_status === "توجد" && (
                   <DetailRow label="قيمة مستحقات الرواتب" value={formatMoney(record.salary_dues_amount)} ltr />

@@ -521,7 +521,7 @@ function ManualTransferDetails({
   const nameOf = profileNameMap(profiles);
   return (
     <Dialog open={Boolean(record)} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className={`glass-strong max-h-[90vh] overflow-y-auto ${detailForm?.settings.cols === 3 ? "max-w-4xl" : "max-w-2xl"}`} dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
         {record && (
           <>
             <DialogHeader className="text-right sm:text-right">

@@ -310,6 +310,7 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
   const [min, setMin] = useState(field?.min_value == null ? "" : String(field.min_value));
   const [max, setMax] = useState(field?.max_value == null ? "" : String(field.max_value));
   const [pattern, setPattern] = useState(field?.validation?.pattern ?? "");
+  const [section, setSection] = useState(field?.section ?? "");
   const [full, setFull] = useState(Boolean(field?.settings?.full));
   const [opts, setOpts] = useState<Opt[]>(
     field?.form_field_options.map((o) => ({ id: o.id, value: o.value, label: o.label, is_active: o.is_active })) ?? [],
@@ -333,6 +334,7 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
         min_value: min === "" ? null : Number(min),
         max_value: max === "" || Number(max) < 0 ? null : Number(max),
         validation: (pattern ? { ...field?.validation, pattern } : {}) as never,
+        ...(form.form_key === "transfer_details" ? { section: section.trim() } : {}),
         settings: { ...field?.settings, full } as never,
         ...(locked ? {} : { field_key: k, field_type: type }),
       };
@@ -423,6 +425,11 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
           <Field label="نص مساعد أسفل الحقل">
             <Input value={helper} onChange={(e) => setHelper(e.target.value)} />
           </Field>
+          {form.form_key === "transfer_details" && (
+            <Field label="القسم في نافذة التفاصيل">
+              <Input value={section} onChange={(e) => setSection(e.target.value)} placeholder="بيانات العملية" />
+            </Field>
+          )}
           <Field label="الحد الأدنى" hint="للأرقام: أقل قيمة — للنص: أقل عدد أحرف">
             <Input type="number" dir="ltr" value={min} onChange={(e) => setMin(e.target.value)} />
           </Field>

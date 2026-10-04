@@ -200,6 +200,7 @@ function DeparturesPage() {
           columns={columns}
           search={search}
           gridKey="departures"
+          sortable
           emptyMessage="لا توجد مغادرة بعد"
           rowActions={(r) => (
             <>

@@ -151,11 +151,22 @@ export function DataGrid<T extends { id: string }>({
                       width: widthOf(header.column.id, header.column.columnDef.meta?.width),
                       minWidth: setById.get(header.column.id)?.width || undefined,
                     }}
-                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0`}
+                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0 ${sortable ? "cursor-pointer select-none hover:text-brand" : ""}`}
+                    onClick={sortable ? header.column.getToggleSortingHandler() : undefined}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : (
+                      <span className="inline-flex items-center gap-1">
+                        {setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
+                        {sortable &&
+                          (header.column.getIsSorted() === "asc" ? (
+                            <ArrowUp className="size-3.5" />
+                          ) : header.column.getIsSorted() === "desc" ? (
+                            <ArrowDown className="size-3.5" />
+                          ) : (
+                            <ArrowUpDown className="size-3.5 opacity-30" />
+                          ))}
+                      </span>
+                    )}
                   </th>
                 ))}
                 {rowActions && (

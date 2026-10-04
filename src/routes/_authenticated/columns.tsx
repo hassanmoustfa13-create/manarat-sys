@@ -202,7 +202,7 @@ function ColumnsPage() {
           <span>الترتيب</span>
           <span>اسم العمود (اكتب اسمًا جديدًا)</span>
           <span>الظهور</span>
-          <span>اللون</span>
+          <span>لون الخلايا</span>
           <span>العرض (بكسل)</span>
           <span>المحاذاة</span>
           <span>تحريك</span>
@@ -259,7 +259,7 @@ function ColumnsPage() {
               <input
                 type="color"
                 aria-label="لون العمود"
-                title={c.color ? "لون العمود — اضغط ✕ للإزالة" : "اختر لونًا للعمود"}
+                title={c.color ? "لون خلايا العمود — اضغط ✕ للإزالة (رؤوس الأعمدة تبقى ثابتة)" : "اختر لونًا لخلايا العمود (رؤوس الأعمدة تبقى ثابتة)"}
                 value={c.color ?? "#ffffff"}
                 onChange={(e) => update(i, { color: e.target.value })}
                 className="h-8 w-8 cursor-pointer rounded-md border border-black/10 bg-transparent p-0.5"

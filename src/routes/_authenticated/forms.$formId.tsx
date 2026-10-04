@@ -263,9 +263,10 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
   });
   const move = (index: number, direction: -1 | 1) => {
     const next = [...order];
+    const current = next[index];
     const other = next[index + direction];
-    if (!other) return;
-    next[index + direction] = next[index];
+    if (!current || !other) return;
+    next[index + direction] = current;
     next[index] = other;
     setOrder(next);
   };

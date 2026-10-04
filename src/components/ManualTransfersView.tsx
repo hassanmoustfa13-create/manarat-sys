@@ -530,6 +530,18 @@ function ManualTransferDetails({
               <DialogDescription>تفاصيل عملية نقل الكفالة</DialogDescription>
             </DialogHeader>
 
+            {detailForm ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {detailSections(detailForm).map(([sec, fields]) => (
+                  <Section key={sec} title={sec}>
+                    {fields.map((fld) => (
+                      <DetailFieldRow key={fld.id} field={fld} record={record} onSaved={onSaved} />
+                    ))}
+                  </Section>
+                ))}
+              </div>
+            ) : (
+              <>
             <div className="grid gap-4 sm:grid-cols-2">
               <Section title="بيانات العملية">
                 <DetailRow label="اسم العاملة" value={record.worker_name || "—"} />
@@ -585,6 +597,8 @@ function ManualTransferDetails({
                 {record.notes && <DetailRow label="ملاحظات" value={record.notes} />}
               </Section>
             </div>
+              </>
+            )}
 
             <SponsorHistory
               transferId={record.id}

@@ -140,8 +140,12 @@ export function DataGrid<T extends { id: string }>({
                 {hg.headers.map((header) => (
                   <th
                     key={header.id}
-                    style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
-                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
+                    style={{
+                      width: widthOf(header.column.id, header.column.columnDef.meta?.width),
+                      minWidth: setById.get(header.column.id)?.width || undefined,
+                      backgroundColor: colorOf(header.column.id),
+                    }}
+                    className={`border-b-2 border-l border-black/10 ${colorOf(header.column.id) ? "" : "bg-white/90"} px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -180,6 +184,7 @@ export function DataGrid<T extends { id: string }>({
                     <td
                       key={cell.id}
                       dir={meta.ltr ? "ltr" : undefined}
+                      style={colorOf(cell.column.id) ? { backgroundColor: colorOf(cell.column.id) } : undefined}
                       className={`border-l border-black/5 px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
                         cell.column.id,
                         meta.ltr,

@@ -255,6 +255,26 @@ function ColumnsPage() {
               {c.visible ? <Eye className="size-4 text-brand" /> : <EyeOff className="size-4" />}
               {c.visible ? "ظاهر" : "مخفي"}
             </button>
+            <span className="flex items-center gap-1">
+              <input
+                type="color"
+                aria-label="لون العمود"
+                title={c.color ? "لون العمود — اضغط ✕ للإزالة" : "اختر لونًا للعمود"}
+                value={c.color ?? "#ffffff"}
+                onChange={(e) => update(i, { color: e.target.value })}
+                className="h-8 w-8 cursor-pointer rounded-md border border-black/10 bg-transparent p-0.5"
+              />
+              {c.color && (
+                <button
+                  aria-label="إزالة اللون"
+                  title="إزالة اللون"
+                  onClick={() => update(i, { color: undefined })}
+                  className="rounded p-0.5 text-ink/50 hover:bg-black/5 hover:text-ink"
+                >
+                  ✕
+                </button>
+              )}
+            </span>
             <input
               type="number"
               min={60}

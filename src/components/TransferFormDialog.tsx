@@ -60,6 +60,8 @@ const empty = {
   payment_status: PAYMENT_STATUSES[1] as string,
   new_sponsor_dues: "0",
   new_sponsor_payment_status: PAYMENT_STATUSES[1] as string,
+  new_sponsor_other_payments: "0",
+  saudi_entry_date: "",
   medical_exam: YES_NO_EXISTS[1] as string,
   residency_status: YES_NO_EXISTS_F[1] as string,
   salary_dues_status: YES_NO_EXISTS_F[1] as string,
@@ -103,6 +105,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             payment_status: transfer.payment_status,
             new_sponsor_dues: String((transfer as any).new_sponsor_dues ?? 0),
             new_sponsor_payment_status: (transfer as any).new_sponsor_payment_status ?? PAYMENT_STATUSES[1],
+            new_sponsor_other_payments: String((transfer as any).new_sponsor_other_payments ?? 0),
+            saudi_entry_date: (transfer as any).saudi_entry_date ?? "",
             medical_exam: transfer.medical_exam,
             residency_status: transfer.residency_status,
             salary_dues_status: transfer.salary_dues_status,
@@ -168,6 +172,10 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
 
   const dues = Number(form.old_sponsor_dues || 0);
   const deposit = Number(form.down_payment || 0);
+  const newStatus =
+    Number(form.down_payment || 0) + Number(form.new_sponsor_other_payments || 0) >= Number(form.new_sponsor_dues || 0)
+      ? PAYMENT_STATUSES[0]
+      : PAYMENT_STATUSES[1];
   const needsPeriod = form.transfer_type !== TRANSFER_TYPE_OTHER;
 
   const save = useMutation({
@@ -186,7 +194,9 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
         down_payment: deposit,
         payment_status: form.payment_status,
         new_sponsor_dues: Number(form.new_sponsor_dues || 0),
-        new_sponsor_payment_status: form.new_sponsor_payment_status,
+        new_sponsor_other_payments: Number(form.new_sponsor_other_payments || 0),
+        new_sponsor_payment_status: newStatus,
+        saudi_entry_date: form.saudi_entry_date || null,
         medical_exam: form.medical_exam,
         residency_status: form.residency_status,
         salary_dues_status: form.salary_dues_status,
@@ -342,6 +352,7 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
             </button>
           </div>
           <TextField label="هاتف الكفيل الجديد" ltr value={form.new_sponsor_phone} onChange={set("new_sponsor_phone")} />
+          <TextField label="تاريخ دخول العاملة السعودية" type="date" ltr value={form.saudi_entry_date} onChange={set("saudi_entry_date")} />
           <SelectField label="نوع التأشيرة" value={form.visa_type} onChange={set("visa_type")} options={VISA_TYPES} />
           <div className="text-[12px]">
             <p className="text-ink/45">رقم التأشيرة</p>
@@ -389,7 +400,8 @@ export function TransferFormDialog({ open, onOpenChange, worker, transfer, isAdm
           <SelectField label="حالة الدفع للكفيل القديم" value={form.payment_status} onChange={set("payment_status")} options={PAYMENT_STATUSES} />
           <TextField label="مستحقات المكتب من الكفيل الجديد" type="number" ltr value={form.new_sponsor_dues} onChange={set("new_sponsor_dues")} />
           <TextField label="العربون (من الكفيل الجديد)" type="number" ltr value={form.down_payment} onChange={set("down_payment")} />
-          <SelectField label="حالة دفع الكفيل الجديد" value={form.new_sponsor_payment_status} onChange={set("new_sponsor_payment_status")} options={PAYMENT_STATUSES} />
+          <TextField label="مدفوعات أخرى للكفيل الجديد" type="number" ltr value={form.new_sponsor_other_payments} onChange={set("new_sponsor_other_payments")} />
+          <TextField label="حالة دفع الكفيل الجديد (تلقائي)" value={newStatus} onChange={() => {}} disabled />
           <SelectField label="الفحص الطبي" value={form.medical_exam} onChange={set("medical_exam")} options={YES_NO_EXISTS} />
           <SelectField label="الإقامة" value={form.residency_status} onChange={set("residency_status")} options={YES_NO_EXISTS_F} />
           <SelectField label="مستحقات رواتب العاملة" value={form.salary_dues_status} onChange={set("salary_dues_status")} options={YES_NO_EXISTS_F} />

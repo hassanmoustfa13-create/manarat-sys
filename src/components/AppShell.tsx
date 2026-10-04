@@ -32,6 +32,7 @@ import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+import { useRowPalette } from "@/lib/rowPalette";
 import {
   DropdownMenu,
   DropdownMenuContent,

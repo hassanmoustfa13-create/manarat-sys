@@ -1,13 +1,15 @@
 import {
   type ColumnDef,
   type RowData,
+  type SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
@@ -35,6 +37,7 @@ interface DataGridProps<T extends { id: string }> {
   minWidth?: number;
   gridKey?: GridKey;
   onRowClick?: (row: T) => void;
+  sortable?: boolean;
 }
 
 export function DataGrid<T extends { id: string }>({
@@ -46,8 +49,10 @@ export function DataGrid<T extends { id: string }>({
   minWidth = 0,
   gridKey,
   onRowClick,
+  sortable = false,
 }: DataGridProps<T>) {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScroll, setCanScroll] = useState(false);
   const move = (left: number) => scrollRef.current?.scrollBy({ left, behavior: "smooth" });
@@ -84,12 +89,14 @@ export function DataGrid<T extends { id: string }>({
   const table = useReactTable({
     data,
     columns,
-    state: { globalFilter: search, pagination, columnVisibility, columnOrder },
+    state: { globalFilter: search, pagination, columnVisibility, columnOrder, sorting },
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     getRowId: (r) => r.id,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    ...(sortable ? { getSortedRowModel: getSortedRowModel() } : {}),
     globalFilterFn: (row, _colId, filter: string) => {
       const q = filter.trim().toLowerCase();
       if (!q) return true;
@@ -144,11 +151,22 @@ export function DataGrid<T extends { id: string }>({
                       width: widthOf(header.column.id, header.column.columnDef.meta?.width),
                       minWidth: setById.get(header.column.id)?.width || undefined,
                     }}
-                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0`}
+                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0 ${sortable ? "cursor-pointer select-none hover:text-brand" : ""}`}
+                    onClick={sortable ? header.column.getToggleSortingHandler() : undefined}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : (
+                      <span className="inline-flex items-center gap-1">
+                        {setById.get(header.column.id)?.label || flexRender(header.column.columnDef.header, header.getContext())}
+                        {sortable &&
+                          (header.column.getIsSorted() === "asc" ? (
+                            <ArrowUp className="size-3.5" />
+                          ) : header.column.getIsSorted() === "desc" ? (
+                            <ArrowDown className="size-3.5" />
+                          ) : (
+                            <ArrowUpDown className="size-3.5 opacity-30" />
+                          ))}
+                      </span>
+                    )}
                   </th>
                 ))}
                 {rowActions && (

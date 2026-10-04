@@ -486,11 +486,11 @@ function DetailFieldRow({
     );
   }
   let value: ReactNode;
-  if (key === "days_in_saudi") value = formatDaysInSaudi(daysInSaudi((rec.saudi_entry_date as string | null) ?? null));
+  if (key === "days_in_saudi") value = formatDaysInSaudi(daysInSaudi((rec["saudi_entry_date"] as string | null) ?? null));
   else if (field.field_type === "date") value = formatDate(rec[key] as string | null);
   else if (field.field_type === "currency") value = formatMoney(rec[key] as number | null);
   else value = (rec[key] as string) || "—";
-  return <DetailRow label={field.label} value={value} ltr={field.settings?.ltr} />;
+  return <DetailRow label={field.label} value={value} ltr={field.settings?.ltr ?? false} />;
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {

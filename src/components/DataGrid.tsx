@@ -72,6 +72,7 @@ export function DataGrid<T extends { id: string }>({
   const fontCls = saved?.fontSize === "sm" ? "text-[12.5px]" : saved?.fontSize === "lg" ? "text-[16px]" : "text-[13.5px]";
   const padCls = saved?.density === "compact" ? "py-1" : saved?.density === "comfortable" ? "py-4" : "py-2";
   const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;
+  const colorOf = (id: string) => setById.get(id)?.color || undefined;
   const alignOf = (id: string, ltr?: boolean) => {
     const a = setById.get(id)?.align;
     if (a === "center") return "text-center";

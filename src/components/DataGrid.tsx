@@ -1,13 +1,15 @@
 import {
   type ColumnDef,
   type RowData,
+  type SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
@@ -35,6 +37,7 @@ interface DataGridProps<T extends { id: string }> {
   minWidth?: number;
   gridKey?: GridKey;
   onRowClick?: (row: T) => void;
+  sortable?: boolean;
 }
 
 export function DataGrid<T extends { id: string }>({

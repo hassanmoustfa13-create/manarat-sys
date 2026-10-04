@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/columns")({
   component: ColumnsPage,
 });
 
-const KEYS: GridKey[] = ["requests", "workers", "transfers", "manual_transfers", "flights", "departures", "office_visas"];
+const KEYS: GridKey[] = ["requests", "workers", "transfers", "manual_transfers", "flights", "departures", "office_visas", "archive"];
 const sel = "glass h-9 rounded-lg px-2 text-[13px] outline-none";
 
 function ColumnsPage() {

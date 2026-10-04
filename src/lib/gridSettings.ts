@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers" | "flights" | "departures" | "office_visas";
+export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers" | "flights" | "departures" | "office_visas" | "archive";
 export type ColAlign = "right" | "center" | "left";
 
 export interface ColumnSetting {
@@ -31,6 +31,7 @@ export const GRID_LABELS: Record<GridKey, string> = {
   flights: "جدول الرحلات",
   departures: "جدول المغادرة",
   office_visas: "جدول تأشيرات المكتب",
+  archive: "جدول الأرشيف",
 };
 
 const AUDIT: [string, string][] = [
@@ -128,6 +129,11 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
     ["holder_name", "اسم صاحب التأشيرة"], ["new_sponsor_name", "اسم الكفيل الجديد"],
     ["visa_status", "حالة التأشيرة"], ["visa_number", "رقم التأشيرة"], ["payment_status", "حالة الدفع"],
   ],
+  archive: [
+    ["worker_name", "العاملة"], ["passport_number", "الجواز"], ["kind", "النوع"], ["category", "الفئة"],
+    ["old_sponsor_name", "الكفيل القديم"], ["new_sponsor_name", "الكفيل الجديد"],
+    ["payment_status", "حالة الدفع"], ["archived_at", "تاريخ الأرشفة"], ["archived_by", "أرشفها"],
+  ],
 };
 
 /** Default compact widths (~1.5 words) so the table stays narrow; text wraps nicely. */
@@ -136,6 +142,7 @@ const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
   flights: { day: 100, flight_date: 110, flight_time: 90, office_name: 170, workers_count: 100, clients_text: 220, status: 110, created_by: 120, updated_by: 120 },
   departures: { day: 100, flight_date: 110, flight_time: 90, office_name: 170, workers_count: 100, clients_text: 220, status: 110, created_by: 120, updated_by: 120 },
   office_visas: { holder_name: 170, new_sponsor_name: 170, visa_status: 140, visa_number: 130, payment_status: 120 },
+  archive: { worker_name: 140, passport_number: 110, kind: 90, category: 80, old_sponsor_name: 130, new_sponsor_name: 130, payment_status: 110, archived_at: 140, archived_by: 110 },
   workers: {
     name: 130,
     passport_number: 110,

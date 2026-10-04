@@ -144,7 +144,7 @@ export function DataGrid<T extends { id: string }>({
                       width: widthOf(header.column.id, header.column.columnDef.meta?.width),
                       minWidth: setById.get(header.column.id)?.width || undefined,
                     }}
-                    className="border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 font-bold backdrop-blur-xl first:border-l-0"
+                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0`}
                   >
                     {header.isPlaceholder
                       ? null

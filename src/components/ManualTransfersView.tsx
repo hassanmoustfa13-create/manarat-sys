@@ -219,6 +219,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
       money("down_payment", "العربون"),
       badge("payment_status", "حالة دفع القديم"),
       money("new_sponsor_dues", "مستحقات المكتب من الجديد"),
+      money("new_sponsor_other_payments", "مدفوعات أخرى للجديد"),
       badge("new_sponsor_payment_status", "حالة دفع الجديد"),
       badge("medical_exam", "الفحص الطبي"),
       badge("residency_status", "الإقامة"),
@@ -489,7 +490,9 @@ function ManualTransferDetails({
                 <EditableSelectRow label="حالة الدفع للكفيل القديم" field="payment_status" value={record.payment_status} options={PAYMENT_STATUSES} record={record} onSaved={onSaved} />
                 <DetailRow label="مستحقات المكتب من الكفيل الجديد" value={formatMoney((record as any).new_sponsor_dues)} ltr />
                 <DetailRow label="العربون (من الكفيل الجديد)" value={formatMoney(record.down_payment)} ltr />
-                <EditableSelectRow label="حالة دفع الكفيل الجديد" field={"new_sponsor_payment_status" as any} value={(record as any).new_sponsor_payment_status} options={PAYMENT_STATUSES} record={record} onSaved={onSaved} />
+                <DetailRow label="مدفوعات أخرى للكفيل الجديد" value={formatMoney((record as any).new_sponsor_other_payments)} ltr />
+                <DetailRow label="حالة دفع الكفيل الجديد (تلقائي)" value={(record as any).new_sponsor_payment_status} />
+                <DetailRow label="تاريخ دخول العاملة السعودية" value={(record as any).saudi_entry_date || "—"} ltr />
                 <EditableSelectRow label="مستحقات الرواتب" field="salary_dues_status" value={record.salary_dues_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
                 {record.salary_dues_status === "توجد" && (
                   <DetailRow label="قيمة مستحقات الرواتب" value={formatMoney(record.salary_dues_amount)} ltr />

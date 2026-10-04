@@ -353,6 +353,7 @@ export type Database = {
           nationality: string
           new_sponsor_dues: number
           new_sponsor_name: string
+          new_sponsor_other_payments: number
           new_sponsor_payment_status: string
           new_sponsor_phone: string
           notes: string
@@ -371,6 +372,7 @@ export type Database = {
           return_to_office_date: string | null
           salary_dues_amount: number
           salary_dues_status: string
+          saudi_entry_date: string | null
           transfer_date: string | null
           transfer_stage: string
           transfer_type: string
@@ -396,6 +398,7 @@ export type Database = {
           nationality?: string
           new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_other_payments?: number
           new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
@@ -414,6 +417,7 @@ export type Database = {
           return_to_office_date?: string | null
           salary_dues_amount?: number
           salary_dues_status?: string
+          saudi_entry_date?: string | null
           transfer_date?: string | null
           transfer_stage?: string
           transfer_type?: string
@@ -439,6 +443,7 @@ export type Database = {
           nationality?: string
           new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_other_payments?: number
           new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
@@ -457,6 +462,7 @@ export type Database = {
           return_to_office_date?: string | null
           salary_dues_amount?: number
           salary_dues_status?: string
+          saudi_entry_date?: string | null
           transfer_date?: string | null
           transfer_stage?: string
           transfer_type?: string
@@ -723,6 +729,7 @@ export type Database = {
           medical_exam: string
           new_sponsor_dues: number
           new_sponsor_name: string
+          new_sponsor_other_payments: number
           new_sponsor_payment_status: string
           new_sponsor_phone: string
           notes: string
@@ -738,6 +745,7 @@ export type Database = {
           residency_status: string
           salary_dues_amount: number
           salary_dues_status: string
+          saudi_entry_date: string | null
           transfer_date: string | null
           transfer_stage: string
           transfer_type: string
@@ -760,6 +768,7 @@ export type Database = {
           medical_exam?: string
           new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_other_payments?: number
           new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
@@ -775,6 +784,7 @@ export type Database = {
           residency_status?: string
           salary_dues_amount?: number
           salary_dues_status?: string
+          saudi_entry_date?: string | null
           transfer_date?: string | null
           transfer_stage?: string
           transfer_type?: string
@@ -797,6 +807,7 @@ export type Database = {
           medical_exam?: string
           new_sponsor_dues?: number
           new_sponsor_name?: string
+          new_sponsor_other_payments?: number
           new_sponsor_payment_status?: string
           new_sponsor_phone?: string
           notes?: string
@@ -812,6 +823,7 @@ export type Database = {
           residency_status?: string
           salary_dues_amount?: number
           salary_dues_status?: string
+          saudi_entry_date?: string | null
           transfer_date?: string | null
           transfer_stage?: string
           transfer_type?: string

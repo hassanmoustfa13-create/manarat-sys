@@ -98,7 +98,16 @@ function ColumnsPage() {
         </p>
         <label className="mt-3 flex flex-wrap items-center gap-2 text-sm">
           <span className="font-semibold">ألوان صفوف الجداول (على هذا الجهاز):</span>
-          <select className={sel} value={palette} onChange={(e) => setPalette(e.target.value as RowPalette)}>
+          <select
+            className={sel}
+            value={palette}
+            onChange={(e) => {
+              const p = e.target.value as RowPalette;
+              setPalette(p)
+                .then(() => toast.success("تم حفظ ألوان الصفوف لجميع المستخدمين"))
+                .catch((err) => toast.error(errorMessage(err)));
+            }}
+          >
             <option value="soft">ألوان متنوعة هادئة</option>
             <option value="contrast">تباين عالٍ (أبيض / أزرق، وتحديد داكن)</option>
             <option value="light">فاتح (أبيض / رمادي فاتح)</option>

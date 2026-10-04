@@ -32,6 +32,7 @@ import { useAuth, useSignOut } from "@/hooks/useAuth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 import { SmartAlerts } from "@/components/SmartAlerts";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+import { useRowPalette } from "@/lib/rowPalette";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -277,6 +278,7 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
   useRealtimeSync();
+  useRowPalette();
   const [menuOpen, setMenuOpen] = useState(false);
   const { shown, custom, ordered } = useNavFiltering();
   const pathname = useRouterState({ select: (r) => r.location.pathname });

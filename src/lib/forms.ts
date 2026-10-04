@@ -58,7 +58,19 @@ export type FormField = {
   settings: FieldSettings;
   form_field_options: FormOption[];
 };
-export type FormSettings = { category?: string; cols?: number; description?: string; title?: string };
+export const DETAIL_HISTORY = "__sponsor_history";
+export const DETAIL_AUDIT = "__audit";
+export const DETAIL_ACTION = "__edit_action";
+export const DETAIL_EXTRAS = [DETAIL_AUDIT, DETAIL_ACTION, DETAIL_HISTORY] as const;
+export const detailSectionKey = (section: string) => `section:${section}`;
+export function detailBlockOrder(form: FormDef) {
+  const sections = [...new Set(activeFields(form).map((f) => detailSectionKey(f.section || "بيانات العملية")))];
+  const available = [...sections, ...DETAIL_EXTRAS];
+  const saved = form.settings.detailOrder ?? [];
+  return [...saved.filter((key) => available.includes(key)), ...available.filter((key) => !saved.includes(key))];
+}
+
+export type FormSettings = { category?: string; cols?: number; description?: string; title?: string; detailOrder?: string[] };
 export type FormDef = {
   id: string;
   form_key: string;

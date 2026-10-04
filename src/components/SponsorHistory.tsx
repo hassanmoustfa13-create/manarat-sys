@@ -54,7 +54,7 @@ export function SponsorHistory({
         <p className="text-[13px] text-ink/50">لا يوجد كفيل جديد بعد</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="ledger-rows w-full text-[12.5px]">
+          <table className="ledger-rows w-full text-right text-[12.5px]" dir="rtl">
             <thead className="text-ink/50">
               <tr className="text-right">
                 <th className="p-1.5 font-medium">#</th>
@@ -72,8 +72,8 @@ export function SponsorHistory({
                     <div className="font-medium">{r.name || "—"}</div>
                     {r.phone && <div dir="ltr" className="text-right text-[11px] text-ink/50">{r.phone}</div>}
                   </td>
-                  <td className="p-1.5 tabular-nums" dir="ltr">{formatDate(r.from)}</td>
-                  <td className="p-1.5">{r.isCurrent ? <span className="text-success">الكفيل الحالي</span> : <span dir="ltr" className="tabular-nums">{formatDate(r.to)}</span>}</td>
+                  <td className="p-1.5 text-right tabular-nums"><span dir="ltr" className="inline-block">{formatDate(r.from)}</span></td>
+                  <td className="p-1.5 text-right">{r.isCurrent ? <span className="text-success">الكفيل الحالي</span> : <span dir="ltr" className="inline-block tabular-nums">{formatDate(r.to)}</span>}</td>
                   <td className="p-1.5">
                     {r.salaryStatus === "توجد" ? (
                       <span className="text-terracotta">توجد — {formatMoney(r.salaryAmount)}</span>

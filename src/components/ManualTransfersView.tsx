@@ -26,7 +26,6 @@ import {
   PAYMENT_STATUSES,
   TRANSFER_STAGES,
   TRANSFER_TYPES,
-  TRANSFER_TYPE_OTHER,
   VISA_TYPES,
   YES_NO_EXISTS,
   YES_NO_EXISTS_F,
@@ -450,7 +449,7 @@ function detailSections(form: FormDef): [string, FormField[]][] {
   for (const f of activeFields(form)) {
     const sec = f.section || "بيانات العملية";
     if (!map.has(sec)) map.set(sec, []);
-    map.get(sec)!.push(f);
+    map.get(sec)?.push(f);
   }
   return [...map.entries()];
 }
@@ -467,18 +466,21 @@ function DetailFieldRow({
 }) {
   const key = field.column_name ?? field.field_key;
   const rec = record as unknown as Record<string, unknown>;
+  const valueFromRecord = field.column_name
+    ? rec[key]
+    : (record.extra as Record<string, unknown> | null)?.[field.field_key];
   const c = field.conditions;
   if (c?.field) {
     const v = String(rec[c.field] ?? "");
     const ok = c.op === "eq" ? v === (c.value ?? "") : v !== (c.value ?? "");
     if (!ok) return null;
   }
-  if (field.field_type === "select") {
+   if (field.field_type === "select" && field.column_name) {
     return (
       <EditableSelectRow
         label={field.label}
         field={key as keyof MT}
-        value={String(rec[key] ?? "")}
+         value={String(valueFromRecord ?? "")}
         options={DETAIL_SELECT_OPTIONS[key] ?? []}
         record={record}
         onSaved={onSaved}
@@ -487,9 +489,9 @@ function DetailFieldRow({
   }
   let value: ReactNode;
   if (key === "days_in_saudi") value = formatDaysInSaudi(daysInSaudi((rec["saudi_entry_date"] as string | null) ?? null));
-  else if (field.field_type === "date") value = formatDate(rec[key] as string | null);
-  else if (field.field_type === "currency") value = formatMoney(rec[key] as number | null);
-  else value = (rec[key] as string) || "—";
+   else if (field.field_type === "date") value = formatDate(valueFromRecord as string | null);
+   else if (field.field_type === "currency") value = formatMoney(Number(valueFromRecord ?? 0));
+   else value = String(valueFromRecord ?? "") || "—";
   return <DetailRow label={field.label} value={value} ltr={field.settings?.ltr ?? false} />;
 }
 
@@ -514,12 +516,12 @@ function ManualTransferDetails({
   onSaved: (field: keyof MT, value: string) => void;
 }) {
   const { data: profiles } = useQuery(profilesQuery);
-  const { data: forms } = useQuery(formsQuery);
+  const { data: forms, isPending: formsPending, isError: formsError, refetch: refetchForms } = useQuery(formsQuery);
   const detailForm = forms?.find((f) => f.form_key === "transfer_details" && f.is_active);
   const nameOf = profileNameMap(profiles);
   return (
     <Dialog open={Boolean(record)} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="glass-strong max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className={`glass-strong max-h-[90vh] overflow-y-auto ${detailForm?.settings.cols === 3 ? "max-w-4xl" : "max-w-2xl"}`} dir="rtl" onOpenAutoFocus={(e) => e.preventDefault()}>
         {record && (
           <>
             <DialogHeader className="text-right sm:text-right">
@@ -531,7 +533,7 @@ function ManualTransferDetails({
             </DialogHeader>
 
             {detailForm ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className={`grid gap-4 ${detailForm.settings.cols === 1 ? "" : detailForm.settings.cols === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
                 {detailSections(detailForm).map(([sec, fields]) => (
                   <Section key={sec} title={sec}>
                     {fields.map((fld) => (
@@ -541,63 +543,10 @@ function ManualTransferDetails({
                 ))}
               </div>
             ) : (
-              <>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Section title="بيانات العملية">
-                <DetailRow label="اسم العاملة" value={record.worker_name || "—"} />
-                <DetailRow label="رقم الجواز" value={record.passport_number || "—"} ltr />
-                <EditableSelectRow label="الجنسية" field="nationality" value={record.nationality} options={NATIONALITIES} record={record} onSaved={onSaved} />
-                <EditableSelectRow label="نوع التأشيرة" field="visa_type" value={record.visa_type} options={VISA_TYPES} record={record} onSaved={onSaved} />
-                <DetailRow label="رقم التأشيرة" value={record.visa_number || "—"} ltr />
-                <EditableSelectRow label="نوع النقل" field="transfer_type" value={record.transfer_type} options={TRANSFER_TYPES} record={record} onSaved={onSaved} />
-                <EditableSelectRow label="حالة النقل" field="transfer_stage" value={record.transfer_stage} options={TRANSFER_STAGES} record={record} onSaved={onSaved} />
-                <DetailRow label="تاريخ النقل" value={formatDate(record.transfer_date)} ltr />
-                <DetailRow label="بداية الفترة" value={formatDate(record.period_start)} ltr />
-                <DetailRow label="نهاية الفترة" value={formatDate(record.period_end)} ltr />
-                <DetailRow label="تاريخ رجوع العاملة المكتب" value={formatDate(record.return_to_office_date)} ltr />
-                <EditableSelectRow label="الجواز لدى" field="passport_holder" value={record.passport_holder} options={PASSPORT_HOLDERS} record={record} onSaved={onSaved} />
-              </Section>
-
-              <div className="space-y-4">
-                <Section title="الكفيل القديم">
-                  <DetailRow label="الاسم" value={record.old_sponsor_name || "—"} />
-                  <DetailRow label="الهاتف" value={record.old_sponsor_phone || "—"} ltr />
-                </Section>
-                <Section title="الكفيل الجديد">
-                  <DetailRow label="الاسم" value={record.new_sponsor_name || "—"} />
-                  <DetailRow label="الهاتف" value={record.new_sponsor_phone || "—"} ltr />
-                </Section>
+              <div className="text-center text-sm text-muted-foreground">
+                {formsPending ? "جارٍ تحميل تفاصيل العملية…" : formsError ? "تعذّر تحميل إعدادات تفاصيل العملية." : "نموذج تفاصيل العملية غير متاح."}
+                {!formsPending && formsError && <Button variant="outline" className="ms-2" onClick={() => void refetchForms()}>إعادة المحاولة</Button>}
               </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Section title="المالية">
-                <DetailRow label="مستحقات الكفيل القديم" value={formatMoney(record.old_sponsor_dues)} ltr />
-                <EditableSelectRow label="حالة الدفع للكفيل القديم" field="payment_status" value={record.payment_status} options={PAYMENT_STATUSES} record={record} onSaved={onSaved} />
-                <DetailRow label="مستحقات المكتب من الكفيل الجديد" value={formatMoney((record as any).new_sponsor_dues)} ltr />
-                <DetailRow label="العربون (من الكفيل الجديد)" value={formatMoney(record.down_payment)} ltr />
-                <DetailRow label="مدفوعات أخرى للكفيل الجديد" value={formatMoney((record as any).new_sponsor_other_payments)} ltr />
-                <DetailRow label="حالة دفع الكفيل الجديد (تلقائي)" value={(record as any).new_sponsor_payment_status} />
-                <DetailRow label="تاريخ دخول العاملة السعودية" value={(record as any).saudi_entry_date || "—"} ltr />
-                <DetailRow label="عدد الأيام في السعودية" value={formatDaysInSaudi(daysInSaudi((record as any).saudi_entry_date ?? null))} ltr />
-                <EditableSelectRow label="مستحقات الرواتب" field="salary_dues_status" value={record.salary_dues_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
-                {record.salary_dues_status === "توجد" && (
-                  <DetailRow label="قيمة مستحقات الرواتب" value={formatMoney(record.salary_dues_amount)} ltr />
-                )}
-              </Section>
-
-              <Section title="حالة العاملة">
-                <EditableSelectRow label="الفحص الطبي" field="medical_exam" value={record.medical_exam} options={YES_NO_EXISTS} record={record} onSaved={onSaved} />
-                <EditableSelectRow label="الإقامة" field="residency_status" value={record.residency_status} options={YES_NO_EXISTS_F} record={record} onSaved={onSaved} />
-                {record.residency_status === "توجد" && (
-                  <DetailRow label="رقم الإقامة" value={record.residency_number || "—"} ltr />
-                )}
-                <EditableSelectRow label="موقع العاملة" field="worker_location" value={record.worker_location} options={LOCATIONS} record={record} onSaved={onSaved} />
-                <DetailRow label="ملاحظات حالة العاملة" value={record.worker_condition || "—"} />
-                {record.notes && <DetailRow label="ملاحظات" value={record.notes} />}
-              </Section>
-            </div>
-              </>
             )}
 
             <SponsorHistory

@@ -277,6 +277,7 @@ function TopNav({ isAdmin }: { isAdmin: boolean }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const auth = useAuth();
   useRealtimeSync();
+  useRowPalette();
   const [menuOpen, setMenuOpen] = useState(false);
   const { shown, custom, ordered } = useNavFiltering();
   const pathname = useRouterState({ select: (r) => r.location.pathname });

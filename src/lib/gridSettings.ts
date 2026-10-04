@@ -103,7 +103,7 @@ export const GRID_COLUMNS: Record<GridKey, [string, string][]> = {
     ["worker_name", "اسم العاملة"], ["passport_number", "رقم الجواز"], ["nationality", "الجنسية"],
     ["old_sponsor_name", "الكفيل القديم"], ["new_sponsor_name", "الكفيل الجديد"], ["visa_type", "نوع التأشيرة"],
     ["visa_number", "رقم التأشيرة"], ["transfer_type", "نوع النقل"], ["transfer_date", "تاريخ النقل"],
-    ["transfer_stage", "حالة النقل"], ["return_to_office_date", "تاريخ رجوع العاملة المكتب"], ["worker_location", "موقع العاملة"],
+    ["transfer_stage", "حالة النقل"], ["return_to_office_date", "تاريخ رجوع العاملة المكتب"], ["days_in_saudi", "أيام العاملة في السعودية"], ["worker_location", "موقع العاملة"],
     ["old_sponsor_dues", "مستحقات القديم"], ["down_payment", "العربون"],
     ["payment_status", "حالة دفع القديم"], ["new_sponsor_dues", "مستحقات المكتب من الجديد"], ["new_sponsor_other_payments", "مدفوعات أخرى للجديد"], ["saudi_entry_date", "تاريخ دخول السعودية"], ["new_sponsor_payment_status", "حالة دفع الجديد"], ["medical_exam", "الفحص الطبي"], ["residency_status", "الإقامة"],
     ["residency_number", "رقم الإقامة"], ["salary_dues_status", "مستحقات الرواتب"], ["salary_dues_amount", "قيمة مستحقات الرواتب"],

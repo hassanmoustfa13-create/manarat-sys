@@ -49,8 +49,10 @@ export function DataGrid<T extends { id: string }>({
   minWidth = 0,
   gridKey,
   onRowClick,
+  sortable = false,
 }: DataGridProps<T>) {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScroll, setCanScroll] = useState(false);
   const move = (left: number) => scrollRef.current?.scrollBy({ left, behavior: "smooth" });
@@ -87,12 +89,14 @@ export function DataGrid<T extends { id: string }>({
   const table = useReactTable({
     data,
     columns,
-    state: { globalFilter: search, pagination, columnVisibility, columnOrder },
+    state: { globalFilter: search, pagination, columnVisibility, columnOrder, sorting },
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     getRowId: (r) => r.id,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: sortable ? getSortedRowModel() : undefined,
     globalFilterFn: (row, _colId, filter: string) => {
       const q = filter.trim().toLowerCase();
       if (!q) return true;

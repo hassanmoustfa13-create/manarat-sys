@@ -13,7 +13,7 @@ import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";
-import { formsQuery } from "@/lib/forms";
+import { activeFields, formsQuery, type FormDef, type FormField } from "@/lib/forms";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -430,6 +430,69 @@ function EditableSelectRow({
   );
 }
 
+/** القوائم الافتراضية لحقول نافذة التفاصيل (تُستبدل بخيارات نموذج الإضافة عند وجودها). */
+const DETAIL_SELECT_OPTIONS: Record<string, readonly string[]> = {
+  nationality: NATIONALITIES,
+  visa_type: VISA_TYPES,
+  transfer_type: TRANSFER_TYPES,
+  transfer_stage: TRANSFER_STAGES,
+  passport_holder: PASSPORT_HOLDERS,
+  payment_status: PAYMENT_STATUSES,
+  salary_dues_status: YES_NO_EXISTS_F,
+  medical_exam: YES_NO_EXISTS,
+  residency_status: YES_NO_EXISTS_F,
+  worker_location: LOCATIONS,
+};
+
+/** تجميع حقول نموذج التفاصيل حسب القسم مع الحفاظ على الترتيب. */
+function detailSections(form: FormDef): [string, FormField[]][] {
+  const map = new Map<string, FormField[]>();
+  for (const f of activeFields(form)) {
+    const sec = f.section || "بيانات العملية";
+    if (!map.has(sec)) map.set(sec, []);
+    map.get(sec)!.push(f);
+  }
+  return [...map.entries()];
+}
+
+/** صف واحد في نافذة التفاصيل يُبنى من تعريف الحقل في «إدارة النماذج». */
+function DetailFieldRow({
+  field,
+  record,
+  onSaved,
+}: {
+  field: FormField;
+  record: MT;
+  onSaved: (field: keyof MT, value: string) => void;
+}) {
+  const key = field.column_name ?? field.field_key;
+  const rec = record as unknown as Record<string, unknown>;
+  const c = field.conditions;
+  if (c?.field) {
+    const v = String(rec[c.field] ?? "");
+    const ok = c.op === "eq" ? v === (c.value ?? "") : v !== (c.value ?? "");
+    if (!ok) return null;
+  }
+  if (field.field_type === "select") {
+    return (
+      <EditableSelectRow
+        label={field.label}
+        field={key as keyof MT}
+        value={String(rec[key] ?? "")}
+        options={DETAIL_SELECT_OPTIONS[key] ?? []}
+        record={record}
+        onSaved={onSaved}
+      />
+    );
+  }
+  let value: ReactNode;
+  if (key === "days_in_saudi") value = formatDaysInSaudi(daysInSaudi((rec["saudi_entry_date"] as string | null) ?? null));
+  else if (field.field_type === "date") value = formatDate(rec[key] as string | null);
+  else if (field.field_type === "currency") value = formatMoney(rec[key] as number | null);
+  else value = (rec[key] as string) || "—";
+  return <DetailRow label={field.label} value={value} ltr={field.settings?.ltr ?? false} />;
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="glass rounded-xl p-4">
@@ -451,6 +514,8 @@ function ManualTransferDetails({
   onSaved: (field: keyof MT, value: string) => void;
 }) {
   const { data: profiles } = useQuery(profilesQuery);
+  const { data: forms } = useQuery(formsQuery);
+  const detailForm = forms?.find((f) => f.form_key === "transfer_details" && f.is_active);
   const nameOf = profileNameMap(profiles);
   return (
     <Dialog open={Boolean(record)} onOpenChange={(o) => !o && onClose()}>
@@ -465,6 +530,18 @@ function ManualTransferDetails({
               <DialogDescription>تفاصيل عملية نقل الكفالة</DialogDescription>
             </DialogHeader>
 
+            {detailForm ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {detailSections(detailForm).map(([sec, fields]) => (
+                  <Section key={sec} title={sec}>
+                    {fields.map((fld) => (
+                      <DetailFieldRow key={fld.id} field={fld} record={record} onSaved={onSaved} />
+                    ))}
+                  </Section>
+                ))}
+              </div>
+            ) : (
+              <>
             <div className="grid gap-4 sm:grid-cols-2">
               <Section title="بيانات العملية">
                 <DetailRow label="اسم العاملة" value={record.worker_name || "—"} />
@@ -520,6 +597,8 @@ function ManualTransferDetails({
                 {record.notes && <DetailRow label="ملاحظات" value={record.notes} />}
               </Section>
             </div>
+              </>
+            )}
 
             <SponsorHistory
               transferId={record.id}

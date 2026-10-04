@@ -198,10 +198,11 @@ function ColumnsPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/8">
-        <div className="grid grid-cols-[60px_1fr_90px_130px_130px_90px] gap-2 border-b border-black/10 px-4 py-3 text-[13px] font-bold text-ink/70">
+        <div className="grid grid-cols-[60px_1fr_90px_70px_130px_130px_90px] gap-2 border-b border-black/10 px-4 py-3 text-[13px] font-bold text-ink/70">
           <span>الترتيب</span>
           <span>اسم العمود (اكتب اسمًا جديدًا)</span>
           <span>الظهور</span>
+          <span>اللون</span>
           <span>العرض (بكسل)</span>
           <span>المحاذاة</span>
           <span>تحريك</span>
@@ -229,7 +230,7 @@ function ColumnsPage() {
               next.splice(i, 0, item!);
               setDraft((d) => ({ ...d, columns: next }));
             }}
-            className={`grid cursor-grab grid-cols-[60px_1fr_90px_130px_130px_90px] items-center gap-2 border-b border-black/5 px-4 py-2 text-sm transition-colors active:cursor-grabbing ${
+            className={`grid cursor-grab grid-cols-[60px_1fr_90px_70px_130px_130px_90px] items-center gap-2 border-b border-black/5 px-4 py-2 text-sm transition-colors active:cursor-grabbing ${
               c.visible ? "" : "opacity-50"
             }`}
           >
@@ -254,6 +255,26 @@ function ColumnsPage() {
               {c.visible ? <Eye className="size-4 text-brand" /> : <EyeOff className="size-4" />}
               {c.visible ? "ظاهر" : "مخفي"}
             </button>
+            <span className="flex items-center gap-1">
+              <input
+                type="color"
+                aria-label="لون العمود"
+                title={c.color ? "لون العمود — اضغط ✕ للإزالة" : "اختر لونًا للعمود"}
+                value={c.color ?? "#ffffff"}
+                onChange={(e) => update(i, { color: e.target.value })}
+                className="h-8 w-8 cursor-pointer rounded-md border border-black/10 bg-transparent p-0.5"
+              />
+              {c.color && (
+                <button
+                  aria-label="إزالة اللون"
+                  title="إزالة اللون"
+                  onClick={() => update(i, { color: undefined })}
+                  className="rounded p-0.5 text-ink/50 hover:bg-black/5 hover:text-ink"
+                >
+                  ✕
+                </button>
+              )}
+            </span>
             <input
               type="number"
               min={60}

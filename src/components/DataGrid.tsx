@@ -72,6 +72,7 @@ export function DataGrid<T extends { id: string }>({
   const fontCls = saved?.fontSize === "sm" ? "text-[12.5px]" : saved?.fontSize === "lg" ? "text-[16px]" : "text-[13.5px]";
   const padCls = saved?.density === "compact" ? "py-1" : saved?.density === "comfortable" ? "py-4" : "py-2";
   const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;
+  const colorOf = (id: string) => setById.get(id)?.color || undefined;
   const alignOf = (id: string, ltr?: boolean) => {
     const a = setById.get(id)?.align;
     if (a === "center") return "text-center";
@@ -139,8 +140,12 @@ export function DataGrid<T extends { id: string }>({
                 {hg.headers.map((header) => (
                   <th
                     key={header.id}
-                    style={{ width: widthOf(header.column.id, header.column.columnDef.meta?.width), minWidth: setById.get(header.column.id)?.width || undefined }}
-                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
+                    style={{
+                      width: widthOf(header.column.id, header.column.columnDef.meta?.width),
+                      minWidth: setById.get(header.column.id)?.width || undefined,
+                      backgroundColor: colorOf(header.column.id),
+                    }}
+                    className={`border-b-2 border-l border-black/10 ${colorOf(header.column.id) ? "" : "bg-white/90"} px-3 py-2.5 ${alignOf(header.column.id)} font-bold backdrop-blur-xl first:border-l-0`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -179,6 +184,7 @@ export function DataGrid<T extends { id: string }>({
                     <td
                       key={cell.id}
                       dir={meta.ltr ? "ltr" : undefined}
+                      style={colorOf(cell.column.id) ? { backgroundColor: colorOf(cell.column.id) } : undefined}
                       className={`border-l border-black/5 px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
                         cell.column.id,
                         meta.ltr,

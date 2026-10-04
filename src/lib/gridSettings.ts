@@ -11,6 +11,8 @@ export interface ColumnSetting {
   align?: ColAlign | undefined;
   /** اسم مخصص للعمود يظهر بدل الاسم الافتراضي */
   label?: string | undefined;
+  /** لون خلفية مستقل للعمود (hex) — يُطبَّق على جميع المستخدمين */
+  color?: string | undefined;
 }
 
 export interface GridSettings {

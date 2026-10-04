@@ -67,7 +67,11 @@ export function detailBlockOrder(form: FormDef) {
   const sections = [...new Set(activeFields(form).map((f) => detailSectionKey(f.section || "بيانات العملية")))];
   const available = [...sections, ...DETAIL_EXTRAS];
   const saved = form.settings.detailOrder ?? [];
-  return [...saved.filter((key) => available.includes(key)), ...available.filter((key) => !saved.includes(key))];
+  const ordered = saved.filter((key) => available.includes(key));
+  const newSections = sections.filter((key) => !ordered.includes(key));
+  const firstExtra = ordered.findIndex((key) => DETAIL_EXTRAS.some((extra) => extra === key));
+  ordered.splice(firstExtra < 0 ? ordered.length : firstExtra, 0, ...newSections);
+  return [...ordered, ...DETAIL_EXTRAS.filter((key) => !ordered.includes(key))];
 }
 
 export type FormSettings = { category?: string; cols?: number; description?: string; title?: string; detailOrder?: string[] };

@@ -17,6 +17,10 @@ import {
   BEHAVIORS,
   FIELD_TYPES,
   OPTION_TYPES,
+  detailBlockOrder,
+  DETAIL_ACTION,
+  DETAIL_AUDIT,
+  DETAIL_HISTORY,
   formsQuery,
   type FieldType,
   type FormDef,
@@ -111,6 +115,7 @@ function FormEditor() {
         <ArrowRight className="size-4" /> كل النماذج
       </Link>
       <FormSettingsCard form={form} onSaved={refresh} />
+      {form.form_key === "transfer_details" && <DetailLayoutCard form={form} onSaved={refresh} />}
 
       <div className="mb-3 mt-5 flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-semibold">الحقول ({fields.length})</h2>
@@ -241,6 +246,49 @@ function IBtn({ title, onClick, children, danger, disabled }: { title: string; o
     >
       {children}
     </button>
+  );
+}
+
+function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => void }) {
+  const available = detailBlockOrder(form);
+  const [order, setOrder] = useState(available);
+  useEffect(() => setOrder(available), [form]);
+  const save = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("forms").update({ settings: { ...form.settings, detailOrder: order } as never }).eq("id", form.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("تم حفظ ترتيب التفاصيل"); onSaved(); },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  const move = (index: number, direction: -1 | 1) => {
+    const next = [...order];
+    const current = next[index];
+    const other = next[index + direction];
+    if (!current || !other) return;
+    next[index + direction] = current;
+    next[index] = other;
+    setOrder(next);
+  };
+  const label = (key: string) => key === DETAIL_HISTORY ? "سجل الكفلاء الجدد" : key === DETAIL_AUDIT ? "سجل التدقيق" : key === DETAIL_ACTION ? "زر تعديل البيانات" : key.startsWith("section:") ? key.slice("section:".length) : key;
+  return (
+    <section className="mt-4 space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-semibold">ترتيب أجزاء نافذة التفاصيل</h2>
+        <Button onClick={() => save.mutate()} disabled={save.isPending}>حفظ الترتيب</Button>
+      </div>
+      <div className="grid gap-1 sm:grid-cols-2">
+        {order.map((key, i) => (
+          <div key={key} className="flex items-center justify-between gap-3 border-b border-border px-2 py-2 text-sm">
+            <span>{label(key)}</span>
+            <div className="flex items-center gap-1">
+              <Button type="button" variant="ghost" size="icon" title="أعلى" aria-label={`تحريك ${label(key)} لأعلى`} disabled={i === 0} onClick={() => move(i, -1)}><ArrowUp className="size-4" /></Button>
+              <Button type="button" variant="ghost" size="icon" title="أسفل" aria-label={`تحريك ${label(key)} لأسفل`} disabled={i === order.length - 1} onClick={() => move(i, 1)}><ArrowDown className="size-4" /></Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

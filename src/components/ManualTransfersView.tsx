@@ -13,7 +13,7 @@ import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";
-import { activeFields, formsQuery, type FormDef, type FormField } from "@/lib/forms";
+import { activeFields, detailBlockOrder, detailSectionKey, DETAIL_ACTION, DETAIL_AUDIT, DETAIL_HISTORY, formsQuery, type FormDef, type FormField } from "@/lib/forms";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -534,13 +534,40 @@ function ManualTransferDetails({
 
             {detailForm ? (
               <div className={`grid gap-4 ${detailForm.settings.cols === 1 ? "" : detailForm.settings.cols === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-                {detailSections(detailForm).map(([sec, fields]) => (
-                  <Section key={sec} title={sec}>
-                    {fields.map((fld) => (
-                      <DetailFieldRow key={fld.id} field={fld} record={record} onSaved={onSaved} />
-                    ))}
-                  </Section>
-                ))}
+                {detailBlockOrder(detailForm).map((block) => {
+                  if (block === DETAIL_HISTORY) return (
+                    <div key={block} className="col-span-full">
+                      <SponsorHistory
+                        transferId={record.id}
+                        source="manual_transfers"
+                        current={{ name: record.new_sponsor_name, phone: record.new_sponsor_phone, since: record.transfer_date, createdAt: record.created_at, salaryStatus: record.salary_dues_status, salaryAmount: Number(record.salary_dues_amount) }}
+                      />
+                    </div>
+                  );
+                  if (block === DETAIL_AUDIT) return (
+                    <Section key={block} title="سجل التدقيق">
+                      <DetailRow label="تم الإضافة بواسطة" value={nameOf(record.created_by) || "—"} />
+                      <DetailRow label="تاريخ الإضافة" value={formatDateTime(record.created_at)} ltr />
+                      <DetailRow label="آخر تعديل بواسطة" value={nameOf(record.updated_by) || "—"} />
+                      <DetailRow label="تاريخ آخر تعديل" value={formatDateTime(record.updated_at)} ltr />
+                    </Section>
+                  );
+                  if (block === DETAIL_ACTION) return (
+                    <div key={block} className="flex items-end">
+                      <Button type="button" onClick={() => onEdit(record)} className="w-full">تعديل البيانات</Button>
+                    </div>
+                  );
+                  const entry = detailSections(detailForm).find(([sec]) => detailSectionKey(sec) === block);
+                  if (!entry) return null;
+                  const [sec, fields] = entry;
+                  return (
+                    <Section key={block} title={sec}>
+                      {fields.map((fld) => (
+                        <DetailFieldRow key={fld.id} field={fld} record={record} onSaved={onSaved} />
+                      ))}
+                    </Section>
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center text-sm text-muted-foreground">
@@ -549,29 +576,6 @@ function ManualTransferDetails({
               </div>
             )}
 
-            <SponsorHistory
-              transferId={record.id}
-              source="manual_transfers"
-              current={{ name: record.new_sponsor_name, phone: record.new_sponsor_phone, since: record.transfer_date, createdAt: record.created_at, salaryStatus: record.salary_dues_status, salaryAmount: Number(record.salary_dues_amount) }}
-            />
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Section title="سجل التدقيق">
-                <DetailRow label="تم الإضافة بواسطة" value={nameOf(record.created_by) || "—"} />
-                <DetailRow label="تاريخ الإضافة" value={formatDateTime(record.created_at)} ltr />
-                <DetailRow label="آخر تعديل بواسطة" value={nameOf(record.updated_by) || "—"} />
-                <DetailRow label="تاريخ آخر تعديل" value={formatDateTime(record.updated_at)} ltr />
-              </Section>
-              <div className="flex items-end">
-                <Button
-                  type="button"
-                  onClick={() => onEdit(record)}
-                  className="w-full"
-                >
-                  تعديل البيانات
-                </Button>
-              </div>
-            </div>
           </>
         )}
       </DialogContent>

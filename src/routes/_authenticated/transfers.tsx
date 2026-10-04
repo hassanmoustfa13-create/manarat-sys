@@ -306,6 +306,19 @@ export function TransfersView({ category }: { category: "منزلية" | "مهن
         cell: ({ getValue }) => formatMoney(getValue() as number),
       },
       {
+        id: "new_sponsor_other_payments",
+        accessorKey: "new_sponsor_other_payments",
+        header: "مدفوعات أخرى للجديد",
+        meta: { ltr: true, className: "tabular-nums" },
+        cell: ({ getValue }) => formatMoney(getValue() as number),
+      },
+      {
+        id: "saudi_entry_date",
+        accessorKey: "saudi_entry_date",
+        header: "تاريخ دخول السعودية",
+        meta: { ltr: true },
+      },
+      {
         id: "new_sponsor_payment_status",
         accessorKey: "new_sponsor_payment_status",
         header: "حالة دفع الجديد",

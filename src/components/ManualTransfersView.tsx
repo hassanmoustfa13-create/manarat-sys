@@ -514,6 +514,8 @@ function ManualTransferDetails({
   onSaved: (field: keyof MT, value: string) => void;
 }) {
   const { data: profiles } = useQuery(profilesQuery);
+  const { data: forms } = useQuery(formsQuery);
+  const detailForm = forms?.find((f) => f.form_key === "transfer_details" && f.is_active);
   const nameOf = profileNameMap(profiles);
   return (
     <Dialog open={Boolean(record)} onOpenChange={(o) => !o && onClose()}>

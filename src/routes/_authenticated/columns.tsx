@@ -202,7 +202,7 @@ function ColumnsPage() {
           <span>الترتيب</span>
           <span>اسم العمود (اكتب اسمًا جديدًا)</span>
           <span>الظهور</span>
-          <span>اللون</span>
+          <span>لون الخلايا</span>
           <span>العرض (بكسل)</span>
           <span>المحاذاة</span>
           <span>تحريك</span>

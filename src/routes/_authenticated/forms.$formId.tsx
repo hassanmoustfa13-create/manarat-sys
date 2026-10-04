@@ -18,7 +18,6 @@ import {
   FIELD_TYPES,
   OPTION_TYPES,
   detailBlockOrder,
-  detailSectionKey,
   DETAIL_ACTION,
   DETAIL_AUDIT,
   DETAIL_HISTORY,

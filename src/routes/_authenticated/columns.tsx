@@ -96,24 +96,52 @@ function ColumnsPage() {
         <p className="text-sm text-muted-foreground">
           تحكم في ترتيب الأعمدة وعرضها ومحاذاتها والأعمدة الظاهرة — تُطبّق على جميع المستخدمين.
         </p>
-        <label className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-          <span className="font-semibold">ألوان صفوف الجداول (على هذا الجهاز):</span>
-          <select
-            className={sel}
-            value={palette}
-            onChange={(e) => {
-              const p = e.target.value as RowPalette;
-              setPalette(p)
-                .then(() => toast.success("تم حفظ ألوان الصفوف لجميع المستخدمين"))
-                .catch((err) => toast.error(errorMessage(err)));
-            }}
-          >
-            <option value="soft">ألوان متنوعة هادئة</option>
-            <option value="contrast">تباين عالٍ (أبيض / أزرق، وتحديد داكن)</option>
-            <option value="light">فاتح (أبيض / رمادي فاتح)</option>
-            <option value="dark">غامق (كحلي / رمادي داكن، نص أبيض)</option>
-          </select>
-        </label>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+          <label className="flex items-center gap-2">
+            <span className="font-semibold">ألوان الجداول (لجميع المستخدمين):</span>
+            <select
+              className={sel}
+              value={paletteSettings.palette}
+              onChange={(e) => savePalette({ palette: e.target.value as RowPalette })}
+            >
+              <option value="soft">ألوان متنوعة هادئة</option>
+              <option value="contrast">تباين عالٍ (أبيض / أزرق)</option>
+              <option value="light">فاتح (أبيض / رمادي فاتح)</option>
+              <option value="dark">غامق (كحلي / رمادي داكن، نص أبيض)</option>
+              <option value="custom">مخصصة (أختار الألوان بنفسي)</option>
+            </select>
+          </label>
+          <label className="flex items-center gap-2">
+            <span className="font-semibold">التلوين على:</span>
+            <select
+              className={sel}
+              value={paletteSettings.mode}
+              onChange={(e) => savePalette({ mode: e.target.value as RowMode })}
+            >
+              <option value="rows">الصفوف</option>
+              <option value="columns">الأعمدة</option>
+            </select>
+          </label>
+          {paletteSettings.palette === "custom" && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-semibold">ألواني:</span>
+              {paletteSettings.colors.map((c, i) => (
+                <input
+                  key={i}
+                  type="color"
+                  value={c}
+                  onChange={(e) => {
+                    const colors = [...paletteSettings.colors];
+                    colors[i] = e.target.value;
+                    savePalette({ colors });
+                  }}
+                  className="h-9 w-11 cursor-pointer rounded-lg border border-black/10 bg-transparent p-0.5"
+                  title={`اللون ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">

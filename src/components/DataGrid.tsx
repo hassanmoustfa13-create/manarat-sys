@@ -96,7 +96,7 @@ export function DataGrid<T extends { id: string }>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: sortable ? getSortedRowModel() : undefined,
+    ...(sortable ? { getSortedRowModel: getSortedRowModel() } : {}),
     globalFilterFn: (row, _colId, filter: string) => {
       const q = filter.trim().toLowerCase();
       if (!q) return true;

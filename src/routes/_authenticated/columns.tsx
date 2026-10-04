@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, RotateCcw } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { errorMessage } from "@/lib/data";
-import { useRowPalette, type RowPalette } from "@/lib/rowPalette";
+import { useRowPalette, type RowColorSettings, type RowMode, type RowPalette } from "@/lib/rowPalette";
 import {
   GRID_COLUMNS,
   GRID_LABELS,
@@ -37,7 +37,11 @@ const sel = "glass h-9 rounded-lg px-2 text-[13px] outline-none";
 
 function ColumnsPage() {
   const auth = useAuth();
-  const [palette, setPalette] = useRowPalette();
+  const [paletteSettings, updatePalette] = useRowPalette();
+  const savePalette = (patch: Partial<RowColorSettings>) =>
+    updatePalette(patch)
+      .then(() => toast.success("تم حفظ ألوان الجداول لجميع المستخدمين"))
+      .catch((err) => toast.error(errorMessage(err)));
   const qc = useQueryClient();
   const { data: all } = useQuery({ ...gridSettingsQuery, enabled: auth.can("admin_columns", "view") });
   const [key, setKey] = useState<GridKey>("workers");

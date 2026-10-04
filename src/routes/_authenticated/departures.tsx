@@ -12,7 +12,7 @@ import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { errorMessage, formatDate, profileNameMap, profilesQuery } from "@/lib/data";
-import { dayName } from "@/routes/_authenticated/flights";
+import { dayName, formatTime } from "@/routes/_authenticated/flights";
 
 export const DEPARTURE_STATUSES = ["—", "تم المغادرة", "تم الإلغاء"];
 
@@ -108,7 +108,7 @@ function DeparturesPage() {
         accessorKey: "flight_time",
         header: "الوقت",
         meta: { width: 90, ltr: true, className: "tabular-nums" },
-        cell: ({ getValue }) => (getValue() as string) || "—",
+        cell: ({ getValue }) => formatTime(getValue() as string) || "—",
       },
       { id: "office_name", accessorKey: "office_name", header: "اسم المكتب الخارجي", meta: { width: 170 }, cell: ({ getValue }) => (getValue() as string) || "—" },
       { id: "workers_count", accessorKey: "workers_count", header: "عدد العاملات", meta: { width: 100, className: "tabular-nums" } },

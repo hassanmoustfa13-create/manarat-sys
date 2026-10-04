@@ -38,6 +38,18 @@ export function dayName(date: string | null) {
   return d.toLocaleDateString("ar-SA-u-ca-gregory", { weekday: "long" });
 }
 
+export function formatTime(t: string | null | undefined) {
+  if (!t) return "";
+  const m = /^(\d{1,2}):(\d{2})/.exec(t.trim());
+  if (!m) return t;
+  let h = Number(m[1]);
+  const min = m[2];
+  const period = h < 12 ? "ص" : "م";
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  return `${h}:${min} ${period}`;
+}
+
 export const Route = createFileRoute("/_authenticated/flights")({
   head: () => ({
     meta: [
@@ -119,7 +131,7 @@ function FlightsPage() {
         accessorKey: "flight_time",
         header: "الوقت",
         meta: { width: 90, ltr: true, className: "tabular-nums" },
-        cell: ({ getValue }) => (getValue() as string) || "—",
+        cell: ({ getValue }) => formatTime(getValue() as string) || "—",
       },
       { id: "office_name", accessorKey: "office_name", header: "اسم المكتب الخارجي", meta: { width: 170 }, cell: ({ getValue }) => (getValue() as string) || "—" },
       { id: "workers_count", accessorKey: "workers_count", header: "عدد العاملات", meta: { width: 100, className: "tabular-nums" } },

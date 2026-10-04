@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 import { RotateCcw } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StatusBadge } from "@/components/StatusBadge";
+import { DataGrid } from "@/components/DataGrid";
 import { SponsorHistory, setArchived } from "@/components/SponsorHistory";
 import { errorMessage, formatDate, formatDateTime, formatMoney, profileNameMap, profilesQuery } from "@/lib/data";
 
@@ -67,12 +69,6 @@ function ArchivePage() {
     },
   });
 
-  const rows = useMemo(() => {
-    const q = search.trim();
-    if (!q) return items;
-    return items.filter((i) => [i.worker_name, i.passport_number, i.nationality, i.r.old_sponsor_name, i.r.new_sponsor_name].some((v) => String(v ?? "").includes(q)));
-  }, [items, search]);
-
   const restore = useMutation({
     mutationFn: (i: Item) => setArchived(i.table, i.id, false),
     onSuccess: () => {
@@ -88,50 +84,46 @@ function ArchivePage() {
     return auth.can(i.category === "مهنية" ? `${base}_pro` : base, "edit");
   };
 
+  const columns = useMemo<ColumnDef<Item, unknown>[]>(
+    () => [
+      { id: "worker_name", accessorKey: "worker_name", header: "العاملة" },
+      { id: "passport_number", accessorKey: "passport_number", header: "الجواز", meta: { ltr: true }, cell: ({ getValue }) => (getValue() as string) || "—" },
+      { id: "kind", accessorKey: "kind", header: "النوع" },
+      { id: "category", accessorKey: "category", header: "الفئة" },
+      { id: "old_sponsor_name", accessorFn: (i) => i.r.old_sponsor_name, header: "الكفيل القديم", cell: ({ getValue }) => (getValue() as string) || "—" },
+      { id: "new_sponsor_name", accessorFn: (i) => i.r.new_sponsor_name, header: "الكفيل الجديد", cell: ({ getValue }) => (getValue() as string) || "—" },
+      { id: "payment_status", accessorFn: (i) => i.r.payment_status, header: "حالة الدفع", cell: ({ getValue }) => <StatusBadge value={getValue() as string} /> },
+      { id: "archived_at", accessorFn: (i) => i.r.archived_at, header: "تاريخ الأرشفة", meta: { ltr: true, className: "tabular-nums" }, cell: ({ getValue }) => formatDateTime(getValue() as string) },
+      { id: "archived_by", accessorFn: (i) => i.r.archived_by, header: "أرشفها", cell: ({ getValue }) => nameOf(getValue() as string) || "—" },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [profiles],
+  );
+
   return (
     <main className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6" dir="rtl">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-bold">الأرشيف <span className="text-sm font-normal text-ink/50">({rows.length})</span></h1>
+        <h1 className="text-xl font-bold">الأرشيف <span className="text-sm font-normal text-ink/50">({items.length})</span></h1>
         <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="بحث بالاسم أو الجواز أو الكفيل" className="max-w-xs" />
       </div>
       {isLoading ? (
         <div className="glass h-64 animate-pulse rounded-2xl" />
-      ) : rows.length === 0 ? (
-        <div className="glass rounded-2xl p-10 text-center text-ink/50">لا توجد عمليات مؤرشفة</div>
       ) : (
-        <div className="glass overflow-x-auto rounded-2xl">
-          <table className="ledger-rows w-full text-[13px]">
-            <thead className="text-ink/55">
-              <tr className="text-right">
-                {["العاملة", "الجواز", "النوع", "الفئة", "الكفيل القديم", "الكفيل الجديد", "حالة الدفع", "تاريخ الأرشفة", "أرشفها", ""].map((h) => (
-                  <th key={h} className="p-2.5 font-medium">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((i) => (
-                <tr key={i.id} className="cursor-pointer border-t border-black/5" onClick={() => setViewing(i)}>
-                  <td className="p-2.5 font-medium">{i.worker_name}</td>
-                  <td className="p-2.5" dir="ltr">{i.passport_number || "—"}</td>
-                  <td className="p-2.5">{i.kind}</td>
-                  <td className="p-2.5">{i.category}</td>
-                  <td className="p-2.5">{i.r.old_sponsor_name || "—"}</td>
-                  <td className="p-2.5">{i.r.new_sponsor_name || "—"}</td>
-                  <td className="p-2.5"><StatusBadge value={i.r.payment_status} /></td>
-                  <td className="p-2.5 tabular-nums" dir="ltr">{formatDateTime(i.r.archived_at)}</td>
-                  <td className="p-2.5">{nameOf(i.r.archived_by) || "—"}</td>
-                  <td className="p-2.5" onClick={(e) => e.stopPropagation()}>
-                    {canRestore(i) && (
-                      <Button size="sm" variant="outline" className="gap-1" onClick={() => restore.mutate(i)} disabled={restore.isPending}>
-                        <RotateCcw className="size-3.5" /> استرجاع
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataGrid
+          data={items}
+          columns={columns}
+          search={search}
+          gridKey="archive"
+          emptyMessage="لا توجد عمليات مؤرشفة"
+          onRowClick={(i) => setViewing(i)}
+          rowActions={(i) =>
+            canRestore(i) ? (
+              <Button size="sm" variant="outline" className="gap-1" onClick={() => restore.mutate(i)} disabled={restore.isPending}>
+                <RotateCcw className="size-3.5" /> استرجاع
+              </Button>
+            ) : null
+          }
+        />
       )}
 
       <Dialog open={Boolean(viewing)} onOpenChange={(o) => !o && setViewing(null)}>

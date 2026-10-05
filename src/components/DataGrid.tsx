@@ -12,7 +12,21 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
+import { customColumnId, customFields, gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
+import { formsQuery, OPTION_TYPES, type FormField } from "@/lib/forms";
+import { formatDate, formatMoney } from "@/lib/data";
+
+function customCell(f: FormField, v: unknown): ReactNode {
+  if (v === null || v === undefined || v === "") return "—";
+  if (f.field_type === "checkbox") return v === true || v === "true" ? "✓ نعم" : "لا";
+  if (f.field_type === "currency" || f.field_type === "number") return formatMoney(v as number);
+  if (f.field_type === "date") return formatDate(String(v));
+  if (OPTION_TYPES.includes(f.field_type)) {
+    const opt = f.form_field_options.find((o) => o.value === String(v));
+    return opt?.label || String(v);
+  }
+  return String(v);
+}
 
 export type CellType = "text" | "number" | "date" | "select" | "textarea";
 
@@ -36,6 +50,8 @@ interface DataGridProps<T extends { id: string }> {
   emptyMessage?: string;
   minWidth?: number;
   gridKey?: GridKey;
+  /** Forms whose custom fields become columns (defaults to the grid's forms). */
+  formKeys?: string[];
   onRowClick?: (row: T) => void;
   sortable?: boolean;
 }
@@ -48,6 +64,7 @@ export function DataGrid<T extends { id: string }>({
   emptyMessage = "لا توجد سجلات بعد",
   minWidth = 0,
   gridKey,
+  formKeys,
   onRowClick,
   sortable = false,
 }: DataGridProps<T>) {
@@ -69,8 +86,29 @@ export function DataGrid<T extends { id: string }>({
     return () => ro.disconnect();
   }, [data, pagination.pageSize]);
   const { data: allSettings } = useQuery(gridSettingsQuery);
+  const { data: forms } = useQuery({ ...formsQuery, enabled: Boolean(gridKey) });
   const saved = gridKey ? allSettings?.[gridKey] : undefined;
-  const colSettings = useMemo(() => (gridKey ? resolveColumns(gridKey, saved) : []), [gridKey, saved]);
+  const formKeysSig = formKeys?.join("|");
+  const extraFields = useMemo(
+    () => (gridKey ? customFields(gridKey, forms, formKeys) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gridKey, forms, formKeysSig],
+  );
+  const allColumns = useMemo<ColumnDef<T, unknown>[]>(() => {
+    const ids = new Set(columns.map((c) => c.id));
+    const extraDefs: ColumnDef<T, unknown>[] = extraFields
+      .filter((f) => !ids.has(customColumnId(f.field_key)))
+      .map((f) => ({
+        id: customColumnId(f.field_key),
+        header: f.label,
+        accessorFn: (r: T) => ((r as Record<string, unknown>)["extra"] as Record<string, unknown> | undefined)?.[f.field_key],
+        meta: { width: 130, ltr: Boolean(f.settings?.ltr) || f.field_type === "phone" },
+        cell: ({ getValue }) => customCell(f, getValue()),
+      }));
+    return [...columns, ...extraDefs];
+  }, [columns, extraFields]);
+  const extraIds = useMemo(() => extraFields.map((f) => customColumnId(f.field_key)), [extraFields]);
+  const colSettings = useMemo(() => (gridKey ? resolveColumns(gridKey, saved, extraIds) : []), [gridKey, saved, extraIds]);
   const setById = useMemo(() => new Map(colSettings.map((c) => [c.id, c])), [colSettings]);
   const columnOrder = colSettings.map((c) => c.id);
   const columnVisibility = Object.fromEntries(colSettings.map((c) => [c.id, c.visible]));
@@ -88,7 +126,7 @@ export function DataGrid<T extends { id: string }>({
 
   const table = useReactTable({
     data,
-    columns,
+    columns: allColumns,
     state: { globalFilter: search, pagination, columnVisibility, columnOrder, sorting },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -101,7 +139,7 @@ export function DataGrid<T extends { id: string }>({
       const q = filter.trim().toLowerCase();
       if (!q) return true;
       return Object.values(row.original as Record<string, unknown>).some((v) =>
-        String(v ?? "")
+        (v && typeof v === "object" ? JSON.stringify(v) : String(v ?? ""))
           .toLowerCase()
           .includes(q),
       );

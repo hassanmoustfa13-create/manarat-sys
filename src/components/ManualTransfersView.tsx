@@ -289,6 +289,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
       ) : (
         <DataGrid
           gridKey="manual_transfers"
+          formKeys={[category === "مهنية" ? "manual_pro" : "manual_domestic"]}
           data={rows}
           columns={columns}
           search={search}

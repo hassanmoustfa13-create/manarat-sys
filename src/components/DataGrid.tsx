@@ -64,6 +64,7 @@ export function DataGrid<T extends { id: string }>({
   emptyMessage = "لا توجد سجلات بعد",
   minWidth = 0,
   gridKey,
+  formKeys,
   onRowClick,
   sortable = false,
 }: DataGridProps<T>) {
@@ -85,8 +86,29 @@ export function DataGrid<T extends { id: string }>({
     return () => ro.disconnect();
   }, [data, pagination.pageSize]);
   const { data: allSettings } = useQuery(gridSettingsQuery);
+  const { data: forms } = useQuery({ ...formsQuery, enabled: Boolean(gridKey) });
   const saved = gridKey ? allSettings?.[gridKey] : undefined;
-  const colSettings = useMemo(() => (gridKey ? resolveColumns(gridKey, saved) : []), [gridKey, saved]);
+  const formKeysSig = formKeys?.join("|");
+  const extraFields = useMemo(
+    () => (gridKey ? customFields(gridKey, forms, formKeys) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gridKey, forms, formKeysSig],
+  );
+  const allColumns = useMemo<ColumnDef<T, unknown>[]>(() => {
+    const ids = new Set(columns.map((c) => c.id));
+    const extraDefs: ColumnDef<T, unknown>[] = extraFields
+      .filter((f) => !ids.has(customColumnId(f.field_key)))
+      .map((f) => ({
+        id: customColumnId(f.field_key),
+        header: f.label,
+        accessorFn: (r: T) => ((r as Record<string, unknown>)["extra"] as Record<string, unknown> | undefined)?.[f.field_key],
+        meta: { width: 130, ltr: Boolean(f.settings?.ltr) || f.field_type === "phone" },
+        cell: ({ getValue }) => customCell(f, getValue()),
+      }));
+    return [...columns, ...extraDefs];
+  }, [columns, extraFields]);
+  const extraIds = useMemo(() => extraFields.map((f) => customColumnId(f.field_key)), [extraFields]);
+  const colSettings = useMemo(() => (gridKey ? resolveColumns(gridKey, saved, extraIds) : []), [gridKey, saved, extraIds]);
   const setById = useMemo(() => new Map(colSettings.map((c) => [c.id, c])), [colSettings]);
   const columnOrder = colSettings.map((c) => c.id);
   const columnVisibility = Object.fromEntries(colSettings.map((c) => [c.id, c.visible]));
@@ -104,7 +126,7 @@ export function DataGrid<T extends { id: string }>({
 
   const table = useReactTable({
     data,
-    columns,
+    columns: allColumns,
     state: { globalFilter: search, pagination, columnVisibility, columnOrder, sorting },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,

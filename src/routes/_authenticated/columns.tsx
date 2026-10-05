@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { errorMessage } from "@/lib/data";
 import { useRowPalette, type RowColorSettings, type RowMode, type RowPalette } from "@/lib/rowPalette";
@@ -11,6 +11,7 @@ import {
   customColumnId,
   customFields,
   gridColumnList,
+  optionalFieldIds,
   GRID_LABELS,
   gridSettingsQuery,
   resolveColumns,
@@ -51,14 +52,15 @@ function ColumnsPage() {
   const [draft, setDraft] = useState<GridSettings>({});
   const { data: forms } = useQuery(formsQuery);
   const extraIds = customFields(key, forms).map((f) => customColumnId(f.field_key));
-  const extraSig = extraIds.join("|");
+  const optionalIds = optionalFieldIds(key, forms);
+  const extraSig = [...extraIds, "|", ...optionalIds].join("|");
 
   useEffect(() => {
     const saved = all?.[key];
     setDraft({
       fontSize: saved?.fontSize ?? "md",
       density: saved?.density ?? "normal",
-      columns: resolveColumns(key, saved, extraIds),
+      columns: resolveColumns(key, saved, extraIds, optionalIds),
       inlineSelectEdit: saved?.inlineSelectEdit ?? false,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,6 +92,18 @@ function ColumnsPage() {
   const labels = Object.fromEntries(gridColumnList(key, forms));
   const update = (i: number, patch: Partial<ColumnSetting>) =>
     setDraft((d) => ({ ...d, columns: cols.map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
+  const addable = [
+    ...cols.filter((c) => !c.visible).map((c) => c.id),
+    ...optionalIds.filter((id) => !cols.some((c) => c.id === id)),
+  ];
+  const addColumn = (id: string) => {
+    if (!id) return;
+    const i = cols.findIndex((c) => c.id === id);
+    if (i >= 0) update(i, { visible: true });
+    else setDraft((d) => ({ ...d, columns: [...cols, { id, visible: true, width: 130 }] }));
+    toast.success(`أُضيف عمود «${labels[id] ?? id}» — اضغط «حفظ الإعدادات» لتطبيقه`);
+  };
+  const removeColumn = (i: number) => setDraft((d) => ({ ...d, columns: cols.filter((_, j) => j !== i) }));
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;
     if (j < 0 || j >= cols.length) return;
@@ -204,6 +218,26 @@ function ColumnsPage() {
         </label>
       </div>
 
+      <div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/60 px-4 py-3 text-sm ring-1 ring-black/8">
+        <Plus className="size-4 text-brand" />
+        <span className="font-semibold">إضافة عمود من حقول النموذج:</span>
+        <select
+          aria-label="إضافة عمود"
+          className={`${sel} min-w-56`}
+          value=""
+          disabled={addable.length === 0}
+          onChange={(e) => addColumn(e.target.value)}
+        >
+          <option value="">{addable.length ? "اختر الحقل…" : "كل الحقول ظاهرة في الجدول"}</option>
+          {addable.map((id) => (
+            <option key={id} value={id}>
+              {labels[id] ?? id}
+            </option>
+          ))}
+        </select>
+        <span className="text-[12px] text-ink/50">تظهر هنا حقول نموذج هذا الجدول والأعمدة المخفية.</span>
+      </div>
+
       <div className="overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/8">
         <div className="grid grid-cols-[60px_1fr_90px_70px_130px_130px_90px] gap-2 border-b border-black/10 px-4 py-3 text-[13px] font-bold text-ink/70">
           <span>الترتيب</span>
@@ -308,6 +342,11 @@ function ColumnsPage() {
               <button aria-label="أسفل" onClick={() => move(i, 1)} className="rounded p-1.5 hover:bg-black/5">
                 <ArrowDown className="size-4" />
               </button>
+              {optionalIds.includes(c.id) && (
+                <button aria-label="إزالة العمود" title="إزالة العمود من الجدول" onClick={() => removeColumn(i)} className="rounded p-1.5 text-destructive hover:bg-destructive/10">
+                  <Trash2 className="size-4" />
+                </button>
+              )}
             </div>
           </div>
         ))}

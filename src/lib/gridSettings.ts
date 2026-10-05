@@ -216,33 +216,53 @@ export const GRID_FORMS: Partial<Record<GridKey, string[]>> = {
   manual_transfers: ["manual_domestic", "manual_pro"],
 };
 export const customColumnId = (fieldKey: string) => `extra_${fieldKey}`;
+/** Column id for any form field: bound fields read their table column, custom ones read `extra`. */
+export const fieldColumnId = (f: FormField) => (f.column_name ? `col_${f.column_name}` : customColumnId(f.field_key));
 
-/** Active custom (unbound) fields of the grid's forms, deduplicated by key. */
-export function customFields(key: GridKey, forms: FormDef[] | undefined, formKeys?: string[]): FormField[] {
+/** Active form fields of the grid's forms that are not already a built-in column (deduplicated). */
+export function gridFormFields(key: GridKey, forms: FormDef[] | undefined, formKeys?: string[]): FormField[] {
   const keys = formKeys ?? GRID_FORMS[key] ?? [];
+  const builtIn = new Set(GRID_COLUMNS[key].map(([id]) => id));
   const seen = new Set<string>();
   const out: FormField[] = [];
   for (const form of forms ?? []) {
     if (!keys.includes(form.form_key)) continue;
     for (const f of form.form_fields) {
-      if (!f.is_active || f.column_name || f.behavior || seen.has(f.field_key)) continue;
-      seen.add(f.field_key);
+      if (!f.is_active || f.behavior || (f.column_name && builtIn.has(f.column_name))) continue;
+      const id = fieldColumnId(f);
+      if (seen.has(id)) continue;
+      seen.add(id);
       out.push(f);
     }
   }
   return out;
 }
 
-/** Built-in columns plus custom form-field columns, as [id, label]. */
+/** Custom (unbound) fields — always offered as columns automatically. */
+export function customFields(key: GridKey, forms: FormDef[] | undefined, formKeys?: string[]): FormField[] {
+  return gridFormFields(key, forms, formKeys).filter((f) => !f.column_name);
+}
+
+/** Bound form fields that are only shown once an admin adds them in table settings. */
+export function optionalFieldIds(key: GridKey, forms: FormDef[] | undefined, formKeys?: string[]): string[] {
+  return gridFormFields(key, forms, formKeys).filter((f) => f.column_name).map(fieldColumnId);
+}
+
+/** Built-in columns plus every form-field column, as [id, label]. */
 export function gridColumnList(key: GridKey, forms: FormDef[] | undefined, formKeys?: string[]): [string, string][] {
-  return [...GRID_COLUMNS[key], ...customFields(key, forms, formKeys).map((f) => [customColumnId(f.field_key), f.label] as [string, string])];
+  return [...GRID_COLUMNS[key], ...gridFormFields(key, forms, formKeys).map((f) => [fieldColumnId(f), f.label] as [string, string])];
 }
 
 /** Merge saved settings with the known column list (new columns appended, unknown dropped). */
-export function resolveColumns(key: GridKey, saved?: GridSettings | null, extraIds: string[] = []): ColumnSetting[] {
+export function resolveColumns(
+  key: GridKey,
+  saved?: GridSettings | null,
+  extraIds: string[] = [],
+  optionalIds: string[] = [],
+): ColumnSetting[] {
   const known = [...GRID_COLUMNS[key].map(([id]) => id), ...extraIds];
   const defaults = DEFAULT_WIDTHS[key];
-  const savedCols = (saved?.columns ?? []).filter((c) => known.includes(c.id));
+  const savedCols = (saved?.columns ?? []).filter((c) => known.includes(c.id) || optionalIds.includes(c.id));
   const missing = known
     .filter((id) => !savedCols.some((c) => c.id === id))
     .map((id) => ({ id, visible: true, width: defaults[id] ?? 110 }) as ColumnSetting);

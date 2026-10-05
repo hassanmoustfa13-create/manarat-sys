@@ -12,7 +12,7 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { customColumnId, customFields, gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
+import { customColumnId, fieldColumnId, gridFormFields, gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
 import { formsQuery, OPTION_TYPES, type FormField } from "@/lib/forms";
 import { formatDate, formatMoney } from "@/lib/data";
 
@@ -90,28 +90,39 @@ export function DataGrid<T extends { id: string }>({
   const saved = gridKey ? allSettings?.[gridKey] : undefined;
   const formKeysSig = formKeys?.join("|");
   const extraFields = useMemo(
-    () => (gridKey ? customFields(gridKey, forms, formKeys) : []),
+    () => (gridKey ? gridFormFields(gridKey, forms, formKeys) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [gridKey, forms, formKeysSig],
   );
   const allColumns = useMemo<ColumnDef<T, unknown>[]>(() => {
     const ids = new Set(columns.map((c) => c.id));
     const extraDefs: ColumnDef<T, unknown>[] = extraFields
-      .filter((f) => !ids.has(customColumnId(f.field_key)))
+      .filter((f) => !ids.has(fieldColumnId(f)))
       .map((f) => ({
-        id: customColumnId(f.field_key),
+        id: fieldColumnId(f),
         header: f.label,
-        accessorFn: (r: T) => ((r as Record<string, unknown>)["extra"] as Record<string, unknown> | undefined)?.[f.field_key],
+        accessorFn: (r: T) => {
+          const rec = r as Record<string, unknown>;
+          return f.column_name ? rec[f.column_name] : (rec["extra"] as Record<string, unknown> | undefined)?.[f.field_key];
+        },
         meta: { width: 130, ltr: Boolean(f.settings?.ltr) || f.field_type === "phone" },
         cell: ({ getValue }) => customCell(f, getValue()),
       }));
     return [...columns, ...extraDefs];
   }, [columns, extraFields]);
-  const extraIds = useMemo(() => extraFields.map((f) => customColumnId(f.field_key)), [extraFields]);
-  const colSettings = useMemo(() => (gridKey ? resolveColumns(gridKey, saved, extraIds) : []), [gridKey, saved, extraIds]);
+  const extraIds = useMemo(() => extraFields.filter((f) => !f.column_name).map((f) => customColumnId(f.field_key)), [extraFields]);
+  const optionalIds = useMemo(() => extraFields.filter((f) => f.column_name).map(fieldColumnId), [extraFields]);
+  const colSettings = useMemo(
+    () => (gridKey ? resolveColumns(gridKey, saved, extraIds, optionalIds) : []),
+    [gridKey, saved, extraIds, optionalIds],
+  );
   const setById = useMemo(() => new Map(colSettings.map((c) => [c.id, c])), [colSettings]);
   const columnOrder = colSettings.map((c) => c.id);
-  const columnVisibility = Object.fromEntries(colSettings.map((c) => [c.id, c.visible]));
+  // Form-field columns the admin has not added yet stay hidden.
+  const columnVisibility = {
+    ...Object.fromEntries(optionalIds.map((id) => [id, false])),
+    ...Object.fromEntries(colSettings.map((c) => [c.id, c.visible])),
+  };
   const fontCls = saved?.fontSize === "sm" ? "text-[12.5px]" : saved?.fontSize === "lg" ? "text-[16px]" : "text-[13.5px]";
   const padCls = saved?.density === "compact" ? "py-1" : saved?.density === "comfortable" ? "py-4" : "py-2";
   const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;

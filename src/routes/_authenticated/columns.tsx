@@ -6,8 +6,11 @@ import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, RotateCcw } from "lucide
 import { useAuth } from "@/hooks/useAuth";
 import { errorMessage } from "@/lib/data";
 import { useRowPalette, type RowColorSettings, type RowMode, type RowPalette } from "@/lib/rowPalette";
+import { formsQuery } from "@/lib/forms";
 import {
-  GRID_COLUMNS,
+  customColumnId,
+  customFields,
+  gridColumnList,
   GRID_LABELS,
   gridSettingsQuery,
   resolveColumns,
@@ -46,16 +49,20 @@ function ColumnsPage() {
   const { data: all } = useQuery({ ...gridSettingsQuery, enabled: auth.can("admin_columns", "view") });
   const [key, setKey] = useState<GridKey>("workers");
   const [draft, setDraft] = useState<GridSettings>({});
+  const { data: forms } = useQuery(formsQuery);
+  const extraIds = customFields(key, forms).map((f) => customColumnId(f.field_key));
+  const extraSig = extraIds.join("|");
 
   useEffect(() => {
     const saved = all?.[key];
     setDraft({
       fontSize: saved?.fontSize ?? "md",
       density: saved?.density ?? "normal",
-      columns: resolveColumns(key, saved),
+      columns: resolveColumns(key, saved, extraIds),
       inlineSelectEdit: saved?.inlineSelectEdit ?? false,
     });
-  }, [all, key]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [all, key, extraSig]);
 
   const save = useMutation({
     mutationFn: async (s: GridSettings) => {
@@ -80,7 +87,7 @@ function ColumnsPage() {
   }
 
   const cols = draft.columns ?? [];
-  const labels = Object.fromEntries(GRID_COLUMNS[key]);
+  const labels = Object.fromEntries(gridColumnList(key, forms));
   const update = (i: number, patch: Partial<ColumnSetting>) =>
     setDraft((d) => ({ ...d, columns: cols.map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
   const move = (i: number, dir: -1 | 1) => {
@@ -315,7 +322,7 @@ function ColumnsPage() {
           {save.isPending ? "جارٍ الحفظ…" : "حفظ الإعدادات"}
         </button>
         <button
-          onClick={() => save.mutate({ fontSize: "md", density: "normal", columns: resolveColumns(key, null) })}
+          onClick={() => save.mutate({ fontSize: "md", density: "normal", columns: resolveColumns(key, null, extraIds) })}
           className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm ring-1 ring-black/10"
         >
           <RotateCcw className="size-4" /> استعادة الافتراضي

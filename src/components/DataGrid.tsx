@@ -139,7 +139,7 @@ export function DataGrid<T extends { id: string }>({
       const q = filter.trim().toLowerCase();
       if (!q) return true;
       return Object.values(row.original as Record<string, unknown>).some((v) =>
-        String(v ?? "")
+        (v && typeof v === "object" ? JSON.stringify(v) : String(v ?? ""))
           .toLowerCase()
           .includes(q),
       );

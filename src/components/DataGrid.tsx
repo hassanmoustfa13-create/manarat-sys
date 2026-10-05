@@ -12,7 +12,21 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
+import { customColumnId, customFields, gridSettingsQuery, resolveColumns, type GridKey } from "@/lib/gridSettings";
+import { formsQuery, OPTION_TYPES, type FormField } from "@/lib/forms";
+import { formatDate, formatMoney } from "@/lib/data";
+
+function customCell(f: FormField, v: unknown): ReactNode {
+  if (v === null || v === undefined || v === "") return "—";
+  if (f.field_type === "checkbox") return v === true || v === "true" ? "✓ نعم" : "لا";
+  if (f.field_type === "currency" || f.field_type === "number") return formatMoney(v as number);
+  if (f.field_type === "date") return formatDate(String(v));
+  if (OPTION_TYPES.includes(f.field_type)) {
+    const opt = f.form_field_options.find((o) => o.value === String(v));
+    return opt?.label || String(v);
+  }
+  return String(v);
+}
 
 export type CellType = "text" | "number" | "date" | "select" | "textarea";
 
@@ -36,6 +50,8 @@ interface DataGridProps<T extends { id: string }> {
   emptyMessage?: string;
   minWidth?: number;
   gridKey?: GridKey;
+  /** Forms whose custom fields become columns (defaults to the grid's forms). */
+  formKeys?: string[];
   onRowClick?: (row: T) => void;
   sortable?: boolean;
 }

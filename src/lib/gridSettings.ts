@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { FormDef, FormField } from "@/lib/forms";
 
 export type GridKey = "workers" | "requests" | "transfers" | "manual_transfers" | "flights" | "departures" | "office_visas" | "archive";
 export type ColAlign = "right" | "center" | "left";
@@ -207,9 +208,39 @@ const DEFAULT_WIDTHS: Record<GridKey, Record<string, number>> = {
   },
 };
 
+/** Which admin-managed forms feed each grid (custom form fields become extra columns). */
+export const GRID_FORMS: Partial<Record<GridKey, string[]>> = {
+  office_visas: ["office_visas"],
+  flights: ["flights"],
+  departures: ["departures"],
+  manual_transfers: ["manual_domestic", "manual_pro"],
+};
+export const customColumnId = (fieldKey: string) => `extra_${fieldKey}`;
+
+/** Active custom (unbound) fields of the grid's forms, deduplicated by key. */
+export function customFields(key: GridKey, forms: FormDef[] | undefined, formKeys?: string[]): FormField[] {
+  const keys = formKeys ?? GRID_FORMS[key] ?? [];
+  const seen = new Set<string>();
+  const out: FormField[] = [];
+  for (const form of forms ?? []) {
+    if (!keys.includes(form.form_key)) continue;
+    for (const f of form.form_fields) {
+      if (!f.is_active || f.column_name || f.behavior || seen.has(f.field_key)) continue;
+      seen.add(f.field_key);
+      out.push(f);
+    }
+  }
+  return out;
+}
+
+/** Built-in columns plus custom form-field columns, as [id, label]. */
+export function gridColumnList(key: GridKey, forms: FormDef[] | undefined, formKeys?: string[]): [string, string][] {
+  return [...GRID_COLUMNS[key], ...customFields(key, forms, formKeys).map((f) => [customColumnId(f.field_key), f.label] as [string, string])];
+}
+
 /** Merge saved settings with the known column list (new columns appended, unknown dropped). */
-export function resolveColumns(key: GridKey, saved?: GridSettings | null): ColumnSetting[] {
-  const known = GRID_COLUMNS[key].map(([id]) => id);
+export function resolveColumns(key: GridKey, saved?: GridSettings | null, extraIds: string[] = []): ColumnSetting[] {
+  const known = [...GRID_COLUMNS[key].map(([id]) => id), ...extraIds];
   const defaults = DEFAULT_WIDTHS[key];
   const savedCols = (saved?.columns ?? []).filter((c) => known.includes(c.id));
   const missing = known

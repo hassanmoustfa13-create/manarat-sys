@@ -10,7 +10,10 @@ import { formsQuery } from "@/lib/forms";
 import {
   customColumnId,
   customFields,
+  fieldColumnId,
   gridColumnList,
+  gridFormFields,
+  GRID_FORMS,
   optionalFieldIds,
   GRID_LABELS,
   gridSettingsQuery,
@@ -50,7 +53,8 @@ function ColumnsPage() {
   const { data: all } = useQuery({ ...gridSettingsQuery, enabled: auth.can("admin_columns", "view") });
   const [key, setKey] = useState<GridKey>("workers");
   const [draft, setDraft] = useState<GridSettings>({});
-  const { data: forms } = useQuery(formsQuery);
+  // Always refetch so fields just added in form management are offered here.
+  const { data: forms } = useQuery({ ...formsQuery, refetchOnMount: "always" });
   const extraIds = customFields(key, forms).map((f) => customColumnId(f.field_key));
   const optionalIds = optionalFieldIds(key, forms);
   const extraSig = [...extraIds, "|", ...optionalIds].join("|");
@@ -92,10 +96,16 @@ function ColumnsPage() {
   const labels = Object.fromEntries(gridColumnList(key, forms));
   const update = (i: number, patch: Partial<ColumnSetting>) =>
     setDraft((d) => ({ ...d, columns: cols.map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
-  const addable = [
-    ...cols.filter((c) => !c.visible).map((c) => c.id),
-    ...optionalIds.filter((id) => !cols.some((c) => c.id === id)),
-  ];
+  // Form fields of this table's forms that are not a visible column yet (newest form fields included).
+  const formFieldIds = gridFormFields(key, forms).map(fieldColumnId);
+  const formNameOf = (id: string) =>
+    forms
+      ?.filter((f) => (GRID_FORMS[key] ?? []).includes(f.form_key))
+      .find((f) => f.form_fields.some((ff) => fieldColumnId(ff) === id))?.name;
+  const isShown = (id: string) => cols.some((c) => c.id === id && c.visible);
+  const addableFields = formFieldIds.filter((id) => !isShown(id));
+  const addableHidden = cols.filter((c) => !c.visible && !formFieldIds.includes(c.id)).map((c) => c.id);
+  const addable = [...addableFields, ...addableHidden];
   const addColumn = (id: string) => {
     if (!id) return;
     const i = cols.findIndex((c) => c.id === id);
@@ -229,13 +239,31 @@ function ColumnsPage() {
           onChange={(e) => addColumn(e.target.value)}
         >
           <option value="">{addable.length ? "اختر الحقل…" : "كل الحقول ظاهرة في الجدول"}</option>
-          {addable.map((id) => (
-            <option key={id} value={id}>
-              {labels[id] ?? id}
-            </option>
-          ))}
+          {addableFields.length > 0 && (
+            <optgroup label="حقول النموذج">
+              {addableFields.map((id) => (
+                <option key={id} value={id}>
+                  {labels[id] ?? id}
+                  {formNameOf(id) ? ` — ${formNameOf(id)}` : ""}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          {addableHidden.length > 0 && (
+            <optgroup label="أعمدة مخفية">
+              {addableHidden.map((id) => (
+                <option key={id} value={id}>
+                  {labels[id] ?? id}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
-        <span className="text-[12px] text-ink/50">تظهر هنا حقول نموذج هذا الجدول والأعمدة المخفية.</span>
+        <span className="text-[12px] text-ink/50">
+          {GRID_FORMS[key]
+            ? "تظهر هنا حقول نموذج هذا الجدول (ومنها الحقول المضافة حديثًا) والأعمدة المخفية."
+            : "هذا الجدول لا يُبنى من نموذج، لذا تظهر هنا أعمدته المخفية فقط."}
+        </span>
       </div>
 
       <div className="overflow-hidden rounded-xl bg-white/60 ring-1 ring-black/8">

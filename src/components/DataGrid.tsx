@@ -86,7 +86,7 @@ export function DataGrid<T extends { id: string }>({
     return () => ro.disconnect();
   }, [data, pagination.pageSize]);
   const { data: allSettings } = useQuery(gridSettingsQuery);
-  const { data: forms } = useQuery({ ...formsQuery, enabled: Boolean(gridKey) });
+  const { data: forms } = useQuery({ ...formsQuery, enabled: Boolean(gridKey), refetchOnMount: "always" });
   const saved = gridKey ? allSettings?.[gridKey] : undefined;
   const formKeysSig = formKeys?.join("|");
   const extraFields = useMemo(

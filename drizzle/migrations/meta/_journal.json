@@ -267,6 +267,13 @@
       "when": 1791094491301,
       "tag": "0037_new_sponsor_other_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1791386153426,
+      "tag": "0038_sync_manual_transfer_forms",
+      "breakpoints": true
     }
   ]
 }

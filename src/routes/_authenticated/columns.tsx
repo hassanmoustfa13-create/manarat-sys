@@ -157,6 +157,42 @@ function ColumnsPage() {
               <option value="columns">الأعمدة</option>
             </select>
           </label>
+          <label className="flex items-center gap-2">
+            <span className="font-semibold">خلفية رؤوس الأعمدة:</span>
+            <input
+              type="color"
+              value={paletteSettings.headerBg ?? "#ffffff"}
+              onChange={(e) => savePalette({ headerBg: e.target.value })}
+              className="h-9 w-11 cursor-pointer rounded-lg border border-black/10 bg-transparent p-0.5"
+              title="لون خلفية رؤوس الأعمدة"
+            />
+            {paletteSettings.headerBg && (
+              <button
+                onClick={() => savePalette({ headerBg: undefined })}
+                className="text-[12px] text-ink/50 underline hover:text-ink"
+              >
+                افتراضي
+              </button>
+            )}
+          </label>
+          <label className="flex items-center gap-2">
+            <span className="font-semibold">لون خطوط الجدول:</span>
+            <input
+              type="color"
+              value={paletteSettings.gridLine ?? "#c9cede"}
+              onChange={(e) => savePalette({ gridLine: e.target.value })}
+              className="h-9 w-11 cursor-pointer rounded-lg border border-black/10 bg-transparent p-0.5"
+              title="لون الخطوط الفاصلة بين الصفوف والأعمدة"
+            />
+            {paletteSettings.gridLine && (
+              <button
+                onClick={() => savePalette({ gridLine: undefined })}
+                className="text-[12px] text-ink/50 underline hover:text-ink"
+              >
+                افتراضي
+              </button>
+            )}
+          </label>
           {paletteSettings.palette === "custom" && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold">ألواني:</span>

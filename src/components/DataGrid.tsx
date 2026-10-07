@@ -190,7 +190,10 @@ export function DataGrid<T extends { id: string }>({
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="text-[12px] font-bold text-ink/70">
-                <th className="w-10 border-b-2 border-black/10 bg-white/90 px-2 py-2.5 text-center font-bold backdrop-blur-xl">
+                <th
+                  style={{ backgroundColor: "var(--grid-header-bg, rgba(255,255,255,0.92))", borderColor: "var(--grid-line, rgba(15,23,42,0.16))" }}
+                  className="w-10 border-b-2 px-2 py-2.5 text-center font-bold backdrop-blur-xl"
+                >
                   م
                 </th>
                 {hg.headers.map((header) => (
@@ -199,8 +202,10 @@ export function DataGrid<T extends { id: string }>({
                     style={{
                       width: widthOf(header.column.id, header.column.columnDef.meta?.width),
                       minWidth: setById.get(header.column.id)?.width || undefined,
+                      backgroundColor: "var(--grid-header-bg, rgba(255,255,255,0.92))",
+                      borderColor: "var(--grid-line, rgba(15,23,42,0.16))",
                     }}
-                    className={`border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0 ${sortable ? "cursor-pointer select-none hover:text-brand" : ""}`}
+                    className={`border-b-2 border-l px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0 ${sortable ? "cursor-pointer select-none hover:text-brand" : ""}`}
                     onClick={sortable ? header.column.getToggleSortingHandler() : undefined}
                   >
                     {header.isPlaceholder ? null : (
@@ -219,7 +224,10 @@ export function DataGrid<T extends { id: string }>({
                   </th>
                 ))}
                 {rowActions && (
-                  <th className="border-b-2 border-l border-black/10 bg-white/90 px-3 py-2.5 text-center font-bold backdrop-blur-xl">
+                  <th
+                    style={{ backgroundColor: "var(--grid-header-bg, rgba(255,255,255,0.92))", borderColor: "var(--grid-line, rgba(15,23,42,0.16))" }}
+                    className="border-b-2 border-l px-3 py-2.5 text-center font-bold backdrop-blur-xl"
+                  >
                     إجراءات
                   </th>
                 )}
@@ -241,17 +249,26 @@ export function DataGrid<T extends { id: string }>({
               <tr
                 key={row.id}
                 onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                className={`border-b border-black/5 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+                style={{ borderColor: "var(--grid-line, rgba(15,23,42,0.10))" }}
+                className={`border-b transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
               >
-                <td className={`px-2 ${padCls} text-center text-[12px] font-semibold text-ink/40`}>{i + 1}</td>
+                <td
+                  style={{ borderColor: "var(--grid-line, rgba(15,23,42,0.10))" }}
+                  className={`px-2 ${padCls} text-center text-[12px] font-semibold text-ink/40`}
+                >
+                  {i + 1}
+                </td>
                 {row.getVisibleCells().map((cell) => {
                   const meta = cell.column.columnDef.meta ?? {};
                   return (
                     <td
                       key={cell.id}
                       dir={meta.ltr ? "ltr" : undefined}
-                      style={colorOf(cell.column.id) ? { backgroundColor: colorOf(cell.column.id) } : undefined}
-                      className={`border-l border-black/5 px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
+                      style={{
+                        ...(colorOf(cell.column.id) ? { backgroundColor: colorOf(cell.column.id) } : {}),
+                        borderColor: "var(--grid-line, rgba(15,23,42,0.10))",
+                      }}
+                      className={`border-l px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
                         cell.column.id,
                         meta.ltr,
                       )} ${meta.className ?? ""}`}
@@ -262,7 +279,8 @@ export function DataGrid<T extends { id: string }>({
                 })}
                 {rowActions && (
                   <td
-                    className="border-l border-black/5 px-3 py-2 align-middle"
+                    style={{ borderColor: "var(--grid-line, rgba(15,23,42,0.10))" }}
+                    className="border-l px-3 py-2 align-middle"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-center gap-1.5">{rowActions(row.original)}</div>

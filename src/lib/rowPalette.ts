@@ -10,6 +10,10 @@ export interface RowColorSettings {
   mode: RowMode;
   /** Custom palette colors (hex), used when palette === "custom". */
   colors: string[];
+  /** لون خلفية رؤوس الأعمدة (hex) — فارغ = الافتراضي */
+  headerBg?: string | undefined;
+  /** لون خطوط الجدول (hex) — فارغ = الافتراضي */
+  gridLine?: string | undefined;
 }
 
 const KEY = "row-palette";
@@ -24,7 +28,8 @@ function normalize(raw: unknown): RowColorSettings {
   const palette = PALETTES.includes(paletteRaw as RowPalette) ? (paletteRaw as RowPalette) : "soft";
   const colors = Array.isArray(o.colors) && o.colors.length > 0 ? o.colors.slice(0, 6) : DEFAULT_CUSTOM_COLORS;
   while (colors.length < 6) colors.push(DEFAULT_CUSTOM_COLORS[colors.length]!);
-  return { palette, mode: o.mode === "columns" ? "columns" : "rows", colors };
+  const hex = (v: unknown) => (typeof v === "string" && /^#[0-9a-fA-F]{6}$/.test(v) ? v : undefined);
+  return { palette, mode: o.mode === "columns" ? "columns" : "rows", colors, headerBg: hex(o.headerBg), gridLine: hex(o.gridLine) };
 }
 
 /** Instant cached read (per device) to avoid a flash before the shared value loads. */
@@ -47,6 +52,10 @@ export function applyRowPalette(s: RowColorSettings) {
   } else {
     for (let i = 1; i <= 6; i++) el.style.removeProperty(`--row-c${i}`);
   }
+  if (s.headerBg) el.style.setProperty("--grid-header-bg", s.headerBg);
+  else el.style.removeProperty("--grid-header-bg");
+  if (s.gridLine) el.style.setProperty("--grid-line", s.gridLine);
+  else el.style.removeProperty("--grid-line");
 }
 
 export const rowPaletteQuery = queryOptions({

@@ -990,6 +990,7 @@ export type Database = {
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       manual_resource: { Args: { _category: string }; Returns: string }
+      manual_sibling_form: { Args: { _form_id: string }; Returns: string }
       staff_names: {
         Args: never
         Returns: {

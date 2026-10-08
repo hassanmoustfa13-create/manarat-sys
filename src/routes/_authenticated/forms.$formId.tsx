@@ -52,6 +52,7 @@ function FormEditor() {
   const [editing, setEditing] = useState<FormField | "new" | null>(null);
   const [deleting, setDeleting] = useState<FormField | null>(null);
   const [preview, setPreview] = useState(false);
+  const [picking, setPicking] = useState(false);
   const refresh = () => qc.invalidateQueries({ queryKey: formsQuery.queryKey });
 
   const run = useMutation({
@@ -123,7 +124,7 @@ function FormEditor() {
           <Button variant="outline" onClick={() => setPreview(true)} className="gap-1.5">
             <Eye className="size-4" /> معاينة النموذج
           </Button>
-          <Button onClick={() => setEditing("new")} className="gap-1.5">
+          <Button onClick={() => (form.form_key === "transfer_details" ? setPicking(true) : setEditing("new"))} className="gap-1.5">
             <Plus className="size-4" /> إضافة حقل
           </Button>
         </div>
@@ -198,6 +199,7 @@ function FormEditor() {
         الحقول «الأساسية» مرتبطة بأعمدة الجدول الحالية ولا تُحذف (يمكن تعطيلها أو تغيير اسمها وخياراتها). حذف أو تعطيل أي حقل لا يحذف البيانات المحفوظة سابقًا.
       </p>
 
+      {picking && <PickManualField form={form} forms={forms ?? []} onClose={() => setPicking(false)} onSaved={() => { setPicking(false); refresh(); }} />}
       {editing && (
         <FieldEditor
           form={form}
@@ -249,16 +251,39 @@ function IBtn({ title, onClick, children, danger, disabled }: { title: string; o
   );
 }
 
+const DEFAULT_SECTION = "بيانات العملية";
+
 function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => void }) {
   const available = detailBlockOrder(form);
+  const active = form.form_fields.filter((f) => f.is_active);
+  const initAssign = () => Object.fromEntries(active.map((f) => [f.id, f.section || DEFAULT_SECTION])) as Record<string, string>;
   const [order, setOrder] = useState(available);
-  useEffect(() => setOrder(available), [form]);
+  const [assign, setAssign] = useState(initAssign);
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [newSection, setNewSection] = useState("");
+  useEffect(() => { setOrder(available); setAssign(initAssign()); setNames({}); }, [form]);
+
+  const sectionsInOrder = order.filter((k) => k.startsWith("section:")).map((k) => k.slice(8));
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("forms").update({ settings: { ...form.settings, detailOrder: order } as never }).eq("id", form.id);
+      const finalName = (s: string) => (names[s]?.trim() || s);
+      const finalNames = sectionsInOrder.map(finalName);
+      if (new Set(finalNames).size !== finalNames.length) throw new Error("يوجد جزآن بنفس الاسم");
+      for (const f of active) {
+        const target = finalName(assign[f.id] ?? DEFAULT_SECTION);
+        if (target !== (f.section || DEFAULT_SECTION)) {
+          const { error } = await supabase.from("form_fields").update({ section: target }).eq("id", f.id);
+          if (error) throw error;
+        }
+      }
+      const used = new Set(active.map((f) => finalName(assign[f.id] ?? DEFAULT_SECTION)));
+      const detailOrder = order
+        .map((k) => (k.startsWith("section:") ? `section:${finalName(k.slice(8))}` : k))
+        .filter((k) => !k.startsWith("section:") || used.has(k.slice(8)));
+      const { error } = await supabase.from("forms").update({ settings: { ...form.settings, detailOrder } as never }).eq("id", form.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("تم حفظ ترتيب التفاصيل"); onSaved(); },
+    onSuccess: () => { toast.success("تم حفظ أجزاء نافذة التفاصيل"); onSaved(); },
     onError: (e) => toast.error(errorMessage(e)),
   });
   const move = (index: number, direction: -1 | 1) => {
@@ -270,25 +295,125 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
     next[index] = other;
     setOrder(next);
   };
-  const label = (key: string) => key === DETAIL_HISTORY ? "سجل الكفلاء الجدد" : key === DETAIL_AUDIT ? "سجل التدقيق" : key === DETAIL_ACTION ? "زر تعديل البيانات" : key.startsWith("section:") ? key.slice("section:".length) : key;
+  const addSection = () => {
+    const n = newSection.trim();
+    if (!n || sectionsInOrder.includes(n)) return;
+    const firstExtra = order.findIndex((k) => !k.startsWith("section:"));
+    const next = [...order];
+    next.splice(firstExtra < 0 ? next.length : firstExtra, 0, `section:${n}`);
+    setOrder(next);
+    setNewSection("");
+  };
+  const label = (key: string) => key === DETAIL_HISTORY ? "سجل الكفلاء الجدد" : key === DETAIL_AUDIT ? "سجل التدقيق" : key === DETAIL_ACTION ? "زر تعديل البيانات" : key.slice(8);
   return (
     <section className="mt-4 space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="font-semibold">ترتيب أجزاء نافذة التفاصيل</h2>
-        <Button onClick={() => save.mutate()} disabled={save.isPending}>حفظ الترتيب</Button>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-semibold">أجزاء نافذة التفاصيل</h2>
+        <Button onClick={() => save.mutate()} disabled={save.isPending}>حفظ الأجزاء والترتيب</Button>
       </div>
-      <div className="grid gap-1 sm:grid-cols-2">
-        {order.map((key, i) => (
-          <div key={key} className="flex items-center justify-between gap-3 border-b border-border px-2 py-2 text-sm">
-            <span>{label(key)}</span>
-            <div className="flex items-center gap-1">
-              <Button type="button" variant="ghost" size="icon" title="أعلى" aria-label={`تحريك ${label(key)} لأعلى`} disabled={i === 0} onClick={() => move(i, -1)}><ArrowUp className="size-4" /></Button>
-              <Button type="button" variant="ghost" size="icon" title="أسفل" aria-label={`تحريك ${label(key)} لأسفل`} disabled={i === order.length - 1} onClick={() => move(i, 1)}><ArrowDown className="size-4" /></Button>
+      <p className="text-[12px] text-ink/50">غيّر اسم أي جزء، واختر لكل حقل الجزء الذي يظهر فيه، ورتّب الأجزاء بالأسهم.</p>
+      <div className="space-y-2">
+        {order.map((key, i) => {
+          const isSection = key.startsWith("section:");
+          const sec = key.slice(8);
+          const fields = isSection ? active.filter((f) => (assign[f.id] ?? DEFAULT_SECTION) === sec) : [];
+          return (
+            <div key={key} className="rounded-lg border border-border p-2 text-sm">
+              <div className="flex items-center justify-between gap-2">
+                {isSection ? (
+                  <Input className="h-8 max-w-xs font-semibold" value={names[sec] ?? sec} onChange={(e) => setNames({ ...names, [sec]: e.target.value })} aria-label="اسم الجزء" />
+                ) : (
+                  <span className="font-semibold">{label(key)}</span>
+                )}
+                <div className="flex items-center gap-1">
+                  <Button type="button" variant="ghost" size="icon" title="أعلى" disabled={i === 0} onClick={() => move(i, -1)}><ArrowUp className="size-4" /></Button>
+                  <Button type="button" variant="ghost" size="icon" title="أسفل" disabled={i === order.length - 1} onClick={() => move(i, 1)}><ArrowDown className="size-4" /></Button>
+                </div>
+              </div>
+              {isSection && (
+                <div className="mt-2 grid gap-1 sm:grid-cols-2">
+                  {fields.length === 0 && <span className="text-[12px] text-ink/45">لا توجد حقول — انقل حقلًا إلى هذا الجزء (الجزء الفارغ لا يُحفظ).</span>}
+                  {fields.map((f) => (
+                    <div key={f.id} className="flex items-center justify-between gap-2 rounded bg-muted/40 px-2 py-1">
+                      <span className="truncate">{f.label}</span>
+                      <select className="h-7 rounded border border-input bg-transparent px-1 text-xs" value={sec} onChange={(e) => setAssign({ ...assign, [f.id]: e.target.value })} aria-label={`جزء ${f.label}`}>
+                        {sectionsInOrder.map((s) => <option key={s} value={s}>{names[s]?.trim() || s}</option>)}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
+      </div>
+      <div className="flex gap-2">
+        <Input className="h-9 max-w-xs" value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="اسم جزء جديد" />
+        <Button variant="outline" onClick={addSection} className="gap-1.5"><Plus className="size-4" /> إضافة جزء</Button>
       </div>
     </section>
+  );
+}
+
+function PickManualField({ form, forms, onClose, onSaved }: { form: FormDef; forms: FormDef[]; onClose: () => void; onSaved: () => void }) {
+  const existing = new Set(form.form_fields.flatMap((f) => [f.field_key, f.column_name ? `col:${f.column_name}` : ""]));
+  const seen = new Set<string>();
+  const candidates = forms
+    .filter((f) => f.form_key === "manual_domestic" || f.form_key === "manual_pro")
+    .flatMap((f) => f.form_fields)
+    .filter((f) => {
+      if (existing.has(f.field_key) || (f.column_name && existing.has(`col:${f.column_name}`)) || seen.has(f.field_key)) return false;
+      seen.add(f.field_key);
+      return true;
+    });
+  const sections = [...new Set(form.form_fields.map((f) => f.section || DEFAULT_SECTION))];
+  const [pick, setPick] = useState("");
+  const [section, setSection] = useState(sections[0] ?? DEFAULT_SECTION);
+  const save = useMutation({
+    mutationFn: async () => {
+      const f = candidates.find((c) => c.field_key === pick);
+      if (!f) throw new Error("اختر حقلًا");
+      const sort = Math.max(0, ...form.form_fields.map((x) => x.sort_order)) + 1;
+      const { error } = await supabase.from("form_fields").insert({
+        form_id: form.id, field_key: f.field_key, label: f.label, field_type: f.field_type, column_name: f.column_name,
+        behavior: f.behavior, section, sort_order: sort, conditions: f.conditions as never, settings: f.settings as never,
+        validation: f.validation as never, min_value: f.min_value, max_value: f.max_value,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("تمت إضافة الحقل"); onSaved(); },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent dir="rtl">
+        <DialogHeader>
+          <DialogTitle>إضافة حقل إلى نافذة التفاصيل</DialogTitle>
+          <DialogDescription>اختر حقلًا من نموذج نقل الكفالة اليدوي.</DialogDescription>
+        </DialogHeader>
+        {candidates.length === 0 ? (
+          <p className="text-sm text-ink/60">كل حقول نقل الكفالة اليدوي موجودة بالفعل في نافذة التفاصيل.</p>
+        ) : (
+          <div className="space-y-3">
+            <Field label="الحقل">
+              <select className={sel} value={pick} onChange={(e) => setPick(e.target.value)}>
+                <option value="">— اختر —</option>
+                {candidates.map((c) => <option key={c.field_key} value={c.field_key}>{c.label}</option>)}
+              </select>
+            </Field>
+            <Field label="الجزء">
+              <select className={sel} value={section} onChange={(e) => setSection(e.target.value)}>
+                {sections.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </Field>
+          </div>
+        )}
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>إلغاء</Button>
+          <Button onClick={() => save.mutate()} disabled={!pick || save.isPending}>إضافة</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

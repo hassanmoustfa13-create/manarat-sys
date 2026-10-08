@@ -364,6 +364,10 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
     field?.form_field_options.map((o) => ({ id: o.id, value: o.value, label: o.label, is_active: o.is_active })) ?? [],
   );
   const [removeOpt, setRemoveOpt] = useState<number | null>(null);
+  const [condField, setCondField] = useState(field?.conditions?.field ?? "");
+  const [condOp, setCondOp] = useState<"eq" | "neq">(field?.conditions?.op === "neq" ? "neq" : "eq");
+  const [condValue, setCondValue] = useState(field?.conditions?.value ?? "");
+  const condOptions = form.form_fields.find((f) => f.field_key === condField)?.form_field_options ?? [];
   const hasOptions = OPTION_TYPES.includes(type) && !(field?.settings?.source === "contacts");
 
   const save = useMutation({
@@ -383,6 +387,7 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
         max_value: max === "" || Number(max) < 0 ? null : Number(max),
         validation: (pattern ? { ...field?.validation, pattern } : {}) as never,
         ...(form.form_key === "transfer_details" ? { section: section.trim() } : {}),
+        conditions: (condField ? { field: condField, op: condOp, value: condValue } : {}) as never,
         settings: { ...field?.settings, full } as never,
         ...(locked ? {} : { field_key: k, field_type: type }),
       };
@@ -478,6 +483,37 @@ function FieldEditor({ form, field, onClose, onSaved }: { form: FormDef; field: 
               <Input value={section} onChange={(e) => setSection(e.target.value)} placeholder="بيانات العملية" />
             </Field>
           )}
+          <div className="grid gap-2 rounded-lg border p-3 sm:col-span-2 sm:grid-cols-3">
+            <span className="text-[13px] font-semibold sm:col-span-3">شرط الظهور (اختياري)</span>
+            <Field label="يظهر عندما يكون الحقل">
+              <select value={condField} onChange={(e) => { setCondField(e.target.value); setCondValue(""); }} className={sel}>
+                <option value="">— يظهر دائمًا —</option>
+                {form.form_fields.filter((f) => f.id !== field?.id && f.is_active).map((f) => (
+                  <option key={f.id} value={f.field_key}>{f.label}</option>
+                ))}
+              </select>
+            </Field>
+            {condField && (
+              <>
+                <Field label="المقارنة">
+                  <select value={condOp} onChange={(e) => setCondOp(e.target.value as "eq" | "neq")} className={sel}>
+                    <option value="eq">يساوي</option>
+                    <option value="neq">لا يساوي</option>
+                  </select>
+                </Field>
+                <Field label="القيمة">
+                  {condOptions.length ? (
+                    <select value={condValue} onChange={(e) => setCondValue(e.target.value)} className={sel}>
+                      <option value="">— اختر —</option>
+                      {condOptions.map((o) => <option key={o.id} value={o.value}>{o.label}</option>)}
+                    </select>
+                  ) : (
+                    <Input value={condValue} onChange={(e) => setCondValue(e.target.value)} />
+                  )}
+                </Field>
+              </>
+            )}
+          </div>
           <Field label="الحد الأدنى" hint="للأرقام: أقل قيمة — للنص: أقل عدد أحرف">
             <Input type="number" dir="ltr" value={min} onChange={(e) => setMin(e.target.value)} />
           </Field>

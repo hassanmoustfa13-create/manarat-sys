@@ -22,6 +22,8 @@ export interface GridSettings {
   columns?: ColumnSetting[] | undefined;
   /** Admin-only: edit dropdown columns directly in the table. */
   inlineSelectEdit?: boolean | undefined;
+  /** شرط ظهور زر الأرشفة: يظهر الزر فقط عندما تساوي قيمة العمود هذه القيمة. null = السلوك الافتراضي */
+  archiveCondition?: { column: string; value: string } | null | undefined;
 }
 
 export const GRID_LABELS: Record<GridKey, string> = {

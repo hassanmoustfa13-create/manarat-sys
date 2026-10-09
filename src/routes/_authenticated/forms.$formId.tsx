@@ -333,7 +333,7 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
         {order.map((key, i) => {
           const isSection = key.startsWith("section:");
           const sec = key.slice(8);
-          const fields = isSection ? active.filter((f) => (assign[f.id] ?? DEFAULT_SECTION) === sec) : [];
+          const fields = isSection ? fieldsOf(sec) : [];
           return (
             <div key={key} className="rounded-lg border border-border p-2 text-sm">
               <div className="flex items-center justify-between gap-2">

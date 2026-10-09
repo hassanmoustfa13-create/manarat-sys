@@ -14,6 +14,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";
 import { activeFields, detailBlockOrder, detailSectionKey, DETAIL_ACTION, DETAIL_AUDIT, DETAIL_HISTORY, formsQuery, type FormDef, type FormField } from "@/lib/forms";
+import { gridSettingsQuery } from "@/lib/gridSettings";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -300,7 +301,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
               {canEdit && (<IconBtn title="تعديل" onClick={() => { setEditing(t); setFormOpen(true); }}>
                 <Pencil className="size-3.5" />
               </IconBtn>)}
-              {canEdit && t.transfer_stage === "تم النقل" && (
+              {canEdit && canArchiveRow(t) && (
                 <IconBtn title="أرشفة العملية" onClick={() => setArchiving(t)}>
                   <Archive className="size-3.5" />
                 </IconBtn>

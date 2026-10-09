@@ -304,9 +304,9 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
   const moveField = async (sec: string, fieldId: string, direction: -1 | 1) => {
     const fields = fieldsOf(sec);
     const i = fields.findIndex((f) => f.id === fieldId);
-    const other = fields[i + direction];
-    if (i < 0 || !other) return;
     const a = fields[i];
+    const other = fields[i + direction];
+    if (!a || !other) return;
     const { error: e1 } = await supabase.from("form_fields").update({ sort_order: other.sort_order }).eq("id", a.id);
     const { error: e2 } = await supabase.from("form_fields").update({ sort_order: a.sort_order }).eq("id", other.id);
     if (e1 || e2) return void toast.error(errorMessage(e1 ?? e2));

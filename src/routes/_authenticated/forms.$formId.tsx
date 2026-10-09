@@ -264,16 +264,22 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
   useEffect(() => { setOrder(available); setAssign(initAssign()); setNames({}); }, [form]);
 
   const sectionsInOrder = order.filter((k) => k.startsWith("section:")).map((k) => k.slice(8));
+  const fieldsOf = (sec: string) =>
+    active.filter((f) => (assign[f.id] ?? DEFAULT_SECTION) === sec).sort((a, b) => a.sort_order - b.sort_order);
   const save = useMutation({
     mutationFn: async () => {
       const finalName = (s: string) => (names[s]?.trim() || s);
       const finalNames = sectionsInOrder.map(finalName);
       if (new Set(finalNames).size !== finalNames.length) throw new Error("يوجد جزآن بنفس الاسم");
-      for (const f of active) {
-        const target = finalName(assign[f.id] ?? DEFAULT_SECTION);
-        if (target !== (f.section || DEFAULT_SECTION)) {
-          const { error } = await supabase.from("form_fields").update({ section: target }).eq("id", f.id);
-          if (error) throw error;
+      let sort = 10;
+      for (const sec of sectionsInOrder) {
+        for (const f of fieldsOf(sec)) {
+          const target = finalName(sec);
+          if (target !== (f.section || DEFAULT_SECTION) || sort !== f.sort_order) {
+            const { error } = await supabase.from("form_fields").update({ section: target, sort_order: sort }).eq("id", f.id);
+            if (error) throw error;
+          }
+          sort += 10;
         }
       }
       const used = new Set(active.map((f) => finalName(assign[f.id] ?? DEFAULT_SECTION)));
@@ -294,6 +300,17 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
     next[index + direction] = current;
     next[index] = other;
     setOrder(next);
+  };
+  const moveField = async (sec: string, fieldId: string, direction: -1 | 1) => {
+    const fields = fieldsOf(sec);
+    const i = fields.findIndex((f) => f.id === fieldId);
+    const a = fields[i];
+    const other = fields[i + direction];
+    if (!a || !other) return;
+    const { error: e1 } = await supabase.from("form_fields").update({ sort_order: other.sort_order }).eq("id", a.id);
+    const { error: e2 } = await supabase.from("form_fields").update({ sort_order: a.sort_order }).eq("id", other.id);
+    if (e1 || e2) return void toast.error(errorMessage(e1 ?? e2));
+    onSaved();
   };
   const addSection = () => {
     const n = newSection.trim();
@@ -316,7 +333,7 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
         {order.map((key, i) => {
           const isSection = key.startsWith("section:");
           const sec = key.slice(8);
-          const fields = isSection ? active.filter((f) => (assign[f.id] ?? DEFAULT_SECTION) === sec) : [];
+          const fields = isSection ? fieldsOf(sec) : [];
           return (
             <div key={key} className="rounded-lg border border-border p-2 text-sm">
               <div className="flex items-center justify-between gap-2">
@@ -333,12 +350,16 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
               {isSection && (
                 <div className="mt-2 grid gap-1 sm:grid-cols-2">
                   {fields.length === 0 && <span className="text-[12px] text-ink/45">لا توجد حقول — انقل حقلًا إلى هذا الجزء (الجزء الفارغ لا يُحفظ).</span>}
-                  {fields.map((f) => (
+                  {fields.map((f, fi) => (
                     <div key={f.id} className="flex items-center justify-between gap-2 rounded bg-muted/40 px-2 py-1">
                       <span className="truncate">{f.label}</span>
-                      <select className="h-7 rounded border border-input bg-transparent px-1 text-xs" value={sec} onChange={(e) => setAssign({ ...assign, [f.id]: e.target.value })} aria-label={`جزء ${f.label}`}>
-                        {sectionsInOrder.map((s) => <option key={s} value={s}>{names[s]?.trim() || s}</option>)}
-                      </select>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <IBtn title="أعلى" disabled={fi === 0} onClick={() => void moveField(sec, f.id, -1)}><ArrowUp className="size-3.5" /></IBtn>
+                        <IBtn title="أسفل" disabled={fi === fields.length - 1} onClick={() => void moveField(sec, f.id, 1)}><ArrowDown className="size-3.5" /></IBtn>
+                        <select className="h-7 rounded border border-input bg-transparent px-1 text-xs" value={sec} onChange={(e) => setAssign({ ...assign, [f.id]: e.target.value })} aria-label={`جزء ${f.label}`}>
+                          {sectionsInOrder.map((s) => <option key={s} value={s}>{names[s]?.trim() || s}</option>)}
+                        </select>
+                      </div>
                     </div>
                   ))}
                 </div>

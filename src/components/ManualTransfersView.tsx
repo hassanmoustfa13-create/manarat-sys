@@ -100,6 +100,17 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const canAdd = auth.can(permRes, "add");
   const canEdit = auth.can(permRes, "edit");
   const canDel = auth.can(permRes, "delete");
+  const { data: gridSettings } = useQuery(gridSettingsQuery);
+  const archiveCond = gridSettings?.manual_transfers?.archiveCondition;
+  // زر الأرشفة يظهر فقط عند تحقق الشرط المحدد في إعدادات الجداول؛ الافتراضي: مرحلة النقل = «تم النقل»
+  const canArchiveRow = (t: MT) => {
+    if (!archiveCond?.column) return t.transfer_stage === "تم النقل";
+    const col = archiveCond.column;
+    const raw = col.startsWith("extra_")
+      ? (t.extra as Record<string, unknown> | null)?.[col.slice(6)]
+      : (t as unknown as Record<string, unknown>)[col];
+    return String(raw ?? "") === archiveCond.value;
+  };
   const canImport = auth.can(permRes, "import");
   const qc = useQueryClient();
   const { data: all = [], isLoading } = useQuery(manualTransfersQuery);

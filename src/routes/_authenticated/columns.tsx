@@ -66,6 +66,7 @@ function ColumnsPage() {
       density: saved?.density ?? "normal",
       columns: resolveColumns(key, saved, extraIds, optionalIds),
       inlineSelectEdit: saved?.inlineSelectEdit ?? false,
+      archiveCondition: saved?.archiveCondition ?? null,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all, key, extraSig]);
@@ -263,6 +264,48 @@ function ColumnsPage() {
           تعديل القوائم المنسدلة مباشرة من الجدول في كل الجداول (للمدير فقط)
         </label>
       </div>
+
+      {key === "manual_transfers" && (
+        <div className="glass flex flex-wrap items-center gap-3 rounded-xl p-4 text-sm">
+          <span className="font-semibold">زر الأرشفة يظهر عندما:</span>
+          <select
+            className={sel}
+            value={draft.archiveCondition?.column ?? ""}
+            onChange={(e) =>
+              setDraft((d) => ({
+                ...d,
+                archiveCondition: e.target.value
+                  ? { column: e.target.value, value: d.archiveCondition?.value ?? "" }
+                  : null,
+              }))
+            }
+          >
+            <option value="">الافتراضي (مرحلة النقل = تم النقل)</option>
+            {cols.map((c) => (
+              <option key={c.id} value={c.id}>{labels[c.id] ?? c.id}</option>
+            ))}
+          </select>
+          {draft.archiveCondition?.column && (
+            <>
+              <span>تساوي</span>
+              <input
+                className={`${sel} min-w-40`}
+                placeholder="اكتب القيمة المطلوبة…"
+                value={draft.archiveCondition.value}
+                onChange={(e) =>
+                  setDraft((d) => ({
+                    ...d,
+                    archiveCondition: d.archiveCondition
+                      ? { ...d.archiveCondition, value: e.target.value }
+                      : null,
+                  }))
+                }
+              />
+            </>
+          )}
+          <span className="text-xs text-muted-foreground">ثم اضغط «حفظ الإعدادات»</span>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/60 px-4 py-3 text-sm ring-1 ring-black/8">
         <Plus className="size-4 text-brand" />

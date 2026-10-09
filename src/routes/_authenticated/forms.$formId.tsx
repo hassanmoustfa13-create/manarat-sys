@@ -350,12 +350,16 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
               {isSection && (
                 <div className="mt-2 grid gap-1 sm:grid-cols-2">
                   {fields.length === 0 && <span className="text-[12px] text-ink/45">لا توجد حقول — انقل حقلًا إلى هذا الجزء (الجزء الفارغ لا يُحفظ).</span>}
-                  {fields.map((f) => (
+                  {fields.map((f, fi) => (
                     <div key={f.id} className="flex items-center justify-between gap-2 rounded bg-muted/40 px-2 py-1">
                       <span className="truncate">{f.label}</span>
-                      <select className="h-7 rounded border border-input bg-transparent px-1 text-xs" value={sec} onChange={(e) => setAssign({ ...assign, [f.id]: e.target.value })} aria-label={`جزء ${f.label}`}>
-                        {sectionsInOrder.map((s) => <option key={s} value={s}>{names[s]?.trim() || s}</option>)}
-                      </select>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <IBtn title="أعلى" disabled={fi === 0} onClick={() => void moveField(sec, f.id, -1)}><ArrowUp className="size-3.5" /></IBtn>
+                        <IBtn title="أسفل" disabled={fi === fields.length - 1} onClick={() => void moveField(sec, f.id, 1)}><ArrowDown className="size-3.5" /></IBtn>
+                        <select className="h-7 rounded border border-input bg-transparent px-1 text-xs" value={sec} onChange={(e) => setAssign({ ...assign, [f.id]: e.target.value })} aria-label={`جزء ${f.label}`}>
+                          {sectionsInOrder.map((s) => <option key={s} value={s}>{names[s]?.trim() || s}</option>)}
+                        </select>
+                      </div>
                     </div>
                   ))}
                 </div>

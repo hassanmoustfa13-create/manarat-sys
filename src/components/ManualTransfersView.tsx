@@ -472,7 +472,7 @@ function DetailFieldRow({
     : (record.extra as Record<string, unknown> | null)?.[field.field_key];
   const c = field.conditions;
   if (c?.field) {
-    const v = String(rec[c.field] ?? "");
+    const v = String(rec[c.field] ?? (record.extra as Record<string, unknown> | null)?.[c.field] ?? "");
     const ok = c.op === "eq" ? v === (c.value ?? "") : v !== (c.value ?? "");
     if (!ok) return null;
   }

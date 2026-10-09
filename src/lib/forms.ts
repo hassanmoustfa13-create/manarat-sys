@@ -34,7 +34,7 @@ export const COMPUTED_BEHAVIORS = ["remaining", "period_end", "day_name"];
 
 export type FormOption = { id: string; field_id: string; value: string; label: string; sort_order: number; is_active: boolean };
 export type Condition = { field?: string; op?: "eq" | "neq"; value?: string };
-export type FieldSettings = { ltr?: boolean; full?: boolean; source?: "contacts"; phoneField?: string };
+export type FieldSettings = { ltr?: boolean; full?: boolean; source?: "contacts"; phoneField?: string; group?: string; span?: "full" };
 export type FormField = {
   id: string;
   form_id: string;
@@ -63,6 +63,17 @@ export const DETAIL_AUDIT = "__audit";
 export const DETAIL_ACTION = "__edit_action";
 export const DETAIL_EXTRAS = [DETAIL_AUDIT, DETAIL_ACTION, DETAIL_HISTORY] as const;
 export const detailSectionKey = (section: string) => `section:${section}`;
+/** تقسيم حقول الجزء إلى مجموعات متتالية حسب «العنوان الفرعي» (settings.group) لعرض فاصل بينها. */
+export function detailGroups(fields: FormField[]): [string, FormField[]][] {
+  const out: [string, FormField[]][] = [];
+  for (const f of fields) {
+    const g = (f.settings?.group ?? "").trim();
+    const last = out[out.length - 1];
+    if (last && last[0] === g) last[1].push(f);
+    else out.push([g, [f]]);
+  }
+  return out;
+}
 export function detailBlockOrder(form: FormDef) {
   const sections = [...new Set(activeFields(form).map((f) => detailSectionKey(f.section || "بيانات العملية")))];
   const available = [...sections, ...DETAIL_EXTRAS];
@@ -74,7 +85,8 @@ export function detailBlockOrder(form: FormDef) {
   return [...ordered, ...DETAIL_EXTRAS.filter((key) => !ordered.includes(key))];
 }
 
-export type FormSettings = { category?: string; cols?: number; description?: string; title?: string; detailOrder?: string[] };
+export type FormSettings = { category?: string; cols?: number; description?: string; title?: string; detailOrder?: string[]; detailStyle?: DetailStyle };
+export type DetailStyle = { cols?: number; fieldCols?: number; gap?: number; padding?: number; sectionBg?: string; titleColor?: string; titleSize?: number; labelColor?: string; valueColor?: string; fontPx?: number; labelBold?: boolean; valueBold?: boolean; fontFamily?: string | undefined; lineColor?: string };
 export type FormDef = {
   id: string;
   form_key: string;

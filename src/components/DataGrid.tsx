@@ -16,6 +16,11 @@ import { customColumnId, fieldColumnId, gridFormFields, gridSettingsQuery, resol
 import { formsQuery, OPTION_TYPES, type FormField } from "@/lib/forms";
 import { formatDate, formatMoney } from "@/lib/data";
 
+// pageSize value that shows every row on one page — the grid's default view.
+const ALL_ROWS = 1000000;
+
+
+
 function customCell(f: FormField, v: unknown): ReactNode {
   if (v === null || v === undefined || v === "") return "—";
   if (f.field_type === "checkbox") return v === true || v === "true" ? "✓ نعم" : "لا";
@@ -54,6 +59,8 @@ interface DataGridProps<T extends { id: string }> {
   formKeys?: string[];
   onRowClick?: (row: T) => void;
   sortable?: boolean;
+  selectedIds?: Set<string> | undefined;
+  onSelectionChange?: ((ids: Set<string>) => void) | undefined;
 }
 
 export function DataGrid<T extends { id: string }>({
@@ -67,8 +74,18 @@ export function DataGrid<T extends { id: string }>({
   formKeys,
   onRowClick,
   sortable = false,
+  selectedIds,
+  onSelectionChange,
 }: DataGridProps<T>) {
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const selectable = Boolean(selectedIds && onSelectionChange);
+  const toggleId = (id: string) => {
+    if (!selectedIds || !onSelectionChange) return;
+    const n = new Set(selectedIds);
+    if (n.has(id)) n.delete(id);
+    else n.add(id);
+    onSelectionChange(n);
+  };
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: ALL_ROWS });
   const [sorting, setSorting] = useState<SortingState>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScroll, setCanScroll] = useState(false);
@@ -125,6 +142,24 @@ export function DataGrid<T extends { id: string }>({
   };
   const fontCls = saved?.fontSize === "sm" ? "text-[12.5px]" : saved?.fontSize === "lg" ? "text-[16px]" : "text-[13.5px]";
   const padCls = saved?.density === "compact" ? "py-1" : saved?.density === "comfortable" ? "py-4" : "py-2";
+  const fontPx = saved?.fontPx || undefined;
+  const lineColor = saved?.lineColor;
+  const cellLine = lineColor || "var(--grid-line, rgba(15,23,42,0.10))";
+  const headLine = lineColor || "var(--grid-line, rgba(15,23,42,0.16))";
+  const headBg = saved?.headerBg || "var(--grid-header-bg, rgba(255,255,255,0.92))";
+  const headStyle = {
+    backgroundColor: headBg,
+    borderColor: headLine,
+    ...(saved?.headerText ? { color: saved.headerText } : {}),
+    ...(saved?.headerFontPx ? { fontSize: saved.headerFontPx } : {}),
+    fontWeight: saved?.headerWeight === "normal" ? 400 : 700,
+  };
+  const tableStyle = {
+    ...(fontPx ? { fontSize: fontPx } : {}),
+    ...(saved?.fontFamily ? { fontFamily: saved.fontFamily } : {}),
+    ...(saved?.textColor ? { color: saved.textColor } : {}),
+    ...(saved?.fontWeight === "bold" ? { fontWeight: 700 } : {}),
+  };
   const widthOf = (id: string, fallback?: number | string) => setById.get(id)?.width || fallback;
   const colorOf = (id: string) => setById.get(id)?.color || undefined;
   const alignOf = (id: string, ltr?: boolean) => {
@@ -186,15 +221,25 @@ export function DataGrid<T extends { id: string }>({
           </div>
         )}
         <div ref={scrollRef} className="grid-scroll max-h-[calc(100vh-15rem)] overflow-auto">
-        <table className={`ledger-rows w-full border-collapse ${fontCls}`} style={{ minWidth }}>
+        <table className={`ledger-rows w-full border-collapse ${fontCls}`} style={{ minWidth, ...tableStyle }}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((hg) => (
-              <tr key={hg.id} className="text-[12px] font-bold text-ink/70">
+              <tr key={hg.id} className="text-[12px] font-bold text-ink/90">
                 <th
-                  style={{ backgroundColor: "var(--grid-header-bg, rgba(255,255,255,0.92))", borderColor: "var(--grid-line, rgba(15,23,42,0.16))" }}
+                  style={headStyle}
                   className="w-10 border-b-2 px-2 py-2.5 text-center font-bold backdrop-blur-xl"
                 >
-                  م
+                  {selectable ? (
+                    <input
+                      type="checkbox"
+                      aria-label="تحديد الكل"
+                      className="size-4 cursor-pointer accent-[var(--color-brand,#0f766e)]"
+                      checked={rows.length > 0 && rows.every((r) => selectedIds!.has(r.id))}
+                      onChange={(e) => onSelectionChange!(e.target.checked ? new Set(rows.map((r) => r.id)) : new Set())}
+                    />
+                  ) : (
+                    "م"
+                  )}
                 </th>
                 {hg.headers.map((header) => (
                   <th
@@ -202,8 +247,7 @@ export function DataGrid<T extends { id: string }>({
                     style={{
                       width: widthOf(header.column.id, header.column.columnDef.meta?.width),
                       minWidth: setById.get(header.column.id)?.width || undefined,
-                      backgroundColor: "var(--grid-header-bg, rgba(255,255,255,0.92))",
-                      borderColor: "var(--grid-line, rgba(15,23,42,0.16))",
+                      ...headStyle,
                     }}
                     className={`border-b-2 border-l px-3 py-2.5 ${alignOf(header.column.id, header.column.columnDef.meta?.ltr)} font-bold backdrop-blur-xl first:border-l-0 ${sortable ? "cursor-pointer select-none hover:text-brand" : ""}`}
                     onClick={sortable ? header.column.getToggleSortingHandler() : undefined}
@@ -225,7 +269,7 @@ export function DataGrid<T extends { id: string }>({
                 ))}
                 {rowActions && (
                   <th
-                    style={{ backgroundColor: "var(--grid-header-bg, rgba(255,255,255,0.92))", borderColor: "var(--grid-line, rgba(15,23,42,0.16))" }}
+                    style={headStyle}
                     className="border-b-2 border-l px-3 py-2.5 text-center font-bold backdrop-blur-xl"
                   >
                     إجراءات
@@ -234,7 +278,7 @@ export function DataGrid<T extends { id: string }>({
               </tr>
             ))}
           </thead>
-          <tbody className="text-ink/85">
+          <tbody className="text-ink/85" style={saved?.textColor ? { color: saved.textColor } : undefined}>
             {rows.length === 0 && (
               <tr>
                 <td
@@ -248,15 +292,29 @@ export function DataGrid<T extends { id: string }>({
             {rows.map((row, i) => (
               <tr
                 key={row.id}
-                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                style={{ borderColor: "var(--grid-line, rgba(15,23,42,0.10))" }}
-                className={`border-b transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+                onClick={onRowClick ? () => onRowClick(row.original) : selectable ? () => toggleId(row.id) : undefined}
+                data-selected={selectable && selectedIds!.has(row.id) ? "true" : undefined}
+                style={{ borderColor: cellLine }}
+                className={`border-b transition-colors ${onRowClick || selectable ? "cursor-pointer" : ""} ${selectable && selectedIds!.has(row.id) ? "bg-primary/15" : ""}`}
               >
                 <td
-                  style={{ borderColor: "var(--grid-line, rgba(15,23,42,0.10))" }}
+                  style={{ borderColor: cellLine }}
                   className={`px-2 ${padCls} text-center text-[12px] font-semibold text-ink/40`}
+                  onClick={selectable ? (e) => e.stopPropagation() : undefined}
                 >
-                  {i + 1}
+                  {selectable ? (
+                    <label className="flex cursor-pointer items-center justify-center gap-1">
+                      <input
+                        type="checkbox"
+                        aria-label={`تحديد الصف ${i + 1}`}
+                        className="size-4 cursor-pointer"
+                        checked={selectedIds!.has(row.id)}
+                        onChange={() => toggleId(row.id)}
+                      />
+                    </label>
+                  ) : (
+                    i + 1
+                  )}
                 </td>
                 {row.getVisibleCells().map((cell) => {
                   const meta = cell.column.columnDef.meta ?? {};
@@ -266,7 +324,9 @@ export function DataGrid<T extends { id: string }>({
                       dir={meta.ltr ? "ltr" : undefined}
                       style={{
                         ...(colorOf(cell.column.id) ? { backgroundColor: colorOf(cell.column.id) } : {}),
-                        borderColor: "var(--grid-line, rgba(15,23,42,0.10))",
+                        ...(setById.get(cell.column.id)?.textColor ? { color: setById.get(cell.column.id)?.textColor } : {}),
+                        ...(setById.get(cell.column.id)?.bold ? { fontWeight: 700 } : {}),
+                        borderColor: cellLine,
                       }}
                       className={`border-l px-3 ${padCls} align-middle break-words first:border-l-0 ${alignOf(
                         cell.column.id,
@@ -279,7 +339,7 @@ export function DataGrid<T extends { id: string }>({
                 })}
                 {rowActions && (
                   <td
-                    style={{ borderColor: "var(--grid-line, rgba(15,23,42,0.10))" }}
+                    style={{ borderColor: cellLine }}
                     className="border-l px-3 py-2 align-middle"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -332,7 +392,7 @@ export function DataGrid<T extends { id: string }>({
             <option value={10}>10 أسطر</option>
             <option value={25}>25 سطرًا</option>
             <option value={50}>50 سطرًا</option>
-            <option value={1000000}>كل الأسطر</option>
+            <option value={ALL_ROWS}>كل الأسطر</option>
           </select>
         </div>
       </div>

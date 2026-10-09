@@ -3,7 +3,7 @@ import { Archive } from "lucide-react";
 import { useMutation, useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -13,7 +13,7 @@ import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";
-import { activeFields, detailBlockOrder, detailSectionKey, DETAIL_ACTION, DETAIL_AUDIT, DETAIL_HISTORY, formsQuery, type FormDef, type FormField } from "@/lib/forms";
+import { type DetailStyle, activeFields, detailBlockOrder, detailGroups, detailSectionKey, DETAIL_ACTION, DETAIL_AUDIT, DETAIL_HISTORY, formsQuery, type FormDef, type FormField } from "@/lib/forms";
 import { gridSettingsQuery } from "@/lib/gridSettings";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -101,15 +101,22 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const canEdit = auth.can(permRes, "edit");
   const canDel = auth.can(permRes, "delete");
   const { data: gridSettings } = useQuery(gridSettingsQuery);
-  const archiveCond = gridSettings?.manual_transfers?.archiveCondition;
-  // زر الأرشفة يظهر فقط عند تحقق الشرط المحدد في إعدادات الجداول؛ الافتراضي: مرحلة النقل = «تم النقل»
+  const archiveConds =
+    gridSettings?.manual_transfers?.archiveConditions ??
+    (gridSettings?.manual_transfers?.archiveCondition
+      ? [gridSettings.manual_transfers.archiveCondition]
+      : []);
+  // زر الأرشفة يظهر عند تحقق أي شرط من الشروط المحددة في إعدادات الجداول؛ بلا شروط: الافتراضي مرحلة النقل = «تم النقل»
   const canArchiveRow = (t: MT) => {
-    if (!archiveCond?.column) return t.transfer_stage === "تم النقل";
-    const col = archiveCond.column;
-    const raw = col.startsWith("extra_")
-      ? (t.extra as Record<string, unknown> | null)?.[col.slice(6)]
-      : (t as unknown as Record<string, unknown>)[col];
-    return String(raw ?? "") === archiveCond.value;
+    if (archiveConds.length === 0) return t.transfer_stage === "تم النقل";
+    return archiveConds.some((cond) => {
+      if (!cond.column) return false;
+      const col = cond.column;
+      const raw = col.startsWith("extra_")
+        ? (t.extra as Record<string, unknown> | null)?.[col.slice(6)]
+        : (t as unknown as Record<string, unknown>)[col];
+      return String(raw ?? "") === cond.value;
+    });
   };
   const canImport = auth.can(permRes, "import");
   const qc = useQueryClient();
@@ -119,6 +126,8 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const [search, setSearch] = useState("");
   const [payFilter, setPayFilter] = useState<string | null>(null);
   const [natFilter, setNatFilter] = useState<string | null>(null);
+  const [locFilter, setLocFilter] = useState<string | null>(null);
+
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<MT | null>(null);
   const [deleting, setDeleting] = useState<MT | null>(null);
@@ -146,13 +155,23 @@ export function ManualTransfersView({ category }: { category: Category }) {
     () => [...new Set(mine.map((t) => t.nationality.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ar")),
     [mine],
   );
+  // مواقع العاملة الموجودة فعليًا في السجلات، بنفس ترتيب القائمة المنسدلة مع «أخرى» في الآخر
+  const locations = useMemo(
+    () =>
+      [...new Set(mine.map((t) => (t.worker_location ?? "").trim()).filter(Boolean))].sort((a, b) =>
+        a === "أخرى" ? 1 : b === "أخرى" ? -1 : a.localeCompare(b, "ar"),
+      ),
+    [mine],
+  );
   const rows = useMemo(
     () =>
       mine
         .filter((r) => (payFilter ? r.payment_status === payFilter : true))
-        .filter((r) => (natFilter ? r.nationality.trim() === natFilter : true)),
-    [mine, payFilter, natFilter],
+        .filter((r) => (natFilter ? r.nationality.trim() === natFilter : true))
+        .filter((r) => (locFilter ? (r.worker_location ?? "").trim() === locFilter : true)),
+    [mine, payFilter, natFilter, locFilter],
   );
+
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -179,7 +198,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
       id,
       accessorKey: id,
       header,
-      cell: ({ getValue }) => ((getValue() as string) ? <StatusBadge value={getValue() as string} /> : "—"),
+      cell: ({ getValue }) => (getValue() as string) || "—",
     });
     const date = (id: keyof MT, header: string): ColumnDef<MT, unknown> => ({
       id,
@@ -251,7 +270,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
         id: "worker_condition",
         accessorKey: "worker_condition",
         header: "ملاحظات حالة العاملة",
-        cell: ({ getValue }) => <span className="line-clamp-1 max-w-[220px] text-ink/70">{(getValue() as string) || "—"}</span>,
+        cell: ({ getValue }) => <FitCellText value={(getValue() as string) || "—"} />,
       },
       {
         id: "created_by",
@@ -293,7 +312,22 @@ export function ManualTransfersView({ category }: { category: Category }) {
             {nationalities.map((n) => (
               <FilterChip key={n} active={natFilter === n} onClick={() => setNatFilter(natFilter === n ? null : n)}>{n}</FilterChip>
             ))}
+            <span className="mx-1 hidden h-4 w-px bg-black/10 sm:inline-block" />
+            <select
+              value={locFilter ?? ""}
+              onChange={(e) => setLocFilter(e.target.value || null)}
+              aria-label="فلترة حسب موقع العاملة"
+              className="glass h-7 rounded-lg border-0 px-2 text-[12px] text-ink/70 outline-none ring-1 ring-black/8 focus:ring-2 focus:ring-brand/30"
+            >
+              <option value="">موقع العاملة: الكل</option>
+              {locations.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
           </>
+
         }
       />
       {isLoading ? (
@@ -366,11 +400,57 @@ export function ManualTransfersView({ category }: { category: Category }) {
   );
 }
 
-function DetailRow({ label, value, ltr }: { label: string; value: ReactNode; ltr?: boolean }) {
+/** خلية ملاحظات حالة العاملة: النص يلتف على حتى 3 أسطر، ويُصغَّر الخط تلقائيًا فقط إذا احتاج أكثر من ذلك. */
+function FitCellText({ value }: { value: string }) {
+  const boxRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [fontPx, setFontPx] = useState<number | null>(null);
+  const MAX_LINES = 3;
+  const MIN_FONT = 8;
+
+  useLayoutEffect(() => {
+    const box = boxRef.current;
+    const text = textRef.current;
+    if (!box || !text) return;
+    const fit = () => {
+      const cs = getComputedStyle(text);
+      const base = parseFloat(cs.fontSize);
+      const lineH = parseFloat(cs.lineHeight) || base * 1.4;
+      const maxH = lineH * MAX_LINES;
+      let size = base;
+      text.style.fontSize = base + "px";
+      while (text.scrollHeight > maxH && size > MIN_FONT) {
+        size -= 0.5;
+        text.style.fontSize = size + "px";
+      }
+      setFontPx(size);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    if (boxRef.current) ro.observe(boxRef.current);
+    return () => ro.disconnect();
+  }, [value]);
+
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-black/5 py-1.5 text-[13px] last:border-b-0">
-      <span className="text-ink/50">{label}</span>
-      <span className={`font-medium ${ltr ? "tabular-nums" : ""}`} dir={ltr ? "ltr" : undefined}>
+    <span
+      ref={boxRef}
+      className="block max-w-[220px] text-black"
+      style={{ fontSize: fontPx ? `${fontPx}px` : undefined }}
+    >
+      <span ref={textRef} className="block">
+        {value}
+      </span>
+    </span>
+  );
+}
+
+const DetailStyleCtx = createContext<DetailStyle>({});
+function DetailRow({ label, value, ltr }: { label: string; value: ReactNode; ltr?: boolean }) {
+  const st = useContext(DetailStyleCtx);
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-black/5 py-1.5 text-[13px] last:border-b-0" style={{ fontSize: st.fontPx, borderColor: st.lineColor }}>
+      <span className="text-ink/50" style={{ color: st.labelColor, fontWeight: st.labelBold ? 700 : undefined }}>{label}</span>
+      <span className={`font-medium ${ltr ? "tabular-nums" : ""}`} dir={ltr ? "ltr" : undefined} style={{ color: st.valueColor, fontWeight: st.valueBold === undefined ? undefined : st.valueBold ? 700 : 400 }}>
         {value ?? "—"}
       </span>
     </div>
@@ -509,9 +589,10 @@ function DetailFieldRow({
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
+  const st = useContext(DetailStyleCtx);
   return (
-    <section className="glass rounded-xl p-4">
-      <h4 className="mb-2 text-[11px] font-semibold text-ink/50">{title}</h4>
+    <section className="glass rounded-xl p-4" style={{ background: st.sectionBg, padding: st.padding, fontFamily: st.fontFamily || undefined }}>
+      <h4 className="mb-2 text-[11px] font-semibold text-ink/50" style={{ color: st.titleColor, fontSize: st.titleSize }}>{title}</h4>
       {children}
     </section>
   );
@@ -546,7 +627,8 @@ function ManualTransferDetails({
             </DialogHeader>
 
             {detailForm ? (
-              <div className={`grid gap-4 ${detailForm.settings.cols === 1 ? "" : detailForm.settings.cols === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+              <DetailStyleCtx.Provider value={detailForm.settings.detailStyle ?? {}}>
+              <div className={`grid gap-4 ${(detailForm.settings.detailStyle?.cols ?? detailForm.settings.cols) === 1 ? "" : (detailForm.settings.detailStyle?.cols ?? detailForm.settings.cols) === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`} style={{ gap: detailForm.settings.detailStyle?.gap }}>
                 {detailBlockOrder(detailForm).map((block) => {
                   if (block === DETAIL_HISTORY) return (
                     <div key={block} className="col-span-full">
@@ -575,13 +657,24 @@ function ManualTransferDetails({
                   const [sec, fields] = entry;
                   return (
                     <Section key={block} title={sec}>
-                      {fields.map((fld) => (
-                        <DetailFieldRow key={fld.id} field={fld} record={record} onSaved={onSaved} />
+                      {detailGroups(fields).map(([grp, run], gi) => (
+                        <div key={`${grp || "x"}-${gi}`}>
+                          {gi > 0 && <div className="my-2 border-t border-dashed border-black/15" />}
+                          {grp && <h5 className="mb-1 text-[11px] font-semibold text-ink/45">{grp}</h5>}
+                          <div className="grid gap-x-4" style={{ gridTemplateColumns: `repeat(${detailForm.settings.detailStyle?.fieldCols ?? 1}, minmax(0, 1fr))` }}>
+                            {run.map((fld) => (
+                              <div key={fld.id} style={fld.settings?.span === "full" ? { gridColumn: "1 / -1" } : undefined}>
+                                <DetailFieldRow field={fld} record={record} onSaved={onSaved} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       ))}
                     </Section>
                   );
                 })}
               </div>
+              </DetailStyleCtx.Provider>
             ) : (
               <div className="text-center text-sm text-muted-foreground">
                 {formsPending ? "جارٍ تحميل تفاصيل العملية…" : formsError ? "تعذّر تحميل إعدادات تفاصيل العملية." : "نموذج تفاصيل العملية غير متاح."}

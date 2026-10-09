@@ -33,15 +33,16 @@ export function GridToolbar({
         <h1 className="text-lg font-semibold">{shownTitle}</h1>
         <span className="text-[12px] text-ink/45">{count} سجل</span>
       </div>
-      <div className="relative w-full lg:ms-4 lg:w-80">
-        <Search className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-ink/35" />
+      <div className="relative w-full lg:ms-4 lg:w-52">
+        <Search className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink/35" />
         <input
           value={search}
           onChange={(e) => onSearch(e.target.value)}
-          placeholder="بحث سريع… الاسم، الجواز، الكفيل، الهاتف"
-          className="glass h-9 w-full rounded-lg pe-9 ps-3 text-sm outline-none placeholder:text-ink/35 focus:ring-2 focus:ring-brand/30"
+          aria-label="بحث"
+          className="glass h-7 w-full rounded-lg pe-8 ps-2.5 text-[13px] outline-none focus:ring-2 focus:ring-brand/30"
         />
       </div>
+
       {filters && <div className="flex flex-wrap items-center gap-1.5">{filters}</div>}
       <div className="flex items-center gap-2 lg:ms-auto">
         {extra}

@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import { DataGrid } from "@/components/DataGrid";
 import { FilterChip, GridToolbar } from "@/components/GridToolbar";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
@@ -68,6 +69,8 @@ function DeparturesPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Departure | null>(null);
   const [deleting, setDeleting] = useState<Departure | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const rows = useMemo(
     () =>
@@ -88,6 +91,20 @@ function DeparturesPage() {
       qc.invalidateQueries({ queryKey: ["departures"] });
       toast.success("تم حذف المغادرة");
       setDeleting(null);
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+
+  const removeMany = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("departures").delete().in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: (_d, ids) => {
+      qc.invalidateQueries({ queryKey: ["departures"] });
+      toast.success(`تم حذف ${ids.length} من المغادرة`);
+      setSelected(new Set());
+      setBulkOpen(false);
     },
     onError: (e) => toast.error(errorMessage(e)),
   });
@@ -192,6 +209,17 @@ function DeparturesPage() {
           </>
         }
       />
+      {canDel && selected.size > 0 && (
+        <div className="mb-2 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm">
+          <span className="font-semibold">تم تحديد {selected.size} صف</span>
+          <Button size="sm" variant="destructive" onClick={() => setBulkOpen(true)}>
+            <Trash2 className="size-4" /> حذف المحدد
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
+            إلغاء التحديد
+          </Button>
+        </div>
+      )}
       {isLoading ? (
         <div className="glass h-64 animate-pulse rounded-2xl" />
       ) : (
@@ -201,6 +229,8 @@ function DeparturesPage() {
           search={search}
           gridKey="departures"
           sortable
+          selectedIds={canDel ? selected : undefined}
+          onSelectionChange={canDel ? setSelected : undefined}
           emptyMessage="لا توجد مغادرة بعد"
           rowActions={(r) => (
             <>
@@ -238,6 +268,14 @@ function DeparturesPage() {
         description="سيتم حذف المغادرة نهائياً."
         pending={remove.isPending}
         onConfirm={() => deleting && remove.mutate(deleting.id)}
+      />
+      <ConfirmDelete
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        title={`حذف ${selected.size} صف؟`}
+        description="سيتم حذف جميع الصفوف المحددة نهائياً."
+        pending={removeMany.isPending}
+        onConfirm={() => removeMany.mutate([...selected])}
       />
     </main>
   );

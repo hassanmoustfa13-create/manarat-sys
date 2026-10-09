@@ -14,16 +14,34 @@ export interface ColumnSetting {
   label?: string | undefined;
   /** لون خلفية مستقل للعمود (hex) — يُطبَّق على جميع المستخدمين */
   color?: string | undefined;
+  /** لون نص خلايا العمود */
+  textColor?: string | undefined;
+  /** خط عريض لخلايا العمود */
+  bold?: boolean | undefined;
 }
 
 export interface GridSettings {
   fontSize?: "sm" | "md" | "lg" | undefined;
   density?: "compact" | "normal" | "comfortable" | undefined;
+  /** حجم خط الخلايا بالبكسل (يتجاوز fontSize) */
+  fontPx?: number | null | undefined;
+  /** حجم خط رؤوس الأعمدة بالبكسل */
+  headerFontPx?: number | null | undefined;
+  fontWeight?: "normal" | "bold" | undefined;
+  headerWeight?: "normal" | "bold" | undefined;
+  fontFamily?: string | undefined;
+  /** ألوان الجدول */
+  headerBg?: string | undefined;
+  headerText?: string | undefined;
+  textColor?: string | undefined;
+  lineColor?: string | undefined;
   columns?: ColumnSetting[] | undefined;
   /** Admin-only: edit dropdown columns directly in the table. */
   inlineSelectEdit?: boolean | undefined;
-  /** شرط ظهور زر الأرشفة: يظهر الزر فقط عندما تساوي قيمة العمود هذه القيمة. null = السلوك الافتراضي */
+  /** شرط ظهور زر الأرشفة (مفرد — قديم) */
   archiveCondition?: { column: string; value: string } | null | undefined;
+  /** شروط ظهور زر الأرشفة: يظهر الزر عند تحقق أي شرط منها (منطق OR). null/فارغ = السلوك الافتراضي */
+  archiveConditions?: { column: string; value: string }[] | null | undefined;
 }
 
 export const GRID_LABELS: Record<GridKey, string> = {

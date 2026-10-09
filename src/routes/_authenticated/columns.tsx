@@ -64,9 +64,21 @@ function ColumnsPage() {
     setDraft({
       fontSize: saved?.fontSize ?? "md",
       density: saved?.density ?? "normal",
+      fontPx: saved?.fontPx ?? null,
+      headerFontPx: saved?.headerFontPx ?? null,
+      fontWeight: saved?.fontWeight ?? "normal",
+      headerWeight: saved?.headerWeight ?? "bold",
+      fontFamily: saved?.fontFamily ?? "",
+      headerBg: saved?.headerBg,
+      headerText: saved?.headerText,
+      textColor: saved?.textColor,
+      lineColor: saved?.lineColor,
       columns: resolveColumns(key, saved, extraIds, optionalIds),
       inlineSelectEdit: saved?.inlineSelectEdit ?? false,
       archiveCondition: saved?.archiveCondition ?? null,
+      archiveConditions:
+        saved?.archiveConditions ??
+        (saved?.archiveCondition ? [saved.archiveCondition] : []),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [all, key, extraSig]);
@@ -244,6 +256,81 @@ function ColumnsPage() {
           </select>
         </label>
         <label className="flex items-center gap-2 text-sm">
+          حجم خط الخلايا (px)
+          <input type="number" min={9} max={32} placeholder="تلقائي" className={`${sel} w-20`} value={draft.fontPx ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, fontPx: e.target.value ? Number(e.target.value) : null }))} />
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          وزن خط الخلايا
+          <select className={sel} value={draft.fontWeight ?? "normal"} onChange={(e) => setDraft((d) => ({ ...d, fontWeight: e.target.value as "normal" | "bold" }))}>
+            <option value="normal">عادي</option>
+            <option value="bold">عريض Bold</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          حجم خط الرؤوس (px)
+          <input type="number" min={9} max={32} placeholder="تلقائي" className={`${sel} w-20`} value={draft.headerFontPx ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, headerFontPx: e.target.value ? Number(e.target.value) : null }))} />
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          وزن خط الرؤوس
+          <select className={sel} value={draft.headerWeight ?? "bold"} onChange={(e) => setDraft((d) => ({ ...d, headerWeight: e.target.value as "normal" | "bold" }))}>
+            <option value="bold">عريض Bold</option>
+            <option value="normal">عادي</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          نوع الخط
+          <select className={sel} value={draft.fontFamily ?? ""} onChange={(e) => setDraft((d) => ({ ...d, fontFamily: e.target.value }))}>
+            <option value="">افتراضي</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="Tahoma, sans-serif">Tahoma</option>
+            <option value="'Segoe UI', sans-serif">Segoe UI</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="Cairo, sans-serif">Cairo</option>
+          </select>
+        </label>
+        {([
+          ["headerBg", "خلفية الرؤوس", "#ffffff"],
+          ["headerText", "نص الرؤوس", "#000000"],
+          ["textColor", "نص الخلايا", "#000000"],
+          ["lineColor", "لون الخطوط", "#000000"],
+        ] as const).map(([k, label, def]) => (
+          <span key={k} className="flex items-center gap-1 text-sm">
+            {label}
+            <input type="color" aria-label={label} value={(draft[k] as string | undefined) ?? def}
+              onChange={(e) => setDraft((d) => ({ ...d, [k]: e.target.value }))}
+              className="h-8 w-8 cursor-pointer rounded-md border border-black/10 bg-transparent p-0.5" />
+            {draft[k] && (
+              <button aria-label="إزالة" onClick={() => setDraft((d) => ({ ...d, [k]: undefined }))} className="rounded p-0.5 text-ink/50 hover:bg-black/5">✕</button>
+            )}
+          </span>
+        ))}
+        <button
+          type="button"
+          className="rounded-md bg-brand px-3 py-1.5 text-sm font-semibold text-primary-foreground"
+          onClick={() =>
+            setDraft((d) => ({
+              ...d,
+              fontPx: 15, headerFontPx: 15, fontWeight: "bold", headerWeight: "bold", fontFamily: "Arial, sans-serif",
+              headerBg: "#ffffff", headerText: "#000000", textColor: "#000000", lineColor: "#000000",
+              columns: d.columns?.map((c) => {
+                const id = c.id.toLowerCase();
+                const color = /remain|balance/.test(id) ? "#bfbfbf"
+                  : /deposit|arbo|down/.test(id) ? "#fff2cc"
+                  : /payment/.test(id) ? "#e2efda"
+                  : /date/.test(id) ? "#bdd7ee"
+                  : /note/.test(id) ? "#c6e0b4"
+                  : /visa/.test(id) ? "#f8cbad"
+                  : "#ffffff";
+                return { ...c, color, bold: true };
+              }),
+            }))
+          }
+        >
+          تطبيق نمط جوجل شيت
+        </button>
+        <label className="flex items-center gap-2 text-sm">
           ارتفاع الصفوف
           <select
             className={sel}
@@ -266,44 +353,71 @@ function ColumnsPage() {
       </div>
 
       {key === "manual_transfers" && (
-        <div className="glass flex flex-wrap items-center gap-3 rounded-xl p-4 text-sm">
-          <span className="font-semibold">زر الأرشفة يظهر عندما:</span>
-          <select
-            className={sel}
-            value={draft.archiveCondition?.column ?? ""}
-            onChange={(e) =>
-              setDraft((d) => ({
-                ...d,
-                archiveCondition: e.target.value
-                  ? { column: e.target.value, value: d.archiveCondition?.value ?? "" }
-                  : null,
-              }))
-            }
-          >
-            <option value="">الافتراضي (مرحلة النقل = تم النقل)</option>
-            {cols.map((c) => (
-              <option key={c.id} value={c.id}>{labels[c.id] ?? c.id}</option>
-            ))}
-          </select>
-          {draft.archiveCondition?.column && (
-            <>
+        <div className="glass rounded-xl p-4 text-sm">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-semibold">زر الأرشفة يظهر عند تحقق أي شرط مما يلي:</span>
+            <button
+              onClick={() =>
+                setDraft((d) => ({
+                  ...d,
+                  archiveConditions: [...(d.archiveConditions ?? []), { column: "", value: "" }],
+                }))
+              }
+              className="rounded-lg bg-brand/12 px-3 py-1.5 text-[13px] font-medium text-brand ring-1 ring-brand/20"
+            >
+              + إضافة شرط
+            </button>
+          </div>
+          {(draft.archiveConditions ?? []).length === 0 && (
+            <div className="mt-2 text-muted-foreground">
+              لا شروط — يظهر الزر بالسلوك الافتراضي (مرحلة النقل = تم النقل)
+            </div>
+          )}
+          {(draft.archiveConditions ?? []).map((cond, i) => (
+            <div key={i} className="mt-2 flex flex-wrap items-center gap-2">
+              <select
+                className={sel}
+                value={cond.column}
+                onChange={(e) =>
+                  setDraft((d) => {
+                    const list = [...(d.archiveConditions ?? [])];
+                    list[i] = { ...list[i]!, column: e.target.value };
+                    return { ...d, archiveConditions: list, archiveCondition: null };
+                  })
+                }
+              >
+                <option value="">اختر العمود…</option>
+                {cols.map((c) => (
+                  <option key={c.id} value={c.id}>{labels[c.id] ?? c.id}</option>
+                ))}
+              </select>
               <span>تساوي</span>
               <input
                 className={`${sel} min-w-40`}
                 placeholder="اكتب القيمة المطلوبة…"
-                value={draft.archiveCondition.value}
+                value={cond.value}
                 onChange={(e) =>
-                  setDraft((d) => ({
-                    ...d,
-                    archiveCondition: d.archiveCondition
-                      ? { ...d.archiveCondition, value: e.target.value }
-                      : null,
-                  }))
+                  setDraft((d) => {
+                    const list = [...(d.archiveConditions ?? [])];
+                    list[i] = { ...list[i]!, value: e.target.value };
+                    return { ...d, archiveConditions: list, archiveCondition: null };
+                  })
                 }
               />
-            </>
-          )}
-          <span className="text-xs text-muted-foreground">ثم اضغط «حفظ الإعدادات»</span>
+              <button
+                onClick={() =>
+                  setDraft((d) => ({
+                    ...d,
+                    archiveConditions: (d.archiveConditions ?? []).filter((_, j) => j !== i),
+                  }))
+                }
+                className="text-[12px] text-red-600 underline hover:text-red-700"
+              >
+                حذف
+              </button>
+            </div>
+          ))}
+          <div className="mt-2 text-xs text-muted-foreground">ثم اضغط «حفظ الإعدادات»</div>
         </div>
       )}
 
@@ -412,6 +526,22 @@ function ColumnsPage() {
                 onChange={(e) => update(i, { color: e.target.value })}
                 className="h-8 w-8 cursor-pointer rounded-md border border-black/10 bg-transparent p-0.5"
               />
+              <input
+                type="color"
+                aria-label="لون نص العمود"
+                title="لون نص العمود"
+                value={c.textColor ?? "#000000"}
+                onChange={(e) => update(i, { textColor: e.target.value })}
+                className="h-8 w-8 cursor-pointer rounded-md border border-black/10 bg-transparent p-0.5"
+              />
+              <button
+                type="button"
+                title="خط عريض"
+                onClick={() => update(i, { bold: !c.bold })}
+                className={`h-8 w-8 rounded-md font-black ring-1 ring-black/10 ${c.bold ? "bg-brand text-primary-foreground" : "bg-white/70"}`}
+              >
+                B
+              </button>
               {c.color && (
                 <button
                   aria-label="إزالة اللون"

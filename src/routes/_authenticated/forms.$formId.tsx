@@ -14,6 +14,7 @@ import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { FormPreview } from "@/components/DynamicForm";
 import { errorMessage } from "@/lib/data";
 import {
+  type DetailStyle,
   BEHAVIORS,
   FIELD_TYPES,
   OPTION_TYPES,
@@ -117,6 +118,7 @@ function FormEditor() {
       </Link>
       <FormSettingsCard form={form} onSaved={refresh} />
       {form.form_key === "transfer_details" && <DetailLayoutCard form={form} onSaved={refresh} />}
+      {form.form_key === "transfer_details" && <DetailStyleCard form={form} onSaved={refresh} />}
 
       <div className="mb-3 mt-5 flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-semibold">الحقول ({fields.length})</h2>
@@ -257,11 +259,13 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
   const available = detailBlockOrder(form);
   const active = form.form_fields.filter((f) => f.is_active);
   const initAssign = () => Object.fromEntries(active.map((f) => [f.id, f.section || DEFAULT_SECTION])) as Record<string, string>;
+  const initGroups = () => Object.fromEntries(active.map((f) => [f.id, f.settings?.group ?? ""])) as Record<string, string>;
   const [order, setOrder] = useState(available);
   const [assign, setAssign] = useState(initAssign);
+  const [groups, setGroups] = useState(initGroups);
   const [names, setNames] = useState<Record<string, string>>({});
   const [newSection, setNewSection] = useState("");
-  useEffect(() => { setOrder(available); setAssign(initAssign()); setNames({}); }, [form]);
+  useEffect(() => { setOrder(available); setAssign(initAssign()); setGroups(initGroups()); setNames({}); }, [form]);
 
   const sectionsInOrder = order.filter((k) => k.startsWith("section:")).map((k) => k.slice(8));
   const fieldsOf = (sec: string) =>
@@ -275,8 +279,11 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
       for (const sec of sectionsInOrder) {
         for (const f of fieldsOf(sec)) {
           const target = finalName(sec);
-          if (target !== (f.section || DEFAULT_SECTION) || sort !== f.sort_order) {
-            const { error } = await supabase.from("form_fields").update({ section: target, sort_order: sort }).eq("id", f.id);
+          const group = (groups[f.id] ?? f.settings?.group ?? "").trim();
+          const groupChanged = group !== (f.settings?.group ?? "").trim();
+          if (target !== (f.section || DEFAULT_SECTION) || sort !== f.sort_order || groupChanged) {
+            const patch = { section: target, sort_order: sort, ...(groupChanged ? { settings: { ...f.settings, group } } : {}) } as never;
+            const { error } = await supabase.from("form_fields").update(patch).eq("id", f.id);
             if (error) throw error;
           }
           sort += 10;
@@ -328,7 +335,7 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
         <h2 className="font-semibold">أجزاء نافذة التفاصيل</h2>
         <Button onClick={() => save.mutate()} disabled={save.isPending}>حفظ الأجزاء والترتيب</Button>
       </div>
-      <p className="text-[12px] text-ink/50">غيّر اسم أي جزء، واختر لكل حقل الجزء الذي يظهر فيه، ورتّب الأجزاء بالأسهم.</p>
+      <p className="text-[12px] text-ink/50">غيّر اسم أي جزء، واختر لكل حقل الجزء الذي يظهر فيه، ورتّب الأجزاء بالأسهم. اكتب «عنوان فرعي» لحقل لتظهر حقول الجزء مقسّمة بعناوين وفواصل.</p>
       <div className="space-y-2">
         {order.map((key, i) => {
           const isSection = key.startsWith("section:");
@@ -356,6 +363,14 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
                       <div className="flex shrink-0 items-center gap-1">
                         <IBtn title="أعلى" disabled={fi === 0} onClick={() => void moveField(sec, f.id, -1)}><ArrowUp className="size-3.5" /></IBtn>
                         <IBtn title="أسفل" disabled={fi === fields.length - 1} onClick={() => void moveField(sec, f.id, 1)}><ArrowDown className="size-3.5" /></IBtn>
+                        <input
+                          className="h-7 w-28 rounded border border-input bg-transparent px-1 text-xs"
+                          value={groups[f.id] ?? f.settings?.group ?? ""}
+                          onChange={(e) => setGroups({ ...groups, [f.id]: e.target.value })}
+                          placeholder="عنوان فرعي"
+                          aria-label={`عنوان فرعي لـ ${f.label}`}
+                        />
+                        <button type="button" className={`h-7 rounded border px-1.5 text-xs ${f.settings?.span === "full" ? "border-primary bg-primary/10" : "border-input"}`} title="عرض الحقل بسطر كامل" onClick={() => void supabase.from("form_fields").update({ settings: { ...f.settings, span: f.settings?.span === "full" ? undefined : "full" } } as never).eq("id", f.id).then(({ error }) => error ? toast.error(errorMessage(error)) : onSaved())}>{f.settings?.span === "full" ? "سطر كامل" : "عادي"}</button>
                         <select className="h-7 rounded border border-input bg-transparent px-1 text-xs" value={sec} onChange={(e) => setAssign({ ...assign, [f.id]: e.target.value })} aria-label={`جزء ${f.label}`}>
                           {sectionsInOrder.map((s) => <option key={s} value={s}>{names[s]?.trim() || s}</option>)}
                         </select>
@@ -372,6 +387,72 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
         <Input className="h-9 max-w-xs" value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="اسم جزء جديد" />
         <Button variant="outline" onClick={addSection} className="gap-1.5"><Plus className="size-4" /> إضافة جزء</Button>
       </div>
+    </section>
+  );
+}
+
+function DetailStyleCard({ form, onSaved }: { form: FormDef; onSaved: () => void }) {
+  const [st, setSt] = useState<DetailStyle>(form.settings.detailStyle ?? {});
+  useEffect(() => setSt(form.settings.detailStyle ?? {}), [form]);
+  const save = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("forms").update({ settings: { ...form.settings, detailStyle: st } as never }).eq("id", form.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("تم حفظ شكل نافذة التفاصيل"); onSaved(); },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  const num = (k: keyof DetailStyle, label: string, min: number, max: number) => (
+    <label className="flex items-center justify-between gap-2 text-sm">{label}
+      <input type="number" min={min} max={max} className="h-8 w-20 rounded border border-input bg-transparent px-1" value={(st[k] as number | undefined) ?? ""} placeholder="تلقائي"
+        onChange={(e) => setSt({ ...st, [k]: e.target.value === "" ? undefined : Number(e.target.value) })} />
+    </label>
+  );
+  const color = (k: keyof DetailStyle, label: string) => (
+    <label className="flex items-center justify-between gap-2 text-sm">{label}
+      <span className="flex items-center gap-1">
+        <input type="color" className="h-8 w-10" value={(st[k] as string | undefined) ?? "#ffffff"} onChange={(e) => setSt({ ...st, [k]: e.target.value })} />
+        <button type="button" className="text-xs text-ink/50" onClick={() => setSt({ ...st, [k]: undefined })}>افتراضي</button>
+      </span>
+    </label>
+  );
+  const bold = (k: "labelBold" | "valueBold", label: string) => (
+    <label className="flex items-center justify-between gap-2 text-sm">{label}
+      <select className="h-8 rounded border border-input bg-transparent px-1" value={st[k] === undefined ? "" : st[k] ? "b" : "n"} onChange={(e) => setSt({ ...st, [k]: e.target.value === "" ? undefined : e.target.value === "b" })}>
+        <option value="">افتراضي</option><option value="b">Bold</option><option value="n">Normal</option>
+      </select>
+    </label>
+  );
+  return (
+    <section className="mt-4 space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-semibold">شكل نافذة التفاصيل</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setSt({})}>استعادة الافتراضي</Button>
+          <Button onClick={() => save.mutate()} disabled={save.isPending}>حفظ الشكل</Button>
+        </div>
+      </div>
+      <div className="grid gap-3 rounded-lg border border-border p-3 sm:grid-cols-2 lg:grid-cols-3">
+        {num("cols", "عدد أعمدة الأجزاء (1-3)", 1, 3)}
+        {num("fieldCols", "عدد أعمدة الحقول داخل الجزء (1-3)", 1, 3)}
+        {num("gap", "المسافة بين الأجزاء (px)", 0, 48)}
+        {num("padding", "الحشو داخل الجزء (px)", 0, 48)}
+        {num("fontPx", "حجم خط الحقول (px)", 9, 24)}
+        {num("titleSize", "حجم عنوان الجزء (px)", 9, 28)}
+        {bold("labelBold", "خط اسم الحقل")}
+        {bold("valueBold", "خط قيمة الحقل")}
+        <label className="flex items-center justify-between gap-2 text-sm">نوع الخط
+          <select className="h-8 rounded border border-input bg-transparent px-1" value={st.fontFamily ?? ""} onChange={(e) => setSt({ ...st, fontFamily: e.target.value || undefined })}>
+            <option value="">افتراضي</option><option value="Arial, sans-serif">Arial</option><option value="Tahoma, sans-serif">Tahoma</option><option value="'Segoe UI', sans-serif">Segoe UI</option><option value="'Times New Roman', serif">Times New Roman</option><option value="'Courier New', monospace">Courier New</option>
+          </select>
+        </label>
+        {color("sectionBg", "خلفية الجزء")}
+        {color("titleColor", "لون عنوان الجزء")}
+        {color("labelColor", "لون اسم الحقل")}
+        {color("valueColor", "لون قيمة الحقل")}
+        {color("lineColor", "لون الخطوط الفاصلة")}
+      </div>
+      <p className="text-[12px] text-ink/50">لعرض حقل بسطر كامل اضغط زر «عادي/سطر كامل» بجانبه في «أجزاء نافذة التفاصيل».</p>
     </section>
   );
 }

@@ -91,6 +91,8 @@ function FlightsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Flight | null>(null);
   const [deleting, setDeleting] = useState<Flight | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const rows = useMemo(
     () =>
@@ -111,6 +113,20 @@ function FlightsPage() {
       qc.invalidateQueries({ queryKey: ["flights"] });
       toast.success("تم حذف الرحلة");
       setDeleting(null);
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+
+  const removeMany = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from("flights").delete().in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: (_d, ids) => {
+      qc.invalidateQueries({ queryKey: ["flights"] });
+      toast.success(`تم حذف ${ids.length} من الرحلات`);
+      setSelected(new Set());
+      setBulkOpen(false);
     },
     onError: (e) => toast.error(errorMessage(e)),
   });
@@ -215,6 +231,17 @@ function FlightsPage() {
           </>
         }
       />
+      {canDel && selected.size > 0 && (
+        <div className="mb-2 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm">
+          <span className="font-semibold">تم تحديد {selected.size} صف</span>
+          <Button size="sm" variant="destructive" onClick={() => setBulkOpen(true)}>
+            <Trash2 className="size-4" /> حذف المحدد
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
+            إلغاء التحديد
+          </Button>
+        </div>
+      )}
       {isLoading ? (
         <div className="glass h-64 animate-pulse rounded-2xl" />
       ) : (
@@ -224,6 +251,8 @@ function FlightsPage() {
           search={search}
           gridKey="flights"
           sortable
+          selectedIds={canDel ? selected : undefined}
+          onSelectionChange={canDel ? setSelected : undefined}
           emptyMessage="لا توجد رحلات بعد"
           rowActions={(r) => (
             <>
@@ -261,6 +290,14 @@ function FlightsPage() {
         description="سيتم حذف الرحلة نهائياً."
         pending={remove.isPending}
         onConfirm={() => deleting && remove.mutate(deleting.id)}
+      />
+      <ConfirmDelete
+        open={bulkOpen}
+        onOpenChange={setBulkOpen}
+        title={`حذف ${selected.size} صف؟`}
+        description="سيتم حذف جميع الصفوف المحددة نهائياً."
+        pending={removeMany.isPending}
+        onConfirm={() => removeMany.mutate([...selected])}
       />
     </main>
   );

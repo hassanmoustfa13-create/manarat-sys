@@ -264,16 +264,22 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
   useEffect(() => { setOrder(available); setAssign(initAssign()); setNames({}); }, [form]);
 
   const sectionsInOrder = order.filter((k) => k.startsWith("section:")).map((k) => k.slice(8));
+  const fieldsOf = (sec: string) =>
+    active.filter((f) => (assign[f.id] ?? DEFAULT_SECTION) === sec).sort((a, b) => a.sort_order - b.sort_order);
   const save = useMutation({
     mutationFn: async () => {
       const finalName = (s: string) => (names[s]?.trim() || s);
       const finalNames = sectionsInOrder.map(finalName);
       if (new Set(finalNames).size !== finalNames.length) throw new Error("يوجد جزآن بنفس الاسم");
-      for (const f of active) {
-        const target = finalName(assign[f.id] ?? DEFAULT_SECTION);
-        if (target !== (f.section || DEFAULT_SECTION)) {
-          const { error } = await supabase.from("form_fields").update({ section: target }).eq("id", f.id);
-          if (error) throw error;
+      let sort = 10;
+      for (const sec of sectionsInOrder) {
+        for (const f of fieldsOf(sec)) {
+          const target = finalName(sec);
+          if (target !== (f.section || DEFAULT_SECTION) || sort !== f.sort_order) {
+            const { error } = await supabase.from("form_fields").update({ section: target, sort_order: sort }).eq("id", f.id);
+            if (error) throw error;
+          }
+          sort += 10;
         }
       }
       const used = new Set(active.map((f) => finalName(assign[f.id] ?? DEFAULT_SECTION)));
@@ -294,6 +300,17 @@ function DetailLayoutCard({ form, onSaved }: { form: FormDef; onSaved: () => voi
     next[index + direction] = current;
     next[index] = other;
     setOrder(next);
+  };
+  const moveField = async (sec: string, fieldId: string, direction: -1 | 1) => {
+    const fields = fieldsOf(sec);
+    const i = fields.findIndex((f) => f.id === fieldId);
+    const other = fields[i + direction];
+    if (i < 0 || !other) return;
+    const a = fields[i];
+    const { error: e1 } = await supabase.from("form_fields").update({ sort_order: other.sort_order }).eq("id", a.id);
+    const { error: e2 } = await supabase.from("form_fields").update({ sort_order: a.sort_order }).eq("id", other.id);
+    if (e1 || e2) return void toast.error(errorMessage(e1 ?? e2));
+    onSaved();
   };
   const addSection = () => {
     const n = newSection.trim();

@@ -14,6 +14,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DynamicFormDialog } from "@/components/DynamicForm";
 import { activeFields, detailBlockOrder, detailSectionKey, DETAIL_ACTION, DETAIL_AUDIT, DETAIL_HISTORY, formsQuery, type FormDef, type FormField } from "@/lib/forms";
+import { gridSettingsQuery } from "@/lib/gridSettings";
 import { IconBtn } from "@/routes/_authenticated/workers";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -99,6 +100,17 @@ export function ManualTransfersView({ category }: { category: Category }) {
   const canAdd = auth.can(permRes, "add");
   const canEdit = auth.can(permRes, "edit");
   const canDel = auth.can(permRes, "delete");
+  const { data: gridSettings } = useQuery(gridSettingsQuery);
+  const archiveCond = gridSettings?.manual_transfers?.archiveCondition;
+  // زر الأرشفة يظهر فقط عند تحقق الشرط المحدد في إعدادات الجداول؛ الافتراضي: مرحلة النقل = «تم النقل»
+  const canArchiveRow = (t: MT) => {
+    if (!archiveCond?.column) return t.transfer_stage === "تم النقل";
+    const col = archiveCond.column;
+    const raw = col.startsWith("extra_")
+      ? (t.extra as Record<string, unknown> | null)?.[col.slice(6)]
+      : (t as unknown as Record<string, unknown>)[col];
+    return String(raw ?? "") === archiveCond.value;
+  };
   const canImport = auth.can(permRes, "import");
   const qc = useQueryClient();
   const { data: all = [], isLoading } = useQuery(manualTransfersQuery);
@@ -300,7 +312,7 @@ export function ManualTransfersView({ category }: { category: Category }) {
               {canEdit && (<IconBtn title="تعديل" onClick={() => { setEditing(t); setFormOpen(true); }}>
                 <Pencil className="size-3.5" />
               </IconBtn>)}
-              {canEdit && t.transfer_stage === "تم النقل" && (
+              {canEdit && canArchiveRow(t) && (
                 <IconBtn title="أرشفة العملية" onClick={() => setArchiving(t)}>
                   <Archive className="size-3.5" />
                 </IconBtn>
